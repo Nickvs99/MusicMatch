@@ -1,0 +1,52 @@
+{% extends "Base/layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block body %}
+
+    <h1>Register here</h1>
+
+    <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group row">
+            <label for="inputEmail" class="col-4 col-sm-3 col-md-2 col-form-label">Username </label>
+            <div class="col">
+                <input name="username" class="form-control-plaintext" type="text" placeholder="username" id="inputUsername"/>
+                <small id="emailHelp" class="form-text text-muted">Use your spotify username for optimal behaviour.</small>
+
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputPassword" class="col-4 col-sm-3 col-md-2 col-form-label">Password </label>
+            <div class="col">
+                <input name="password" class="form-control-plaintext" type="password" placeholder="password" id=inputPassword/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputFirstName" class="col-4 col-sm-3 col-md-2 col-form-label">First name</label>
+            <div class="col">
+                <input name="firstname" class="form-control-plaintext" type="text" placeholder="firstname" id="inputFirstName"/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputLastName" class="col-4 col-sm-3 col-md-2 col-form-label">Last name </label>
+            <div class="col">
+                <input name="lastname" class="form-control-plaintext" type="text" placeholder="lastname" id="inputLastName"/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputEmail" class="col-4 col-sm-3 col-md-2 col-form-label">Email </label>
+            <div class="col">
+                <input name="email" class="form-control-plaintext" type="text" placeholder="email" id="inputEmail"/>
+            </div>
+        </div>
+
+        <input type="submit" value="Register" class="btn btn-primary mb-2"/>
+    </form>
+{% endblock %}

@@ -1,0 +1,32 @@
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapseContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button> 
+
+    <div class="collapse navbar-collapse" id="navbarCollapseContent">
+        <ul class="navbar-nav">
+            <a class="navbar-brand" href="{% url 'index' %}">Home</a>
+            <a class="navbar-brand" href="{% url 'stats' request.user %}">Stats</a> 
+            <a class="navbar-brand" href="{% url 'compare' 'None' 'None' %}">Compare</a>  
+        </ul>
+    </div>
+   
+    <div class="ml-auto">
+        {% if request.user.is_authenticated %}
+            {{ request.user.username }}
+            <a href="{% url 'logout' %}">
+                <button class="btn btn-outline-secondary" type="button">Sign out</button>
+            </a>
+
+        {% else %}
+            <a href="{% url 'login' %}">
+                <button class="btn btn-outline-primary" type="button">Login</button>
+            </a>
+            
+            <a  href="{% url 'register' %}">
+                <button class="btn btn-outline-secondary" type="button">Register</button>
+            </a>
+        {% endif %}
+    </div>
+</nav>

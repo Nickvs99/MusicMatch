@@ -1,0 +1,17 @@
+$main-margin-side:15%;
+
+.main {
+    margin-left: $main-margin-side;
+    margin-right: $main-margin-side;
+    margin-top: 15px;
+}
+
+@media only screen and (max-width: 576px) {
+    .main {
+      margin-left:10px;
+      margin-right:10px;
+    }
+    .row {
+      margin-left:0px;
+    }
+  }
