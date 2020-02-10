@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    horizontalBarChart('artistChart', artists, user1_artist_count, user2_artist_count, "Most in common artists");
-    horizontalBarChart('genreChart', genres, user1_genre_count, user2_genre_count, "Most in common genres"); 
+    if(typeof artists !== "undefined"){
+        horizontalBarChart('artistChart', artists, user1_artist_count, user2_artist_count, "Most in common artists");
+        horizontalBarChart('genreChart', genres, user1_genre_count, user2_genre_count, "Most in common genres"); 
+    }
 
 });
 
