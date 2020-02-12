@@ -1,12 +1,96 @@
 document.addEventListener('DOMContentLoaded', () => {
+    
+    document.getElementById("submitUsername").onclick = () => {
+
+        clearMessages();
+        clearCharts();
+
+        let inputUsernameElement = document.getElementById("inputUsername");
+        let username = inputUsernameElement.value
+
+        updateTitle("Loading stats for " + username);
+
+        // Fetch the stats for username
+        fetch("../ajax/stats", {
+            method: "post",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            mode: "same-origin",
+            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+            body: JSON.stringify({
+                "username": username
+            })        
+        })
+        // Parse data to json
+        .then((response) => {
+            return response.json();
+        })
+        .then((responseJson) => {
+
+            if(!responseJson["usernameValid"]){
+                createMessage("danger", username +" is not found in the database");  
+                updateTitle("Stats");
+                return
+            }
+            artistCount = responseJson["artist_count"];
+            genreCount = responseJson["genre_count"]
+            updateTitle("Stats for " + username)
+
+            drawCharts(artistCount, genreCount);
+        })
+    }
+});
+
+// Update the title 
+function updateTitle(title){
+    document.getElementById("title").innerText = title;
+}
+
+// Clears all messages
+function clearMessages(){
+    let messages = document.getElementById("messages");
+    while(messages.firstChild){
+        messages.firstChild.remove();
+    }
+}
+
+// Clears the charts. This is done by removing the old element and then creating 
+// a new element with the same attributes.
+// TODO seach for a cleaner solution. 
+function clearCharts(){
+
+    // Should be in opposite order of how you want the charts displayed
+    let chartIDs = ["genreChart", "artistChart"];
+
+    for(let i in chartIDs){
+
+        let id = chartIDs[i];
+        let element = document.getElementById(id);
+        let cloneElement = element.cloneNode(false);
+
+        // Set  the elements after the title
+        let titleElement = document.getElementById("title");
+        titleElement.parentNode.insertBefore(cloneElement, titleElement.nextSibling);
+
+        
+        element.remove();
+
+    }
+
+}
+
+// Draws the chart with the given data
+function drawCharts(artistCount, genreCount){
     var ctx = document.getElementById('artistChart').getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: Object.keys(artist_count),
+            labels: Object.keys(artistCount),
             datasets: [{
                 label: "Count",
-                data: Object.values(artist_count),
+                data: Object.values(artistCount),
                 backgroundColor: colors,
                 borderColor: borderColors,
                 borderWidth: 1 
@@ -34,25 +118,49 @@ document.addEventListener('DOMContentLoaded', () => {
         type: 'pie',
         data: {
             datasets: [{
-                data: Object.values(genre_count),
-                backgroundColor: createPieColors(Object.keys(genre_count).length, colors),
+                data: Object.values(genreCount),
+                backgroundColor: createPieColors(Object.keys(genreCount).length, colors),
                 borderColor: 'rgba(255,255,255,255)',
                 borderWidth:1,
             }],
         
             // These labels appear in the legend and in the tooltips when hovering different arcs
-            labels: Object.keys(genre_count)
+            labels: Object.keys(genreCount)
         },
         options: {
             title: {
                 display: true,
                 text: "Most popular genres"
             },
-
         }
     });
-})
+}
 
+// Create a information message to the user
+function createMessage(context, message){
+
+    // Get parent object of new messageElement
+    let messagesElement = document.getElementById("messages");
+
+    let messageElement = document.createElement("div");
+
+    // Bootstraps contextual classes 
+    let bootstrapContexts = ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"];
+    
+    if(bootstrapContexts.includes(context)){
+        messageElement.classList.add("alert", "alert-" + context);
+        messageElement.innerText = message;
+    }
+    else {
+        console.log(`ERROR: ${context} is an invalid context type. Choose from ${bootstrapContexts}`);
+        messageElement.classList.add("alert", "alert-danger");
+        messageElement.innerText = message;
+    }
+    messagesElement.appendChild(messageElement);
+
+}
+
+// Colors used for the charts
 var colors = [
     'rgba(255, 99, 132, 0.2)',
     'rgba(54, 162, 235, 0.2)',
@@ -66,6 +174,8 @@ var colors = [
     'rgba(0,0,128,0.2)',
 ]
 
+// BorderColors used for the charts
+// TODO link them to colors
 var borderColors = [
     'rgba(255, 99, 132, 1)',
     'rgba(54, 162, 235, 1)',
@@ -79,8 +189,8 @@ var borderColors = [
     'rgba(0,0,128,1)',
 ]
 
+// Creates the colors for the pie chart. This is done by looping over colorPalette.
 function createPieColors(n, colorPalette){
-    // Creates the colors for the pie chart. This is done by looping over colorPalette.
     
     pieColors = []
     for( let i = 0; i < n; i++){

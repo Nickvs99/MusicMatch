@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let usernameInputElement = document.getElementById("inputUsername");
         let username = usernameInputElement.value;
         console.log(username);
+        // TODO absolute path or relate from root or django template
         fetch("../ajax/validate_username", {
             method: "post",
             headers: {
@@ -36,6 +37,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 usernameInputElement.parentNode.insertBefore(newElement, usernameInputElement.nextSibling);
             }
         });
-};
-
+    };
 });

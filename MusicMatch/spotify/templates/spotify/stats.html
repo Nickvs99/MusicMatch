@@ -11,38 +11,23 @@
     <link rel="stylesheet" href="{% static 'spotify/css/styles.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
-    <script>
-        var artist_count = {{ artist_count | safe }};
-        var genre_count = {{ genre_count | safe }}
-    </script>
     <script src="{% static 'spotify/js/chart_stats.js' %}"></script>
 
 {% endblock %}
 
 {% block body %}
 
-    <form action="{% url 'stats_redirect' %}" method="post">
-        {% csrf_token %}
-
-        <div class="form-group row">
-            <div class="col-8 col-sm-10">
-                <input name="username" class="form-control-plaintext" type="text" placeholder="Search username..." id="inputSearch"/>
-            </div>
-            <input type="submit" value="Search" class="btn btn-primary col-3 col-sm-2"/>
-
+    <div class="form-group row">
+        <div class="col-8 col-sm-10">
+            <input name="username" class="form-control-plaintext" type="text" placeholder="Search username..." id="inputUsername"/>
         </div>
+        <div id="submitUsername" class="btn btn-primary col-3 col-sm-2"/>Search</div>
+    </div>
 
-    </form>
+    <h3 id="title">Stats</h3>
 
-    <h3>Stats for {{ username }}</h3>
+    <canvas class="chart" id="artistChart" width="400" height="400"></canvas>        
 
-
-    {% if artist_count %}
-        <canvas class="chart" id="artistChart" width="400" height="400"></canvas>        
-    {% endif %}
-
-    {% if genre_count %}
-        <canvas class="chart" id="genreChart" width="400" height="400"></canvas>
-    {% endif %}
+    <canvas class="chart" id="genreChart" width="400" height="400"></canvas>
 
 {% endblock %}

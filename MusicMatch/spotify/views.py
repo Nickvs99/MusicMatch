@@ -1,15 +1,25 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.http import JsonResponse
 
 from .func import *
 
-def stats(request, username):
-    """ Retrieves public information about the username's spotify account."""
+def stats(request):
+
+    return render(request, "spotify/stats.html")
+
+def get_stats(request):
+
+    username = json.loads(request.body).get('username', None)
 
     sp = get_sp()
 
     if not user_exists(request,sp, username):
-        return render(request, "spotify/stats.html")
+        data = {
+            "usernameValid": False
+        }
+        return JsonResponse(data)
+
 
     artists_count = get_artist_count(sp, username)
 
@@ -22,13 +32,16 @@ def stats(request, username):
     if artists_count == {}:
         messages.warning(request, f"No songs found for {username}. Make sure the playlists are set to public.")
     
-    context = {
-        "username": username,
+    data = {
+        "usernameValid": True,
         "artist_count": frequent_artists,
         "genre_count": frequent_genres,
     }
 
-    return render(request, "spotify/stats.html", context=context)
+
+
+    return JsonResponse(data)
+
 
 def compare(request, username1, username2):
     """ Compares the music taste between two users. """
@@ -109,24 +122,6 @@ def playlist(request, username1, username2):
     messages.success(request, "Succes! Check your spotify account for your newly created playlist!")
     
     return redirect("compare", username1, username2)
-
-def stats_redirect(request):
-    """ 
-        This view redirect to the stats page. It is triggered when a user does a 
-        POST request on stats.html. 
-    """
-
-    if request.method == "POST":
-        username = request.POST["username"]
-
-        if not username:
-            return redirect("stats", request.user)
-
-        return redirect("stats", username)
-
-    elif request.method == "GET":
-
-        return redirect("stats", request.user)
 
 def compare_redirect(request):
     """ 

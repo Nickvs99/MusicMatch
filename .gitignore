@@ -130,3 +130,6 @@ dmypy.json
 
 # local settings
 config.sh
+
+.vscode
+Other
