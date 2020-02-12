@@ -1,47 +1,47 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById("submitUsername").onclick = () => {
-
+        
         clearMessages();
         clearCharts();
-
+    
         let inputUsernameElement = document.getElementById("inputUsername");
         let username = inputUsernameElement.value
-
-        updateTitle("Loading stats for " + username);
-
-        // Fetch the stats for username
-        fetch("../ajax/stats", {
-            method: "post",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            mode: "same-origin",
-            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-            body: JSON.stringify({
-                "username": username
-            })        
-        })
-        // Parse data to json
-        .then((response) => {
-            return response.json();
-        })
-        .then((responseJson) => {
-
-            if(!responseJson["usernameValid"]){
-                createMessage("danger", username +" is not found in the database");  
-                updateTitle("Stats");
-                return
-            }
-            artistCount = responseJson["artist_count"];
-            genreCount = responseJson["genre_count"]
-            updateTitle("Stats for " + username)
-
-            drawCharts(artistCount, genreCount);
-        })
+        
+        UpdatePage(username);
     }
 });
+
+// Updates the stats page for a new username
+async function UpdatePage(username){
+
+    updateTitle("Loading stats for " + username);
+    let data = await fetch("../ajax/stats", {
+        method: "post",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        mode: "same-origin",
+        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+        body: JSON.stringify({
+            "username": username
+        })        
+    });
+
+    let dataJson = await data.json();
+
+    if(!dataJson["usernameValid"]){
+        createMessage("danger", username +" is not found in the database");  
+        updateTitle("Stats");
+        return
+    }
+    artistCount = dataJson["artist_count"];
+    genreCount = dataJson["genre_count"]
+    updateTitle("Stats for " + username)
+
+    drawCharts(artistCount, genreCount);
+}
 
 // Update the title 
 function updateTitle(title){

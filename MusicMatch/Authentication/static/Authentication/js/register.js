@@ -10,32 +10,37 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let usernameInputElement = document.getElementById("inputUsername");
         let username = usernameInputElement.value;
-        console.log(username);
-        // TODO absolute path or relate from root or django template
-        fetch("../ajax/validate_username", {
-            method: "post",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            mode: "same-origin",
-            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-            body: JSON.stringify({
-                "username": username
-            })
-        })
-        .then((respone) => {
-            return respone.json();
-        })
-        .then((responseJson) => {
-            console.log(responseJson);
-            if (responseJson["usernameTaken"]){
-            
-                let newElement = document.createElement("Small");
-                newElement.innerHTML = "This username already exists";
-                newElement.classList.add("inputUsernameError");
-                usernameInputElement.parentNode.insertBefore(newElement, usernameInputElement.nextSibling);
-            }
-        });
+
+        CheckUsername(username);
     };
 });
+
+// Check if username exists
+async function CheckUsername(username){
+
+    // TODO absolute path or relate from root or django template
+    let data = await fetch("../ajax/validate_username", {
+        method: "post",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        mode: "same-origin",
+        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+        body: JSON.stringify({
+            "username": username
+        })
+    })
+
+    let dataJson = await data.json();
+
+    if (dataJson["usernameTaken"]){
+            
+        let newElement = document.createElement("Small");
+        newElement.innerHTML = "This username already exists";
+        newElement.classList.add("inputUsernameError");
+
+        let usernameInputElement = document.getElementById("inputUsername");
+        usernameInputElement.parentNode.insertBefore(newElement, usernameInputElement.nextSibling);
+    }
+}
