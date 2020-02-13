@@ -103,14 +103,49 @@ def get_comparison(request):
 
     return JsonResponse(data)
 
-def playlist(request, username1, username2):
+def playlist(request):
     """ Creates a playlist for username with all the songs both users have in their playlist."""
 
-    user = User.objects.get(username=username1)
+    jsonLoad = json.loads(request.body)
+
+    username1 = jsonLoad["username1"]
+    username2 = jsonLoad["username2"]
+
+    data = {
+        "username1Valid": True,
+        "username2Valid": True,
+    }
+
+    sp = get_sp()
+
+    # Check if both usernames are valid
+    if not user_exists(request, sp, username1):
+
+        data["username1Valid"] = False
+    
+    if not user_exists(request, sp, username2):
+
+        data["username2Valid"] = False  
+
+    if not data["username1Valid"] or not data["username2Valid"]:
+
+        return JsonResponse(data)
+
+    # Check if user is logged in
+    if not request.user.is_authenticated:
+        data["error"] = "You have to be logged in to create a playlist."
+
+        return JsonResponse(data)
+
+    # If both valid get the authorised spotipy object
+    user = User.objects.get(username=request.user)
     user = UserProfile.objects.get(user=user)
 
     if not user.access_token:
-        return redirect("verify")
+        
+        data["error"] = "This profile does not contain an access_token."
+        return JsonResponse(data)
+
 
     sp = get_auth_sp(user)
 
@@ -123,7 +158,5 @@ def playlist(request, username1, username2):
             in_common_songs.append(song)
 
     create_playlist(sp, username1, username2, in_common_songs)
-
-    messages.success(request, "Succes! Check your spotify account for your newly created playlist!")
     
-    return redirect("compare", username1, username2)
+    return JsonResponse(data)

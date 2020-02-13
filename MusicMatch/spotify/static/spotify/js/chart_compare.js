@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         clearMessages();
         clearCharts();
-    
+        
+        // TODO create function for getting usernames
         let inputUsername1Element = document.getElementById("inputUsername1");
         let username1 = inputUsername1Element.value
 
@@ -12,6 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
         let username2 = inputUsername2Element.value
         
         UpdatePage(username1, username2);
+    }
+
+    document.getElementById("inputCreatePlaylist").onclick = () => {
+
+        clearMessages()
+
+        let inputUsername1Element = document.getElementById("inputUsername1");
+        let username1 = inputUsername1Element.value;
+
+        let inputUsername2Element = document.getElementById("inputUsername2");
+        let username2 = inputUsername2Element.value;
+
+        CreatePlaylist(username1, username2);
+
     }
 });
 
@@ -182,4 +197,60 @@ function horizontalBarChart(id, username1, username2, labels, data1, data2, titl
             responsive: true,
         }
     });
+}
+
+async function CreatePlaylist(username1, username2){
+
+    updateTitle("Creating playlist...")
+
+    let data = await fetch("../ajax/playlist", {
+        method: "post",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        mode: "same-origin",
+        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+        body: JSON.stringify({
+            "username1": username1,
+            "username2": username2
+        }) 
+    });
+
+    let dataJson = await data.json();
+
+    // TODO combine all possible errors in an array of errors.
+
+    // Check if the usernames were valid
+    let valid = true;
+    if(!dataJson["username1Valid"]){
+        createMessage("danger", username1 +" is not found in the database");  
+        valid = false;
+    }
+    if(!dataJson["username2Valid"]){
+        createMessage("danger", username2 +" is not found in the database");  
+        valid = false;
+    }
+
+    if(!valid){
+        updateTitle("Compare");
+        return
+    }
+
+    // Check if another error occured
+    if(dataJson["error"]){
+
+        createMessage("danger", dataJson["error"]);
+
+        // If the error message has something to say about a access_token
+        if (dataJson["error"].includes("access_token")){
+
+            window.location.href = "../verify";
+        }
+        return
+    }
+
+    createMessage("success", "Successfully created a playlist!")
+    updateTitle(`Comparison between ${username1} and ${username2}`);
+
 }
