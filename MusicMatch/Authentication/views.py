@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 
 from .models import UserProfile
 
@@ -101,6 +102,16 @@ def register(request):
         messages.success(request, "Successfully registered.")
 
         return redirect("login")
+
+def validate_username(request):
+
+    username = json.loads(request.body).get('username', None)
+
+    data = {
+        'usernameTaken': User.objects.filter(username=username).exists(),
+    }
+
+    return JsonResponse(data)
 
 def verify(request):
     """ 

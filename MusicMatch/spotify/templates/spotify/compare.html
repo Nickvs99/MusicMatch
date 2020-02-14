@@ -12,60 +12,29 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
-    <script>
-        var artists = {{ artists | safe }};
-        var user1_artist_count = {{ user1_artist_count | safe }};
-        var user2_artist_count = {{ user2_artist_count | safe }};
-
-        var genres = {{ genres | safe }};
-        var user1_genre_count = {{ user1_genre_count | safe }};
-        var user2_genre_count = {{ user2_genre_count | safe }};
-
-        var username1 = "{{ username1 | safe }}";
-        var username2 = "{{ username2 | safe }}";
-    </script>
     <script src="{% static 'spotify/js/chart_compare.js' %}"></script>
 {% endblock %}
 
 {% block body %}
 
-    <form action="{% url 'compare_redirect' %}" method="post">
-        {% csrf_token %}
+    <div class="form-group row">
 
-            <div class="form-group row">
-        
-                <div class="col-4 col-sm-5">
-                    <input name="username1" class="form-control-plaintext" type="text" placeholder="Search for user..." id="inputSearch"/>
-                </div>
-                <div class="col-4 col-sm-5">
-                    <input name="username2" class="form-control-plaintext" type="text" placeholder="Search for user..." id="inputSearch"/>
-                </div>
+        <input name="username1" id="inputUsername1" class="form-control-plaintext col-4 col-sm-5" type="text" placeholder="Search for user..."/>
 
-                <input type="submit" value="Search" class="btn btn-primary col-3 col-sm-2"/>
+        <input name="username2" id="inputUsername2" class="form-control-plaintext col-4 col-sm-5" type="text" placeholder="Search for user..."/>
 
-        </div>
-    </form>
-    
-    <div class="row">
-        {% if username1 and username2 %}
-            <h3>Stats for {{username1}} and {{username2}}</h3>
-        {% endif %}
-        {% if username1 == request.user.username %}
-            <form action="{% url 'playlist' username1 username2 %}" class="ml-auto">
-                {% csrf_token %}
-                <input type="submit" value="Create playlist" class="btn btn-primary mb-2>
-                <input name="username1" type="hidden" value="{{ username1 }}">
-                <input name="username2" type="hidden" value="{{ username2 }}">
-            </form>
-        {% endif %}
+        <div id="submitUsernames" class="btn btn-primary col-3 col-sm-2">Search</div>
+
     </div>
     
-    {% if artists %}
+    <div class="row">
+        <h3 id="title">Comparison</h3>
+        <div id="inputCreatePlaylist" class="btn btn-primary mb-2 ml-auto">Create Playlist</div>
+    </div>
+    
+    <div id = charts>
         <canvas class="chart" id="artistChart" width="400" height="400"></canvas>
-    {% endif %}
 
-    {% if genres %}
         <canvas class="chart" id="genreChart" width="400" height="400"></canvas>
-    {% endif %}
-
+    </div>
 {% endblock %}

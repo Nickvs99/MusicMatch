@@ -1,15 +1,25 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.http import JsonResponse
 
 from .func import *
 
-def stats(request, username):
-    """ Retrieves public information about the username's spotify account."""
+def stats(request):
+
+    return render(request, "spotify/stats.html")
+
+def get_stats(request):
+
+    username = json.loads(request.body).get('username', None)
 
     sp = get_sp()
 
     if not user_exists(request,sp, username):
-        return render(request, "spotify/stats.html")
+        data = {
+            "usernameValid": False
+        }
+        return JsonResponse(data)
+
 
     artists_count = get_artist_count(sp, username)
 
@@ -22,27 +32,45 @@ def stats(request, username):
     if artists_count == {}:
         messages.warning(request, f"No songs found for {username}. Make sure the playlists are set to public.")
     
-    context = {
-        "username": username,
+    data = {
+        "usernameValid": True,
         "artist_count": frequent_artists,
         "genre_count": frequent_genres,
     }
 
-    return render(request, "spotify/stats.html", context=context)
+    return JsonResponse(data)
 
-def compare(request, username1, username2):
-    """ Compares the music taste between two users. """
+def compare(request):
 
-    # Only show two search fields when both users are 'None'. This happens when navigated from the navbar.
-    if username1 == 'None' and username2 == 'None':
+    return render(request, "spotify/compare.html")
 
-        return render(request, "spotify/compare.html")
+def get_comparison(request):
+    """ Get the comparison between two usernames. """
+
+    jsonLoad = json.loads(request.body)
+
+    username1 = jsonLoad["username1"]
+    username2 = jsonLoad["username2"]
+
+    data = {
+        "username1Valid": True,
+        "username2Valid": True
+    }
 
     sp = get_sp()
 
-    if not user_exists(request, sp, username1) or not user_exists(request, sp, username2):
+    # Check if both usernames are valid
+    if not user_exists(request, sp, username1):
 
-        return render(request, "spotify/compare.html")
+        data["username1Valid"] = False
+    
+    if not user_exists(request, sp, username2):
+
+        data["username2Valid"] = False  
+
+    if not data["username1Valid"] or not data["username2Valid"]:
+
+        return JsonResponse(data)
 
     user1_artist_count = get_artist_count(sp, username1)
     user2_artist_count = get_artist_count(sp, username2)
@@ -64,35 +92,42 @@ def compare(request, username1, username2):
 
     genres, user1_genre_count, user2_genre_count = get_n_artists_and_count(10, sorted_in_common_genres)
 
-    # Add message when username1 and username2 have nothing in common
-    if len(artists) == 0:
-        messages.warning(request, f"{username1} and {username2} have no artists in common.")
-    
-    if len(genres) == 0:
-        messages.warning(request, f"{username1} and {username2} have no genres in common.")
-    
-    context = {
-        "artists": artists,
-        "user1_artist_count": user1_count,
-        "user2_artist_count": user2_count,
+    # Set data in dict 
+    data["artists"] = artists
+    data["user1_artist_count"] = user1_count
+    data["user2_artist_count"] = user2_count
 
-        "genres": genres,
-        "user1_genre_count": user1_genre_count,
-        "user2_genre_count": user2_genre_count,
+    data["genres"] = genres
+    data["user1_genre_count"] = user1_genre_count
+    data["user2_genre_count"] = user2_genre_count
 
-        "username1": username1,
-        "username2": username2,
-    }
-    return render(request, "spotify/compare.html", context)
+    return JsonResponse(data)
 
-def playlist(request, username1, username2):
+def playlist(request):
     """ Creates a playlist for username with all the songs both users have in their playlist."""
 
-    user = User.objects.get(username=username1)
+    jsonLoad = json.loads(request.body)
+
+    username1 = jsonLoad["username1"]
+    username2 = jsonLoad["username2"]
+
+    data = {}
+    
+    # Check if user is logged in
+    if not request.user.is_authenticated:
+        data["error"] = "You have to be logged in to create a playlist."
+
+        return JsonResponse(data)
+
+    # If both valid get the authorised spotipy object
+    user = User.objects.get(username=request.user)
     user = UserProfile.objects.get(user=user)
 
     if not user.access_token:
-        return redirect("verify")
+        
+        data["error"] = "This profile does not contain an access_token."
+        return JsonResponse(data)
+
 
     sp = get_auth_sp(user)
 
@@ -105,49 +140,30 @@ def playlist(request, username1, username2):
             in_common_songs.append(song)
 
     create_playlist(sp, username1, username2, in_common_songs)
-
-    messages.success(request, "Succes! Check your spotify account for your newly created playlist!")
     
-    return redirect("compare", username1, username2)
+    return JsonResponse(data)
 
-def stats_redirect(request):
-    """ 
-        This view redirect to the stats page. It is triggered when a user does a 
-        POST request on stats.html. 
-    """
+def validate_spotify_usernames(request):
 
-    if request.method == "POST":
-        username = request.POST["username"]
+    jsonLoad = json.loads(request.body)
 
-        if not username:
-            return redirect("stats", request.user)
+    usernames = jsonLoad["usernames"]
 
-        return redirect("stats", username)
+    sp = get_sp()
 
-    elif request.method == "GET":
+    data = {}
+    data["usernames"] = {}
 
-        return redirect("stats", request.user)
+    all_valid = True
+    for username in usernames:
+        if not user_exists(request, sp, username):
 
-def compare_redirect(request):
-    """ 
-        This view redirect to the compare page. It is triggered when a user does a 
-        POST request on compare.html. 
-    """
+            data["usernames"][username] = False
+            all_valid = False
 
-    if request.method == "POST":
+        else:
+            data["usernames"][username] = True
 
-        username1 = request.POST["username1"]
-        username2 = request.POST["username2"]
+    data["all_valid"] = all_valid
 
-        if not username1 or not username2:
-            messages.error(request, "Both fields are required.")
-            return redirect("compare", "None", "None")
-
-        return redirect("compare", username1, username2)
-
-    elif request.method == "GET":
-
-        messages.error(request, "Both field need to be filled in.")
-
-        return redirect("compare", "None", "None")
-    
+    return JsonResponse(data)

@@ -1,5 +1,7 @@
 {% extends "Base/layout.html" %}
 
+{% load static %}
+
 {% block title %}
     Register
 {% endblock %}
@@ -14,7 +16,7 @@
             <label for="inputEmail" class="col-4 col-sm-3 col-md-2 col-form-label">Username </label>
             <div class="col">
                 <input name="username" class="form-control-plaintext" type="text" placeholder="username" id="inputUsername"/>
-                <small id="emailHelp" class="form-text text-muted">Use your spotify username for optimal behaviour.</small>
+                <small class="form-text text-muted">Use your spotify username for optimal behaviour.</small>
 
             </div>
         </div>
@@ -49,4 +51,9 @@
 
         <input type="submit" value="Register" class="btn btn-primary mb-2"/>
     </form>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'Authentication/js/register.js' %}"></script>
+
 {% endblock %}

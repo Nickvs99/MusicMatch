@@ -279,7 +279,6 @@ def user_exists(request, sp, username):
 
         return True
     except:
-        messages.error(request, f"{username} does not exist.")
 
         return False
 

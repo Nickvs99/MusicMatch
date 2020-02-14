@@ -2,10 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("stats/<str:username>/", views.stats, name="stats"),
-    path("stats/", views.stats_redirect, name="stats_redirect"),
-    path("compare/<str:username1>/<str:username2>/", views.compare, name="compare"),
-    path("compare/", views.compare_redirect, name="compare_redirect"),
-    path("playlist/<str:username1>/<str:username2>/", views.playlist, name="playlist"),
-
+    path("stats/", views.stats, name="stats"),
+    path("compare/", views.compare, name="compare"),
+    path("ajax/playlist", views.playlist, name="playlist"),
+    path("ajax/stats", views.get_stats),
+    path("ajax/compare", views.get_comparison),
+    path("ajax/validate_spotify_usernames", views.validate_spotify_usernames),
 ]
