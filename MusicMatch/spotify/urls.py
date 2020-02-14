@@ -7,4 +7,5 @@ urlpatterns = [
     path("ajax/playlist", views.playlist, name="playlist"),
     path("ajax/stats", views.get_stats),
     path("ajax/compare", views.get_comparison),
+    path("ajax/validate_spotify_usernames", views.validate_spotify_usernames),
 ]

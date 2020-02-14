@@ -111,26 +111,8 @@ def playlist(request):
     username1 = jsonLoad["username1"]
     username2 = jsonLoad["username2"]
 
-    data = {
-        "username1Valid": True,
-        "username2Valid": True,
-    }
-
-    sp = get_sp()
-
-    # Check if both usernames are valid
-    if not user_exists(request, sp, username1):
-
-        data["username1Valid"] = False
+    data = {}
     
-    if not user_exists(request, sp, username2):
-
-        data["username2Valid"] = False  
-
-    if not data["username1Valid"] or not data["username2Valid"]:
-
-        return JsonResponse(data)
-
     # Check if user is logged in
     if not request.user.is_authenticated:
         data["error"] = "You have to be logged in to create a playlist."
@@ -159,4 +141,29 @@ def playlist(request):
 
     create_playlist(sp, username1, username2, in_common_songs)
     
+    return JsonResponse(data)
+
+def validate_spotify_usernames(request):
+
+    jsonLoad = json.loads(request.body)
+
+    usernames = jsonLoad["usernames"]
+
+    sp = get_sp()
+
+    data = {}
+    data["usernames"] = {}
+
+    all_valid = True
+    for username in usernames:
+        if not user_exists(request, sp, username):
+
+            data["usernames"][username] = False
+            all_valid = False
+
+        else:
+            data["usernames"][username] = True
+
+    data["all_valid"] = all_valid
+
     return JsonResponse(data)

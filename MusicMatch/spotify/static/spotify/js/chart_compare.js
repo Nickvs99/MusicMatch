@@ -12,9 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let inputUsername2Element = document.getElementById("inputUsername2");
         let username2 = inputUsername2Element.value
         
-        UpdatePage(username1, username2);
+        UpdatePage([username1, username2]);
     }
-
+        
     document.getElementById("inputCreatePlaylist").onclick = () => {
 
         clearMessages()
@@ -25,13 +25,29 @@ document.addEventListener('DOMContentLoaded', () => {
         let inputUsername2Element = document.getElementById("inputUsername2");
         let username2 = inputUsername2Element.value;
 
-        CreatePlaylist(username1, username2);
+        RunCreatePlaylist([username1, username2])
 
     }
 });
 
-// Updates the pages based on the two usernames
-async function UpdatePage(username1, username2){
+// Updated the page
+async function UpdatePage(usernames){
+
+    if(await validate_usernames(usernames)){
+        UpdateCharts(usernames[0], usernames[1]);   
+    }
+}
+
+// Run the creation of the playlist
+async function RunCreatePlaylist(usernames){
+    if(await validate_usernames(usernames)){
+
+        CreatePlaylist(usernames[0], usernames[1]);
+    }
+}
+
+// Updates the charts based on the two usernames
+async function UpdateCharts(username1, username2){
 
     updateTitle(`Loading comparison between ${username1} and ${username2}`);
 
@@ -53,22 +69,6 @@ async function UpdatePage(username1, username2){
     // Parse to json format
     let dataJson = await data.json();
 
-    // Check if the usernames were valid
-    let valid = true;
-    if(!dataJson["username1Valid"]){
-        createMessage("danger", username1 +" is not found in the database");  
-        valid = false;
-    }
-    if(!dataJson["username2Valid"]){
-        createMessage("danger", username2 +" is not found in the database");  
-        valid = false;
-    }
-
-    if(!valid){
-        updateTitle("Compare");
-        return
-    }
-
     let artists = dataJson["artists"];
     let user1ArtistCount = dataJson["user1_artist_count"];
     let user2ArtistCount = dataJson["user2_artist_count"];
@@ -84,6 +84,33 @@ async function UpdatePage(username1, username2){
     updateTitle(`Comparison between ${username1} and ${username2}`);
 }
 
+// Checks if all given usernames have a spotify account
+async function validate_usernames(usernames){
+
+    let data = await fetch("../ajax/validate_spotify_usernames", {
+        method: "post",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        mode: "same-origin",
+        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+        body: JSON.stringify({
+            "usernames": usernames
+        })  
+    });
+
+    let dataJson = await data.json();
+
+    for(let username in dataJson["usernames"]){
+
+        if(!dataJson["usernames"][username]){
+            createMessage("danger", username +" is not found in the database");  
+        }
+    }
+    
+    return dataJson["all_valid"]
+}
 // Update the title 
 function updateTitle(title){
     document.getElementById("title").innerText = title;
@@ -218,24 +245,6 @@ async function CreatePlaylist(username1, username2){
     });
 
     let dataJson = await data.json();
-
-    // TODO combine all possible errors in an array of errors.
-
-    // Check if the usernames were valid
-    let valid = true;
-    if(!dataJson["username1Valid"]){
-        createMessage("danger", username1 +" is not found in the database");  
-        valid = false;
-    }
-    if(!dataJson["username2Valid"]){
-        createMessage("danger", username2 +" is not found in the database");  
-        valid = false;
-    }
-
-    if(!valid){
-        updateTitle("Compare");
-        return
-    }
 
     // Check if another error occured
     if(dataJson["error"]){
