@@ -12,6 +12,7 @@ import spotipy.oauth2 as oauth2
 from .classes import Artist
 from .genres import popular_genres
 from Authentication.models import UserProfile
+from spotify.models import Artist, Song, Genre
 
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -336,3 +337,74 @@ def get_genre_ranking(user1_genre_count, user1_total_genres, user2_genre_count, 
 
     return get_sorted_in_common_artists(in_common_genres)
 
+def write_data_to_db(username):
+    """
+    Writes the songs, artists and genres from username
+    to the database.
+    """
+
+    sp = get_sp()
+
+    song_count = 0
+    # Get all playlists
+    for playlist in get_playlists(sp, username):
+
+
+        songs = get_songs(sp, username, playlist)
+
+        for song in songs:
+            
+            song_count += 1
+
+            # if song_count == 10:
+            #     return
+
+            song_id = song["track"]["id"]
+
+            if Song.objects.filter(pk = song_id).exists():
+                continue
+                
+            # Check if the song has a track attribute. 
+            # I guess local songs dont have them, but are still obtained with the spotipy id. 
+            if not song['track']:
+                continue
+            
+            artists_id = []
+            for artist in song["track"]["artists"]:
+                artists_id.append(artist["id"])
+
+            artists = []
+            for artist_id in artists_id:
+                
+                artist_obj = Artist.objects.filter(pk = artist_id).first()
+                if artist_obj:
+
+                    artists.append(artist_obj)                    
+                    continue
+                
+                sp_artist = sp.artists([artist_id])
+
+                print(sp_artist)
+                genres = []
+                for genre in sp_artist["artists"][0]["genres"]:
+                    
+                    genre_obj = Genre.objects.filter(pk = genre).first()
+
+                    if not genre_obj:
+                        genre_obj = Genre(name = genre)
+                        genre_obj.save()
+
+                    genres.append(genre_obj)       
+                    
+                artist_obj = Artist(id=artist_id, name=sp_artist["artists"][0]["name"])
+                artist_obj.save()
+
+                artist_obj.genres.add(*genres)
+
+                artists.append(artist_obj)
+
+            new_song = Song(id=song_id, name=song["track"]["name"])
+            new_song.save()
+            new_song.artists.add(*artists)
+
+    return artists_count

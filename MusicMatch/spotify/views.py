@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 
 from .func import *
 
@@ -167,3 +167,9 @@ def validate_spotify_usernames(request):
     data["all_valid"] = all_valid
 
     return JsonResponse(data)
+
+def write_data(request, username):
+
+    write_data_to_db(username)
+    
+    return HttpResponse(username)
