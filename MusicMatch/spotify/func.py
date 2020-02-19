@@ -345,66 +345,96 @@ def write_data_to_db(username):
 
     sp = get_sp()
 
-    song_count = 0
-    # Get all playlists
-    for playlist in get_playlists(sp, username):
+    # dict with arists who are not yet in the database
+    # key: artist id, value: Artist object
+    missing_artists_info = {}
 
+    playlists = get_playlists(sp, username)
+    for playlist in playlists:
 
         songs = get_songs(sp, username, playlist)
 
         for song in songs:
             
-            song_count += 1
-
-            # if song_count == 10:
-            #     return
-
             song_id = song["track"]["id"]
 
             if Song.objects.filter(pk = song_id).exists():
+
+                # TODO Add song username relationship
+
                 continue
-                
+  
             # Check if the song has a track attribute. 
             # I guess local songs dont have them, but are still obtained with the spotipy id. 
             if not song['track']:
                 continue
-            
-            artists_id = []
-            for artist in song["track"]["artists"]:
-                artists_id.append(artist["id"])
-
-            artists = []
-            for artist_id in artists_id:
-                
-                artist_obj = Artist.objects.filter(pk = artist_id).first()
-                if artist_obj:
-
-                    artists.append(artist_obj)                    
-                    continue
-                
-                sp_artist = sp.artists([artist_id])
-
-                print(sp_artist)
-                genres = []
-                for genre in sp_artist["artists"][0]["genres"]:
-                    
-                    genre_obj = Genre.objects.filter(pk = genre).first()
-
-                    if not genre_obj:
-                        genre_obj = Genre(name = genre)
-                        genre_obj.save()
-
-                    genres.append(genre_obj)       
-                    
-                artist_obj = Artist(id=artist_id, name=sp_artist["artists"][0]["name"])
-                artist_obj.save()
-
-                artist_obj.genres.add(*genres)
-
-                artists.append(artist_obj)
 
             new_song = Song(id=song_id, name=song["track"]["name"])
             new_song.save()
+
+            artists = []
+            for artist in song["track"]["artists"]:
+
+                artist_id = artist["id"]
+
+                if artist_id is None:
+                    continue
+                
+                artist_obj = Artist.objects.filter(pk = artist_id).first()
+                
+                if not artist_obj:
+                    
+                    if artist_id not in missing_artists_info:
+                        artist_obj = Artist(id=artist_id, name=artist["name"])
+                        artist_obj.save()
+
+                        missing_artists_info[artist_id] = artist_obj
+                    
+                    else:
+                        artist_obj = missing_artists_info[artist_id]
+
+                artists.append(artist_obj)
+
             new_song.artists.add(*artists)
 
-    return artists_count
+    add_missing_artists_info(sp, missing_artists_info)
+
+def add_missing_artists_info(sp, artists_dict):
+    """ 
+    Adds the genre information for new artists.
+    sp: spotipy object
+    artists_dict: dict, key = artist_id, value = Artist object
+    """
+    
+    # Get all missing artists ids
+    artists_id = list(artists_dict.keys())
+
+    spotify_limit = 50
+    artist_count = 0
+    # Since the limit of obtaining arists is 50, multiple requests have to be made.
+    for i in range (ceil(len(artists_id)/spotify_limit)):
+        
+        # Get json response for n artists
+        # print(len(artists_id), i, artist_count)
+        # print(artists_id[artist_count: artist_count + spotify_limit])
+        artists_response = sp.artists(artists_id[artist_count: artist_count + spotify_limit])
+
+        for artist in artists_response["artists"]:
+            
+            genres = []
+            for genre in artist["genres"]:
+                
+                # Check if genre already exists
+                genre_obj = Genre.objects.filter(pk = genre).first()
+                if not genre_obj:
+
+                    genre_obj = Genre(name = genre)
+                    genre_obj.save()
+
+                genres.append(genre_obj) 
+
+            artist_obj = artists_dict[artists_id[artist_count]]
+            artist_obj.genres.add(*genres)
+
+            artist_count += 1
+

@@ -168,6 +168,7 @@ def validate_spotify_usernames(request):
 
     return JsonResponse(data)
 
+@transaction.atomic
 def write_data(request, username):
 
     write_data_to_db(username)
