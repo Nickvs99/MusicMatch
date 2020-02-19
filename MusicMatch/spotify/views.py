@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
+from django.db import transaction
 
 from .func import *
 
@@ -171,6 +172,7 @@ def validate_spotify_usernames(request):
 @transaction.atomic
 def write_data(request, username):
 
-    write_data_to_db(username)
+    if not write_data_to_db(username):
+        return HttpResponse("username does not exist in db")
     
     return HttpResponse(username)

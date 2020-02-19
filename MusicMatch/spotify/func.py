@@ -345,6 +345,13 @@ def write_data_to_db(username):
 
     sp = get_sp()
 
+    user = User.objects.filter(username = username).first()
+
+    if user is None:
+        return False
+    
+    userProfile =  UserProfile.objects.filter(user=user).first()
+
     # dict with arists who are not yet in the database
     # key: artist id, value: Artist object
     missing_artists_info = {}
@@ -357,10 +364,10 @@ def write_data_to_db(username):
         for song in songs:
             
             song_id = song["track"]["id"]
-
+            
             if Song.objects.filter(pk = song_id).exists():
 
-                # TODO Add song username relationship
+                userProfile.songs.add(Song.objects.filter(pk = song_id).first())
 
                 continue
   
@@ -371,6 +378,7 @@ def write_data_to_db(username):
 
             new_song = Song(id=song_id, name=song["track"]["name"])
             new_song.save()
+            userProfile.songs.add(new_song)
 
             artists = []
             for artist in song["track"]["artists"]:
@@ -399,6 +407,7 @@ def write_data_to_db(username):
 
     add_missing_artists_info(sp, missing_artists_info)
 
+    return True
 def add_missing_artists_info(sp, artists_dict):
     """ 
     Adds the genre information for new artists.
