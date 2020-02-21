@@ -96,7 +96,8 @@ def register(request):
         user.save()
 
         # Save it to the extended User model
-        user = UserProfile(user=user)
+        # NOTE when the userprofile already exists, a reference is made from the user object to the userprofile object
+        user = UserProfile(user=user, username=username)
         user.save()
         
         messages.success(request, "Successfully registered.")

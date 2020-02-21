@@ -345,12 +345,11 @@ def write_data_to_db(username):
 
     sp = get_sp()
 
-    user = User.objects.filter(username = username).first()
+    userProfile =  UserProfile.objects.filter(username=username).first()
+    if userProfile is None:
+        userProfile = UserProfile(username=username)
+        userProfile.save()
 
-    if user is None:
-        return False
-    
-    userProfile =  UserProfile.objects.filter(user=user).first()
 
     # dict with arists who are not yet in the database
     # key: artist id, value: Artist object
