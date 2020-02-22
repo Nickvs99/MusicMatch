@@ -31,8 +31,8 @@ async function UpdatePage(username){
 
     let dataJson = await data.json();
 
-    if(!dataJson["usernameValid"]){
-        createMessage("danger", username +" is not found in the database");  
+    if(dataJson["error"]){
+        createMessage("danger", dataJson["error"]);  
         updateTitle("Stats");
         return
     }

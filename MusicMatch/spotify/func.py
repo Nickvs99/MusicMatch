@@ -70,7 +70,7 @@ def get_artists_from_song(song):
 
     return artists_id
 
-def get_artist_count(sp, username):
+def get_artist_count(user_profile):
     """ Returns how many times an artist occurs in the usernames playlists. 
         Return:
             artist_count: dictionary, keys:artists, value:count
@@ -78,40 +78,49 @@ def get_artist_count(sp, username):
 
     # Keeps track of how many times an artist/genre is featured in the public playlists
     artists_count = {}
+    genre_count = {}
 
-    # Get all playlists
-    for playlist in get_playlists(sp, username):
+    for song in user_profile.songs.all():
 
-        songs = get_songs(sp, username, playlist)
+        for artist in song.artists.all():
 
-        for song in songs:
-            
-            # Check if the song has a track attribute. 
-            # I guess local songs dont have them, but are still obtained with the spotipy id. 
-            if song['track']:
-                artists = get_artists_from_song(song)
-                for artist in artists:
+            if artist.name in artists_count:
+                artists_count[artist.name] += 1
 
-                    artist_name = artist['name']
-                    if artist_name in artists_count:
-                        artists_count[artist_name].count += 1
-                    else:
-                        artists_count[artist_name] = Artist(artist_name, artist['id'])
+            else:
+                artists_count[artist.name] = 1
 
-    return artists_count
+            for genre in artist.genres.all():
 
-def get_frequent_artists(artists_count, n):
-    """ Sorts the artists_count from high to low and return the nth most frequent artists. """
+                if genre.name in genre_count:
+                    genre_count[genre.name] += 1
+
+                else:
+                    genre_count[genre.name] = 1
     
-    # Sort dic from high to low, based on the count value from the Artists
-    sorted_artists = sorted(artists_count.values(), key=attrgetter('count'), reverse=True)
-    
-    # Get the n most frequent artists. Store these in a dictionay, key: artist.name, value:artist.count. 
-    frequent_artists = {}
-    for artist in sorted_artists[:n]:
-        frequent_artists[artist.name] = artist.count
+    print(artists_count)
+    print(genre_count)
+    return artists_count, genre_count
 
-    return frequent_artists
+def get_n_heighest_from_dict(dictionary, n):
+    """ 
+    Sorts the artists_count from high to low and return the nth most frequent artists.
+    Args:
+        dictionary (dictionary): The dictionary whose keys and values are sorted.
+        n (int): Get the top n values.
+    
+    """
+    # TODO better function name
+
+    # Sort dic from high to low, based on the value
+    sorted_dict = sorted(dictionary.items(), key=lambda x: x[1], reverse=True)
+    
+    # Get the n heightest values and their respective key. Store these in a dictionay
+    frequent_dictionary = {}
+    for key, value in sorted_dict[:n]:
+        frequent_dictionary[key] = value
+
+    return frequent_dictionary
 
 def get_artists_id(artists_count):
     """ Get the all artists id from artist_count. """
@@ -272,7 +281,7 @@ def refresh_access_token(user):
     user.access_token = access_token
     user.save()
 
-def user_exists(request, sp, username):
+def user_exists(sp, username):
     """ Checks if a user exists. Returns True if the user exists, else returns False."""
 
     try:
@@ -407,6 +416,7 @@ def write_data_to_db(username):
     add_missing_artists_info(sp, missing_artists_info)
 
     return True
+
 def add_missing_artists_info(sp, artists_dict):
     """ 
     Adds the genre information for new artists.
@@ -445,4 +455,3 @@ def add_missing_artists_info(sp, artists_dict):
             artist_obj.genres.add(*genres)
 
             artist_count += 1
-

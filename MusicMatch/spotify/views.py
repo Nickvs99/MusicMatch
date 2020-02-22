@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 
+from Authentication.models import UserProfile
+
 from .func import *
 
 def stats(request):
@@ -13,28 +15,35 @@ def get_stats(request):
 
     username = json.loads(request.body).get('username', None)
 
-    sp = get_sp()
+    # username validation
+    # TODO these checks have to happen in another fetch call
+    user_profile = UserProfile.objects.filter(pk=username).first()
+    if not user_profile:
 
-    if not user_exists(request,sp, username):
-        data = {
-            "usernameValid": False
-        }
-        return JsonResponse(data)
+        sp = get_sp()
 
+        if user_exists(sp, username):
 
-    artists_count = get_artist_count(sp, username)
+            user_profile = UserProfile(username=username)
+            user_profile.save()
 
-    frequent_artists = get_frequent_artists(artists_count, 10)
+            write_data_to_db(username)
+
+        else:
+
+            data = {
+                "error": f"{username} does not exist in the spotify database."
+            }
+            
+            return JsonResponse(data)
+
+    artist_count, genre_count = get_artist_count(user_profile)
+
+    frequent_artists = get_n_heighest_from_dict(artist_count, 10)
     
-    genre_count = get_genre_count(sp, artists_count)
+    frequent_genres = get_n_heighest_from_dict(genre_count, 15)
 
-    frequent_genres = get_frequent_genres(genre_count, 100)
-
-    if artists_count == {}:
-        messages.warning(request, f"No songs found for {username}. Make sure the playlists are set to public.")
-    
     data = {
-        "usernameValid": True,
         "artist_count": frequent_artists,
         "genre_count": frequent_genres,
     }
@@ -61,11 +70,11 @@ def get_comparison(request):
     sp = get_sp()
 
     # Check if both usernames are valid
-    if not user_exists(request, sp, username1):
+    if not user_exists(sp, username1):
 
         data["username1Valid"] = False
     
-    if not user_exists(request, sp, username2):
+    if not user_exists(sp, username2):
 
         data["username2Valid"] = False  
 
@@ -157,7 +166,7 @@ def validate_spotify_usernames(request):
 
     all_valid = True
     for username in usernames:
-        if not user_exists(request, sp, username):
+        if not user_exists(sp, username):
 
             data["usernames"][username] = False
             all_valid = False
