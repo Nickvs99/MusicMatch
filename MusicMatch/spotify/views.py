@@ -13,29 +13,10 @@ def stats(request):
 
 def get_stats(request):
 
+    # TODO different syntax
     username = json.loads(request.body).get('username', None)
 
-    # username validation
-    # TODO these checks have to happen in another fetch call
     user_profile = UserProfile.objects.filter(pk=username).first()
-    if not user_profile:
-
-        sp = get_sp()
-
-        if user_exists(sp, username):
-
-            user_profile = UserProfile(username=username)
-            user_profile.save()
-
-            write_data_to_db(username)
-
-        else:
-
-            data = {
-                "error": f"{username} does not exist in the spotify database."
-            }
-            
-            return JsonResponse(data)
 
     artist_count, genre_count = get_artist_count(user_profile)
 
@@ -178,10 +159,38 @@ def validate_spotify_usernames(request):
 
     return JsonResponse(data)
 
-@transaction.atomic
-def write_data(request, username):
-
-    if not write_data_to_db(username):
-        return HttpResponse("username does not exist in db")
+def validate_usernames(request):
     
-    return HttpResponse(username)
+    jsonLoad = json.loads(request.body)
+
+    usernames = jsonLoad["usernames"]
+
+    sp = get_sp()
+
+    data = {}
+
+    all_valid = True
+    for username in usernames:
+        
+        if not UserProfile.objects.filter(pk=username).exists():
+
+            data[username] = False
+            all_valid = False
+
+        else:
+            data[username] = True
+
+    return JsonResponse(data)
+    
+@transaction.atomic
+def write_data(request):
+
+    jsonLoad = json.loads(request.body)
+
+    username = jsonLoad["username"]
+
+    write_data_to_db(username)
+
+    data = {}
+    return JsonResponse(data)
+    
