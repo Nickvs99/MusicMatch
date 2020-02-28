@@ -75,7 +75,7 @@ def get_artist_count(user_profile):
         Return:
             artist_count: dictionary, keys:artists, value:count
     """
-
+    
     # Keeps track of how many times an artist/genre is featured in the public playlists
     artists_count = {}
     genre_count = {}
@@ -98,8 +98,6 @@ def get_artist_count(user_profile):
                 else:
                     genre_count[genre.name] = 1
     
-    print(artists_count)
-    print(genre_count)
     return artists_count, genre_count
 
 def get_n_heighest_from_dict(dictionary, n):
@@ -113,12 +111,18 @@ def get_n_heighest_from_dict(dictionary, n):
     # TODO better function name
 
     # Sort dic from high to low, based on the value
-    sorted_dict = sorted(dictionary.items(), key=lambda x: x[1], reverse=True)
-    
+    sorted_dict = sort_dict_value(dictionary)
+
     # Get the n heightest values and their respective key. Store these in a dictionay
     frequent_dictionary = {}
-    for key, value in sorted_dict[:n]:
-        frequent_dictionary[key] = value
+    count = 0
+    for key in sorted_dict:
+        frequent_dictionary[key] = sorted_dict[key]
+
+        count += 1
+        if count == n:
+            break
+
 
     return frequent_dictionary
 
@@ -205,29 +209,20 @@ def get_sp():
 
     return sp
 
-def get_total_artist_count(artist_count):
-    """ Returns the total amount of artist mentions. """
+def get_total_dict_value(dictionary):
+    """ Returns the sum of all values in a dictionary."""
 
-    total_artists = 0
-    for artist in artist_count:
-        total_artists += artist_count[artist].count
+    total = 0
+    for value in dictionary.values():
+        total += value
 
-    return total_artists
+    return total
 
 def get_sorted_in_common_artists(in_common_artists):
     """ Sort dictionary based on the third value. """
     sorted_artists = sorted(in_common_artists.items(), key=lambda e: e[1][2], reverse=True)
     sorted_artists = dict(sorted_artists)
     return sorted_artists
-
-def get_total_genres(genre_count):
-    """ Return the total number of genres."""
-    
-    total = 0
-    for value in genre_count.values():
-        total += value
-
-    return total
 
 def get_all_songs_id_from_user(sp, username):
     """ Returns all public song ids from a user. """
@@ -292,40 +287,43 @@ def user_exists(sp, username):
 
         return False
 
-def get_artist_ranking(user1_artist_count, user1_total_artists, user2_artist_count, user2_total_artists):
-    """ Returns a dictionary with the in common artists.
-        key:artist_name, value:list [user1_count, user2_count, compared_ranking]
+def get_frequent_keys(dict1, dict2):
+    """ 
+    Returns a sorted list of keys based on the compared ranking between both artist_count.
+    params:
+        dict1, dict2: dictionary whose values have to be numbers
     """
+
+    user1_total = get_total_dict_value(dict1)
+    user2_total = get_total_dict_value(dict2)
 
     in_common_artists = {}
 
-    for artist in user1_artist_count:
-        if artist in user2_artist_count:
-            user1_count = user1_artist_count[artist].count
-            user2_count = user2_artist_count[artist].count
-            in_common_artists[artist] = [
-                user1_count,
-                user2_count,
-                (user1_count / user1_total_artists) * (user2_count / user2_total_artists)
-            ]
+    for key in dict1:
+        if key in dict2:
+            user1_count = dict1[key]
+            user2_count = dict2[key]
+            in_common_artists[key] = (user1_count / user1_total) * (user2_count / user2_total)
+            
+    return list(sort_dict_value(in_common_artists).keys())
 
-    # Returns sorted dictionary based on their compared ranking
-    return get_sorted_in_common_artists(in_common_artists)
+def sort_dict_value(dictionary):
+    """ Sort a dictionary based on the values from high to low. """
 
-def get_n_artists_and_count(n, sorted_in_common_artists):
+    return dict(sorted(dictionary.items(), key=lambda x: x[1], reverse=True))
+
+
+def get_n_dict_and_count(n, keys, user1_artist_count, user2_artist_count):
     """ Returns the first n artists, and their respective count for user1 and user2. """
 
-    artists, user1_count, user2_count = [], [], []
-    count = 0
-    for key, value in sorted_in_common_artists.items():
-        artists.append(key)
-        user1_count.append(value[0])
-        user2_count.append(value[1])
-        if count == n:
-            break
-        count += 1
+    keys = keys[:n]
+    user1_count, user2_count = [], []
+    for key in keys:
 
-    return artists, user1_count, user2_count
+        user1_count.append(user1_artist_count[key])
+        user2_count.append(user2_artist_count[key])
+
+    return keys, user1_count, user2_count
 
 def get_genre_ranking(user1_genre_count, user1_total_genres, user2_genre_count, user2_total_genres):
     """ Returns a dictionary with the in common genres.

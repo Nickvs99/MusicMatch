@@ -40,53 +40,28 @@ def get_comparison(request):
 
     jsonLoad = json.loads(request.body)
 
-    username1 = jsonLoad["username1"]
-    username2 = jsonLoad["username2"]
+    usernames = jsonLoad["usernames"]
 
-    data = {
-        "username1Valid": True,
-        "username2Valid": True
-    }
+    user1 = UserProfile.objects.filter(pk=usernames[0]).first()
+    user2 = UserProfile.objects.filter(pk=usernames[1]).first()
 
-    sp = get_sp()
+    user1_artist_count, user1_genre_count = get_artist_count(user1)
+    user2_artist_count, user2_genre_count = get_artist_count(user2)
 
-    # Check if both usernames are valid
-    if not user_exists(sp, username1):
+    artists_sorted_all = get_frequent_keys(user1_artist_count, user2_artist_count)
 
-        data["username1Valid"] = False
+    artists, user1_artist_count, user2_artist_count = get_n_dict_and_count(10, artists_sorted_all, user1_artist_count, user2_artist_count)
+
+    genres_sorted_all = get_frequent_keys(user1_genre_count, user2_genre_count)
+
+    genres, user1_genre_count, user2_genre_count = get_n_dict_and_count(10, genres_sorted_all, user1_genre_count, user2_genre_count)
+
+    data = {}
     
-    if not user_exists(sp, username2):
-
-        data["username2Valid"] = False  
-
-    if not data["username1Valid"] or not data["username2Valid"]:
-
-        return JsonResponse(data)
-
-    user1_artist_count = get_artist_count(sp, username1)
-    user2_artist_count = get_artist_count(sp, username2)
-
-    user1_total_artists = get_total_artist_count(user1_artist_count)
-    user2_total_artists = get_total_artist_count(user2_artist_count)
-
-    sorted_in_common_artists = get_artist_ranking(user1_artist_count, user1_total_artists, user2_artist_count, user2_total_artists)
-
-    artists, user1_count, user2_count = get_n_artists_and_count(10, sorted_in_common_artists)
-
-    user1_genre_count = get_genre_count(sp, user1_artist_count)
-    user2_genre_count = get_genre_count(sp, user2_artist_count)
-
-    user1_total_genres = get_total_genres(user1_genre_count)
-    user2_total_genres = get_total_genres(user2_genre_count)
-
-    sorted_in_common_genres = get_genre_ranking(user1_genre_count, user1_total_genres, user2_genre_count, user2_total_genres)
-
-    genres, user1_genre_count, user2_genre_count = get_n_artists_and_count(10, sorted_in_common_genres)
-
     # Set data in dict 
     data["artists"] = artists
-    data["user1_artist_count"] = user1_count
-    data["user2_artist_count"] = user2_count
+    data["user1_artist_count"] = user1_artist_count
+    data["user2_artist_count"] = user2_artist_count
 
     data["genres"] = genres
     data["user1_genre_count"] = user1_genre_count
