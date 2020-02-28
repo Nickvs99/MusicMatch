@@ -246,16 +246,16 @@ def get_auth_sp(user):
 
     return sp
 
-def create_playlist(sp, username1, username2 , in_common_songs):
+def create_playlist(sp, username, usernames , in_common_songs):
     """ Creates an spotify playlist with all in_common_songs. This playlist is stored on the 
     account of username1. """
     
-    playlist_name  = f"Music Match - {username2}"
-    playlist = sp.user_playlist_create(username1, playlist_name, public = False)
+    playlist_name  = f"Music Match - {usernames[0]} - {usernames[1]}"
+    playlist = sp.user_playlist_create(username, playlist_name, public = False)
 
     sp_limit = 100
     for i in range(ceil(len(in_common_songs)/100)):
-        sp.user_playlist_add_tracks(username1, playlist['id'], in_common_songs[i * 100:(i + 1) * 100])
+        sp.user_playlist_add_tracks(username, playlist['id'], in_common_songs[i * 100:(i + 1) * 100])
 
 def refresh_access_token(user):
     """ Refreshes the access token for the user. """

@@ -74,39 +74,26 @@ def playlist(request):
 
     jsonLoad = json.loads(request.body)
 
-    username1 = jsonLoad["username1"]
-    username2 = jsonLoad["username2"]
+    usernames = jsonLoad["usernames"]
 
-    data = {}
-    
-    # Check if user is logged in
-    if not request.user.is_authenticated:
-        data["error"] = "You have to be logged in to create a playlist."
+    user = UserProfile.objects.get(pk=request.user.username)
 
-        return JsonResponse(data)
-
-    # If both valid get the authorised spotipy object
-    user = User.objects.get(username=request.user)
-    user = UserProfile.objects.get(user=user)
-
-    if not user.access_token:
-        
-        data["error"] = "This profile does not contain an access_token."
-        return JsonResponse(data)
-
+    user1 = UserProfile.objects.get(pk=usernames[0])
+    user2 = UserProfile.objects.get(pk=usernames[1])
 
     sp = get_auth_sp(user)
 
-    user1_songs = get_all_songs_id_from_user(sp, username1)
-    user2_songs = get_all_songs_id_from_user(sp, username2)
+    user1_songs = user1.songs.all()
+    user2_songs = user2.songs.all()
 
     in_common_songs = []
     for song in user2_songs:
         if song in user1_songs:
-            in_common_songs.append(song)
+            in_common_songs.append(song.id)
 
-    create_playlist(sp, username1, username2, in_common_songs)
+    create_playlist(sp, request.user.username, usernames, in_common_songs)
     
+    data = {}
     return JsonResponse(data)
 
 def validate_spotify_usernames(request):
@@ -154,6 +141,26 @@ def validate_usernames(request):
 
         else:
             data[username] = True
+
+    return JsonResponse(data)
+
+def check_access_token(request):
+
+    data = {
+        "loggedin": True,
+        "access_token": True,
+    }
+
+    if not request.user.is_authenticated:
+        data["loggedin"] = False
+
+        return JsonResponse(data)
+
+    user_profile = UserProfile.objects.filter(pk=request.user.username).first()
+
+    if user_profile.access_token == "":
+        data["access_token"] = False
+        return JsonResponse(data)
 
     return JsonResponse(data)
     

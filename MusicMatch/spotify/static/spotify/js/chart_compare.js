@@ -53,6 +53,10 @@ async function UpdatePage(usernames){
 // Run the creation of the playlist
 async function RunCreatePlaylist(usernames){
 
+    if(! await CheckAccesToken()){
+        return;
+    }
+
     let inValidUsernames = await validateUsernames(usernames);
     
     if(inValidUsernames.length != 0){
@@ -67,8 +71,7 @@ async function RunCreatePlaylist(usernames){
         await writeData(inValidUsernames);
     }
 
-    CreatePlaylist(usernames[0], usernames[1]);
-    
+    CreatePlaylist(usernames);
 }
 
 // Updates the charts based on the two usernames
@@ -156,11 +159,40 @@ function horizontalBarChart(id, usernames, labels, data1, data2, title){
     });
 }
 
-async function CreatePlaylist(username1, username2){
+async function CheckAccesToken(){
+
+    let data = await fetch("../ajax/check_access_token", {
+        method: "post",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        mode: "same-origin",
+        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+    })
+
+    let dataJson = await data.json();
+
+    if(!dataJson["loggedin"]){
+        createMessage("danger", "You have to login to create a playlist.")
+        return false;
+    }
+
+    if(!dataJson["access_token"]){
+
+        window.location.href = "/verify"
+        return false
+    }
+
+    return true;
+}
+
+// Creates a playlist for the user which is currently logged in
+async function CreatePlaylist(usernames){
 
     updateTitle("Creating playlist...")
 
-    let data = await fetch("../ajax/playlist", {
+    await fetch("../ajax/playlist", {
         method: "post",
         headers: {
             'Accept': 'application/json',
@@ -169,27 +201,11 @@ async function CreatePlaylist(username1, username2){
         mode: "same-origin",
         headers: {'X-CSRFToken': Cookies.get('csrftoken')},
         body: JSON.stringify({
-            "username1": username1,
-            "username2": username2
+            "usernames": usernames,
         }) 
     });
 
-    let dataJson = await data.json();
-
-    // Check if another error occured
-    if(dataJson["error"]){
-
-        createMessage("danger", dataJson["error"]);
-
-        // If the error message has something to say about a access_token
-        if (dataJson["error"].includes("access_token")){
-
-            window.location.href = "../verify";
-        }
-        return
-    }
-
     createMessage("success", "Successfully created a playlist!")
-    updateTitle(`Comparison between ${username1} and ${username2}`);
-
+    
+    updateTitle(`Comparison between ${usernames[0]} and ${usernames[1]}`);
 }

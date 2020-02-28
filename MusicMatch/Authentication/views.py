@@ -40,7 +40,7 @@ def login_view(request):
             messages.success(request, "Logged in.")
 
             # Check if the user already has an access token.
-            user = UserProfile.objects.get(user=request.user)
+            user = UserProfile.objects.get(username=username)
             if user.access_token:
                 return redirect("index")
 
@@ -158,7 +158,7 @@ def callback(request):
         messages.warning(request, "Some features will not work since you rejected access." )
         return redirect("index")
 
-    user = UserProfile.objects.get(user=request.user)
+    user = UserProfile.objects.get(username=request.user)
     user.access_token = access_token
     user.refresh_token = refresh_token
     user.save()
