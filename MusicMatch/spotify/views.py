@@ -176,3 +176,32 @@ def write_data(request):
     data = {}
     return JsonResponse(data)
     
+
+def update_view(request):
+
+    return render(request, "spotify/update.html")
+
+@transaction.atomic
+def update(request):
+
+    jsonLoad = json.loads(request.body)
+
+    username = jsonLoad["username"]
+
+    user = UserProfile.objects.filter(pk=username).first()
+
+    # Create userprofile if it doesnt exist yet
+    if user is None:
+        user = UserProfile(username=username)
+
+    if user.songs:
+
+        # Clear all song relationships with this user
+        user.songs.clear()
+
+    write_data_to_db(username)
+
+    data = {}
+    return JsonResponse(data)
+
+

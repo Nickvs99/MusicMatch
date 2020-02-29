@@ -49,6 +49,8 @@ async function validateSpotify(usernames){
         })        
     });
 
+    console.log("Done")
+
     let dataJson = await data.json();
 
     if (dataJson["all_valid"]){
@@ -69,6 +71,7 @@ async function validateSpotify(usernames){
 // All usernames need to have a spotify account.
 async function writeData(usernames){
     
+    updateTitle("Writing spotify data to account.")
     for(let i in usernames){
         let username = usernames[i];
 
