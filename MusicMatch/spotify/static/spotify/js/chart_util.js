@@ -1,10 +1,85 @@
 // Set of functions the stats pages need. Like validation etc.
 
+async function processingUsernames(usernames, forced){
+
+    let inValidUsernames = await validateUsernames(usernames);
+    
+    if(inValidUsernames.length != 0){
+
+        let valid = await validateSpotify(inValidUsernames);
+
+        if(!valid){
+            // TODO better title
+            updateTitle("Stats")
+            return false
+        }
+    }
+
+    await updateProfiles(usernames, forced);
+
+    return true
+}
+
+async function updateProfiles(usernames, forced){
+    
+    for(let i in usernames){
+        let username = usernames[i];
+        console.log(username);
+
+        if(!forced){
+            
+            updateTitle("Checking for update...");
+
+            let data = await fetch("../ajax/check_update", {
+                method: "post",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                mode: "same-origin",
+                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                body: JSON.stringify({
+                    "username": username,
+                })  
+            })
+
+            let dataJson = await data.json();
+
+            forced = dataJson["update"];
+            console.log(forced);
+        }
+
+        if(forced){
+
+            updateTitle(`Updating ${username}'s profile...`);
+
+            await fetch("../ajax/update", {
+                method: "post",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                mode: "same-origin",
+                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                body: JSON.stringify({
+                    "username": username,
+                })   
+            });
+
+            createMessage("success", `Updated ${username}'s profile`);
+            
+            updateTitle("Updated profile");
+        }
+    }
+
+}
+
 // Checks wheter the usernames are registered in the MM db.
 // Returns a list with all usernames which are not registered.
 async function validateUsernames(usernames){
     
     updateTitle("Checking if accounts exist in database.");
+
     let data = await fetch("../ajax/validate_usernames", {
         method: "post",
         headers: {
@@ -36,6 +111,7 @@ async function validateUsernames(usernames){
 async function validateSpotify(usernames){
 
     updateTitle("Checking if accounts exist in spotify database.");
+    
     let data = await fetch("../ajax/validate_spotify_usernames", {
         method: "post",
         headers: {
@@ -48,8 +124,6 @@ async function validateSpotify(usernames){
             "usernames": usernames
         })        
     });
-
-    console.log("Done")
 
     let dataJson = await data.json();
 

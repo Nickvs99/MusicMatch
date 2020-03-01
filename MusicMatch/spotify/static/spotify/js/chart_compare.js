@@ -33,18 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // Updated the page
 async function UpdatePage(usernames){
 
-    let inValidUsernames = await validateUsernames(usernames);
-    
-    if(inValidUsernames.length != 0){
-
-        let valid = await validateSpotify(inValidUsernames);
-
-        if(!valid){
-            updateTitle("Stats")
-            return 
-        }
-
-        await writeData(inValidUsernames);
+    if(! await processingUsernames(usernames, false)){
+        return
     }
 
     UpdateCharts(usernames);
@@ -57,20 +47,9 @@ async function RunCreatePlaylist(usernames){
         return;
     }
 
-    let inValidUsernames = await validateUsernames(usernames);
-    
-    if(inValidUsernames.length != 0){
-
-        let valid = await validateSpotify(inValidUsernames);
-
-        if(!valid){
-            updateTitle("Stats")
-            return 
-        }
-
-        await writeData(inValidUsernames);
+    if(! await processingUsernames(usernames, false)){
+        return
     }
-
     CreatePlaylist(usernames);
 }
 

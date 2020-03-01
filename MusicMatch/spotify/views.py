@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 
+import datetime
+
 from Authentication.models import UserProfile
 
 from .func import *
@@ -193,6 +195,7 @@ def update(request):
     # Create userprofile if it doesnt exist yet
     if user is None:
         user = UserProfile(username=username)
+        user.save()
 
     if user.songs:
 
@@ -204,4 +207,30 @@ def update(request):
     data = {}
     return JsonResponse(data)
 
+def check_update(request):
+
+    data = {}
+
+    jsonLoad = json.loads(request.body)
+
+    username = jsonLoad["username"]
+
+    userProfile =  UserProfile.objects.filter(username=username).first()
+    if userProfile is None:
+
+        data["update"] = True
+
+        return JsonResponse(data)
+
+    # Check if it has been more than x days since last update
+    delta = datetime.date.today() - userProfile.last_updated
+    if delta.days > 14:
+        
+        data["update"] = True
+
+        return JsonResponse(data)
+
+    data["update"] = False
+
+    return JsonResponse(data)
 

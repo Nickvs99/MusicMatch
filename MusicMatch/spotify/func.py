@@ -4,6 +4,8 @@ import json
 from math import ceil
 from operator import itemgetter, attrgetter
 import requests
+import datetime
+
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -356,7 +358,9 @@ def write_data_to_db(username):
     if userProfile is None:
         userProfile = UserProfile(username=username)
         userProfile.save()
-
+    
+    userProfile.last_updated = datetime.date.today()
+    userProfile.save()
 
     # dict with arists who are not yet in the database
     # key: artist id, value: Artist object

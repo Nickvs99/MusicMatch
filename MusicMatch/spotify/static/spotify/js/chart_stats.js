@@ -15,20 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // Updates the stats page for a new username
 async function UpdatePage(username){
 
-    let inValidUsernames = await validateUsernames([username]);
-    
-    if(inValidUsernames.length != 0){
-
-        let valid = await validateSpotify(inValidUsernames);
-
-        if(!valid){
-            updateTitle("Stats")
-            return 
-        }
-
-        await writeData(inValidUsernames);
+    if(! await processingUsernames([username], false)){
+        return
     }
-
     UpdateCharts(username);
 }
 
@@ -37,6 +26,7 @@ async function UpdatePage(username){
 async function UpdateCharts(username){
 
     updateTitle("Reading stats for " + username);
+    
     let data = await fetch("../ajax/stats", {
         method: "post",
         headers: {
