@@ -49,29 +49,45 @@ async function updateProfiles(usernames, forced){
             console.log(forced);
         }
 
-        if(forced){
+        if(!forced){
+            return
+        } 
 
-            updateTitle(`Updating ${username}'s profile...`);
+        updateTitle(`Updating ${username}'s profile...`);
 
-            await fetch("../ajax/update", {
-                method: "post",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                mode: "same-origin",
-                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-                body: JSON.stringify({
-                    "username": username,
-                })   
-            });
+        await fetch("../ajax/update", {
+            method: "post",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            mode: "same-origin",
+            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+            body: JSON.stringify({
+                "username": username,
+            })   
+        });
 
-            createMessage("success", `Updated ${username}'s profile`);
-            
-            updateTitle("Updated profile");
-        }
+        updateTitle(`Cashing results for ${username}'s profile...`);
+
+        await fetch("../ajax/cache_results", {
+            method: "post",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            mode: "same-origin",
+            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+            body: JSON.stringify({
+                "username": username,
+            })   
+        }); 
+
+        createMessage("success", `Updated ${username}'s profile`);
+        
+        updateTitle("Updated profile");
+        
     }
-
 }
 
 // Checks wheter the usernames are registered in the MM db.

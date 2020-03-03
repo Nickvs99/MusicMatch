@@ -234,3 +234,24 @@ def check_update(request):
 
     return JsonResponse(data)
 
+def cache_results(request):
+
+    jsonLoad = json.loads(request.body)
+
+    username = jsonLoad["username"]
+
+    user_profile = UserProfile.objects.filter(username=username).first()
+    
+    results = get_artist_count(user_profile)
+
+    # TODO sort results
+    user_profile.artist_count = results[0]
+
+    user_profile.genre_count = results[1]
+
+    user_profile.save()
+
+    print(user_profile.artist_count)
+
+    data = {}
+    return JsonResponse(data)

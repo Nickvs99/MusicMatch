@@ -100,6 +100,9 @@ def get_artist_count(user_profile):
                 else:
                     genre_count[genre.name] = 1
     
+    artists_count = sort_dict_value(artists_count)
+    genre_count = sort_dict_value(genre_count)
+
     return artists_count, genre_count
 
 def get_n_heighest_from_dict(dictionary, n):
@@ -111,9 +114,6 @@ def get_n_heighest_from_dict(dictionary, n):
     
     """
     # TODO better function name
-
-    # Sort dic from high to low, based on the value
-    sorted_dict = sort_dict_value(dictionary)
 
     # Get the n heightest values and their respective key. Store these in a dictionay
     frequent_dictionary = {}

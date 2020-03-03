@@ -14,4 +14,5 @@ urlpatterns = [
     path("ajax/check_access_token", views.check_access_token),
     path("ajax/update", views.update),
     path("ajax/check_update", views.check_update),
+    path("ajax/cache_results", views.cache_results),
 ]
