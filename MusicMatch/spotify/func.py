@@ -107,7 +107,7 @@ def get_artist_count(user_profile):
 
 def get_n_heighest_from_dict(dictionary, n):
     """ 
-    Sorts the artists_count from high to low and return the nth most frequent artists.
+    Return the nth most frequent artists.
     Args:
         dictionary (dictionary): The dictionary whose keys and values are sorted.
         n (int): Get the top n values.
@@ -118,8 +118,8 @@ def get_n_heighest_from_dict(dictionary, n):
     # Get the n heightest values and their respective key. Store these in a dictionay
     frequent_dictionary = {}
     count = 0
-    for key in sorted_dict:
-        frequent_dictionary[key] = sorted_dict[key]
+    for key in dictionary:
+        frequent_dictionary[key] = dictionary[key]
 
         count += 1
         if count == n:
@@ -313,7 +313,6 @@ def sort_dict_value(dictionary):
     """ Sort a dictionary based on the values from high to low. """
 
     return dict(sorted(dictionary.items(), key=lambda x: x[1], reverse=True))
-
 
 def get_n_dict_and_count(n, keys, user1_artist_count, user2_artist_count):
     """ Returns the first n artists, and their respective count for user1 and user2. """

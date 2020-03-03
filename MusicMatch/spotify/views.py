@@ -20,7 +20,9 @@ def get_stats(request):
 
     user_profile = UserProfile.objects.filter(pk=username).first()
 
-    artist_count, genre_count = get_artist_count(user_profile)
+    artist_count = user_profile.artist_count
+
+    genre_count = user_profile.genre_count
 
     frequent_artists = get_n_heighest_from_dict(artist_count, 10)
     
@@ -47,8 +49,11 @@ def get_comparison(request):
     user1 = UserProfile.objects.filter(pk=usernames[0]).first()
     user2 = UserProfile.objects.filter(pk=usernames[1]).first()
 
-    user1_artist_count, user1_genre_count = get_artist_count(user1)
-    user2_artist_count, user2_genre_count = get_artist_count(user2)
+    user1_artist_count = user1.artist_count
+    user1_genre_count = user1.genre_count
+
+    user2_artist_count = user2.artist_count
+    user2_genre_count = user2.genre_count
 
     artists_sorted_all = get_frequent_keys(user1_artist_count, user2_artist_count)
 
@@ -250,8 +255,6 @@ def cache_results(request):
     user_profile.genre_count = results[1]
 
     user_profile.save()
-
-    print(user_profile.artist_count)
 
     data = {}
     return JsonResponse(data)

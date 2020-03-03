@@ -50,7 +50,7 @@ async function updateProfiles(usernames, forced){
         }
 
         if(!forced){
-            return
+            continue
         } 
 
         updateTitle(`Updating ${username}'s profile...`);
