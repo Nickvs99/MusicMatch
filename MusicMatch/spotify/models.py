@@ -21,7 +21,6 @@ class Artist(models.Model):
         return f"{self.name}"
 
 class Song(models.Model):
-    """ Song class """
 
     id = models.CharField(max_length=100, primary_key=True)
 

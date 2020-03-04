@@ -12,13 +12,13 @@ import json
 
 from utils.utils import get_env_var
 
-def index(request):
+def home_view(request):
     """ Homepage view """
 
     return render(request, "Authentication/index.html")
 
 def login_view(request):
-    """ Login view """
+    """ Login view. Manages the login process. """
 
     if request.method == 'GET':
         if request.user.is_authenticated:
@@ -51,7 +51,7 @@ def login_view(request):
             return render(request, "Authentication/login.html")
 
 def logout_view(request):
-    """ The user is now logged out. """
+    """ Logs the user out. Then redirects to the login view."""
 
     if request.user.is_authenticated:
         logout(request)
@@ -62,8 +62,8 @@ def logout_view(request):
 
     return redirect("login")
 
-def register(request):
-    """ Register view. Has the field to register a user. """
+def register_view(request):
+    """ Register view. Has the field to register a user."""
 
     if request.method == 'GET':
         if request.user.is_authenticated:

@@ -1,46 +1,45 @@
 import os
 import json
-
 from math import ceil
-from operator import itemgetter, attrgetter
 import requests
 import datetime
-
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy.oauth2 as oauth2
 
-from .classes import Artist
-from .genres import popular_genres
+from django.contrib.auth.models import User
+
 from Authentication.models import UserProfile
 from spotify.models import Artist, Song, Genre
-
-from django.contrib.auth.models import User
-from django.contrib import messages
 
 from utils.utils import get_env_var
 
 """ A set of functions used in views.py. """
 
-def print_json(json_response):
-    """ Prints the json response in a human readable form."""
-
-    print(json.dumps(json_response, indent=4))
-
-def print_dic(dic):
-    """ Prints the items from dic on a new line for each. Makes it more human readable."""
-
-    for key, value in dic.items():
-        print(key, value)
-
 def get_playlists(sp, username):
-    """ Returns all playlist items. """
+    """
+    Returns all playlist items for a given username.
+    Args:
+        username: str
+    Returns:
+        playlists: json response
+        
+    """
 
     return sp.user_playlists(username)['items']
 
 def get_songs(sp, username, playlist):
-    """ Returns all songs from a playlist."""
+    """
+    Returns all songs from a playlist.
+    Args:
+        sp: spotipy object
+        username: str
+        playlist: json response
+
+    Returns:
+        songs: list of json responses
+    """
 
     track_count = playlist['tracks']['total']
 
@@ -58,24 +57,14 @@ def get_songs(sp, username, playlist):
 
     return songs
 
-def get_artists_from_song(song):
-    """ Returns all artists from a song."""
-
-    artists_id = []
-
-    for artist in song['track']['artists']:
-
-        # Some very small artists do not have an id, those artists are not 
-        # used for the stats or comparison.
-        if artist['id'] != None:
-            artists_id.append(artist)
-
-    return artists_id
-
-def get_artist_count(user_profile):
-    """ Returns how many times an artist occurs in the usernames playlists. 
-        Return:
-            artist_count: dictionary, keys:artists, value:count
+def get_data(user_profile):
+    """ 
+    Gets the data from all the songs from a user
+    Args:
+        user_profile: UserProfile object
+    Returns:
+        artist_count: dict, keys:artists (str), value: count (int)
+        genre_count: dict, keys:artists (str), value: count (int)
     """
     
     # Keeps track of how many times an artist/genre is featured in the public playlists
@@ -107,11 +96,12 @@ def get_artist_count(user_profile):
 
 def get_n_heighest_from_dict(dictionary, n):
     """ 
-    Return the nth most frequent artists.
+    Return the n most frequent artists and their respective count.
     Args:
-        dictionary (dictionary): The dictionary whose keys and values are sorted.
-        n (int): Get the top n values.
-    
+        dictionary (dictionary): A sorted dictionary
+        n (int): Get the top n items.
+    Returns:
+        dictionary
     """
     # TODO better function name
 
@@ -128,78 +118,13 @@ def get_n_heighest_from_dict(dictionary, n):
 
     return frequent_dictionary
 
-def get_artists_id(artists_count):
-    """ Get the all artists id from artist_count. """
-
-    artists_id = []
-    for artist in artists_count.values():
-        artists_id.append(artist.id)
-
-    
-    return artists_id
-
-def get_artists_by_id(sp, artists_id):
-    """ Get the artists from the artists_id with a spotipy request. """
-
-    artists = []
-
-    spotify_limit = 50
-    # Since the limit of obtaining arists is 50, multiple requests have to be made.
-    for i in range (ceil(len(artists_id)/spotify_limit)):
-
-    # DEBUG
-    # for i in range(1):
-
-        artists_response = sp.artists(artists_id[i * spotify_limit: (i + 1) * spotify_limit])
-        for artist in artists_response['artists']:
-            artists.append(artist)
-
-    return artists
-
-def get_genres_from_artist(artist):
-    """ Get all genres from the artist. """
-
-    genres = []
-    for genre in artist['genres']:
-        if genre in popular_genres:
-            genres.append(genre)
-
-    return genres
-
-def get_genre_count(sp, artists_count):
-    """ Returns how many times an genre occurs in the usernames playlists. 
-        Return:
-            genre_count: dictionary, keys:genres, value:count
-    """
-
-    # Get the most populare genres
-    # Since a song does not have a genre, the most popular genres get calculated from the most frequent artists and their genres:
-    genre_count = {}
-
-    artists_id = get_artists_id(artists_count)
-
-    artists = get_artists_by_id(sp, artists_id)
-
-    for artist in artists:
-        genres = get_genres_from_artist(artist)
-        for genre in genres:
-            if genre in genre_count:
-                genre_count[genre] += 1
-            else:
-                genre_count[genre] = 1
-
-    return genre_count
-
-def get_frequent_genres(genre_count, n):
-    """ Get the nth most frequent genres. """
-
-    sorted_genres = sorted(genre_count.items(), key=itemgetter(1), reverse=True)
-    sorted_genres = dict(sorted_genres)
-
-    return sorted_genres
-
 def get_sp():
-
+    """
+    Obtains a spotipy object. With this object you can make calls to
+    the spotify database.
+    Returns:
+        spotipy object
+    """
     # Not sure if this is needed for every request
     credentials = oauth2.SpotifyClientCredentials(
             client_id=get_env_var("CLIENT_ID"),
@@ -212,7 +137,11 @@ def get_sp():
     return sp
 
 def get_total_dict_value(dictionary):
-    """ Returns the sum of all values in a dictionary."""
+    """
+    Returns the sum of all values in a dictionary.
+    Args: dictionary, value has to be an int
+    Returns: int
+    """
 
     total = 0
     for value in dictionary.values():
@@ -220,27 +149,14 @@ def get_total_dict_value(dictionary):
 
     return total
 
-def get_sorted_in_common_artists(in_common_artists):
-    """ Sort dictionary based on the third value. """
-    sorted_artists = sorted(in_common_artists.items(), key=lambda e: e[1][2], reverse=True)
-    sorted_artists = dict(sorted_artists)
-    return sorted_artists
-
-def get_all_songs_id_from_user(sp, username):
-    """ Returns all public song ids from a user. """
-
-    user_playlists = get_playlists(sp, username)
-
-    songs = []
-    for playlist in user_playlists:
-        for song in get_songs(sp, username, playlist):
-            
-            songs.append(song['track']['id'])
-
-    return songs
-
 def get_auth_sp(user):
-    """ Get an authorized spotipy object. """
+    """
+    Get an authorized spotipy object for the user.
+    Args:
+        user: UserProfile object
+    Returns:
+        authorized spotipy object
+    """
 
     refresh_access_token(user)
 
@@ -248,19 +164,29 @@ def get_auth_sp(user):
 
     return sp
 
-def create_playlist(sp, username, usernames , in_common_songs):
-    """ Creates an spotify playlist with all in_common_songs. This playlist is stored on the 
-    account of username1. """
+def create_playlist(sp, username, usernames, songs_id):
+    """
+    Creates an spotify playlist with the songs. This playlist is stored on the account of username.
+    Args:
+        sp: spotipy object
+        username: str
+        usernames: list of strings
+        songs_id: list of strings.
+    """
     
     playlist_name  = f"Music Match - {usernames[0]} - {usernames[1]}"
     playlist = sp.user_playlist_create(username, playlist_name, public = False)
 
     sp_limit = 100
-    for i in range(ceil(len(in_common_songs)/100)):
-        sp.user_playlist_add_tracks(username, playlist['id'], in_common_songs[i * 100:(i + 1) * 100])
+    for i in range(ceil(len(songs_id)/100)):
+        sp.user_playlist_add_tracks(username, playlist['id'], songs_id[i * 100:(i + 1) * 100])
 
 def refresh_access_token(user):
-    """ Refreshes the access token for the user. """
+    """
+    Refreshes the access token for the user.
+    Args:
+        user: UserProfile object
+    """
 
     # Refresh access token
     API_BASE = 'https://accounts.spotify.com'
@@ -279,7 +205,13 @@ def refresh_access_token(user):
     user.save()
 
 def user_exists(sp, username):
-    """ Checks if a user exists. Returns True if the user exists, else returns False."""
+    """
+    Checks if a user exists. Returns True if the user exists, else returns False.
+    Args:
+        sp: spotipy object
+        username: str
+    Returns: bool
+    """
 
     try:
         sp.user(username)
@@ -291,9 +223,11 @@ def user_exists(sp, username):
 
 def get_frequent_keys(dict1, dict2):
     """ 
-    Returns a sorted list of keys based on the compared ranking between both artist_count.
+    Returns a sorted list of keys based on the compared ranking between two dictionaries.
     params:
-        dict1, dict2: dictionary whose values have to be numbers
+        dict1, dict2: dictionary whose values have to be floats or ints
+    Returns:
+        list of strings
     """
 
     user1_total = get_total_dict_value(dict1)
@@ -310,45 +244,41 @@ def get_frequent_keys(dict1, dict2):
     return list(sort_dict_value(in_common_artists).keys())
 
 def sort_dict_value(dictionary):
-    """ Sort a dictionary based on the values from high to low. """
+    """
+    Sort a dictionary based on the values from high to low.
+    Args: dictionary, value has to be an integer or float
+    Returns: sorted dictionary
+    """
 
     return dict(sorted(dictionary.items(), key=lambda x: x[1], reverse=True))
 
-def get_n_dict_and_count(n, keys, user1_artist_count, user2_artist_count):
-    """ Returns the first n artists, and their respective count for user1 and user2. """
+def get_n_dict_and_count(n, keys, dict1, dict2):
+    """
+    Returns the first n artists, and their respective count for user1 and user2.
+    Args:
+        n: int, the number of returned items
+        keys: list of str
+        dict1, dict2: dictionary
+    Returns:
+        keys: list of str
+        user1_count: dictionary, with only the keys from keys
+        user2_count: dictionary, with only the keys from keys
+    """
 
     keys = keys[:n]
     user1_count, user2_count = [], []
     for key in keys:
 
-        user1_count.append(user1_artist_count[key])
-        user2_count.append(user2_artist_count[key])
+        user1_count.append(dict1[key])
+        user2_count.append(dict2[key])
 
     return keys, user1_count, user2_count
 
-def get_genre_ranking(user1_genre_count, user1_total_genres, user2_genre_count, user2_total_genres):
-    """ Returns a dictionary with the in common genres.
-        key:genre_name, value:list [user1_count, user2_count, compared_ranking]
-    """
-    
-    in_common_genres = {}
-
-    for genre in user1_genre_count:
-        if genre in user2_genre_count:
-            temp1 = user1_genre_count[genre]
-            temp2 = user2_genre_count[genre]
-            in_common_genres[genre] = [
-                temp1,
-                temp2,
-                (temp1 / user1_total_genres) * (temp2 / user2_total_genres)
-            ]
-
-    return get_sorted_in_common_artists(in_common_genres)
-
 def write_data_to_db(username):
     """
-    Writes the songs, artists and genres from username
-    to the database.
+    Writes the songs, artists and genres from username to the database.
+    Adds a relationship between the songs and the userprofile.
+    Args: username, str
     """
 
     sp = get_sp()
@@ -361,7 +291,8 @@ def write_data_to_db(username):
     userProfile.last_updated = datetime.date.today()
     userProfile.save()
 
-    # dict with arists who are not yet in the database
+    # dict with arists who are not yet in the database. These are grouped together,
+    # since this will result in less calls to the spotify database.
     # key: artist id, value: Artist object
     missing_artists_info = {}
 
@@ -382,11 +313,13 @@ def write_data_to_db(username):
   
             # Check if the song has a track attribute. 
             # I guess local songs dont have them, but are still obtained with the spotipy id. 
+            # These are only a very small percentage of the songs
             if not song['track']:
                 continue
 
             new_song = Song(id=song_id, name=song["track"]["name"])
             new_song.save()
+
             userProfile.songs.add(new_song)
 
             artists = []
@@ -394,11 +327,13 @@ def write_data_to_db(username):
 
                 artist_id = artist["id"]
 
+                # Some artists dont have an spotify id. This is a very small percentage of the artists
                 if artist_id is None:
                     continue
                 
                 artist_obj = Artist.objects.filter(pk = artist_id).first()
                 
+                # Check if the artist exists in the database
                 if not artist_obj:
                     
                     if artist_id not in missing_artists_info:
@@ -416,27 +351,23 @@ def write_data_to_db(username):
 
     add_missing_artists_info(sp, missing_artists_info)
 
-    return True
-
 def add_missing_artists_info(sp, artists_dict):
     """ 
     Adds the genre information for new artists.
-    sp: spotipy object
-    artists_dict: dict, key = artist_id, value = Artist object
+    Args:
+        sp: spotipy object
+        artists_dict: dict, key = artist_id, value = Artist object
     """
     
     # Get all missing artists ids
     artists_id = list(artists_dict.keys())
 
     spotify_limit = 50
-    artist_count = 0
     # Since the limit of obtaining arists is 50, multiple requests have to be made.
     for i in range (ceil(len(artists_id)/spotify_limit)):
         
         # Get json response for n artists
-        # print(len(artists_id), i, artist_count)
-        # print(artists_id[artist_count: artist_count + spotify_limit])
-        artists_response = sp.artists(artists_id[artist_count: artist_count + spotify_limit])
+        artists_response = sp.artists(artists_id[i * spotify_limit: (i + 1) + spotify_limit])
 
         for artist in artists_response["artists"]:
             
@@ -454,5 +385,3 @@ def add_missing_artists_info(sp, artists_dict):
 
             artist_obj = artists_dict[artists_id[artist_count]]
             artist_obj.genres.add(*genres)
-
-            artist_count += 1

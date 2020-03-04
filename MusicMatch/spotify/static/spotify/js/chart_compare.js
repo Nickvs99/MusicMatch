@@ -30,7 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Updated the page
+/**
+ * Updates the content of the page based on the usernames.
+ * @param {string[]} usernames 
+ */
 async function UpdatePage(usernames){
 
     if(! await processingUsernames(usernames, false)){
@@ -40,7 +43,10 @@ async function UpdatePage(usernames){
     UpdateCharts(usernames);
 }
 
-// Run the creation of the playlist
+/**
+ * Creates a playlist based on the usernames
+ * @param {string[]} usernames 
+ */
 async function RunCreatePlaylist(usernames){
 
     if(! await CheckAccesToken()){
@@ -53,8 +59,12 @@ async function RunCreatePlaylist(usernames){
     CreatePlaylist(usernames);
 }
 
-// Updates the charts based on the two usernames
-// TODO more than two users
+/**
+ * Updates the charts based on the usernames
+ * @param {string[]} usernames 
+ * 
+ * TODO more than two users
+ */
 async function UpdateCharts(usernames){
 
     updateTitle(`Loading comparison between ${usernames[0]} and ${usernames[1]}`);
@@ -91,7 +101,15 @@ async function UpdateCharts(usernames){
     updateTitle(`Comparison between ${usernames[0]} and ${usernames[1]}`);
 }
 
-// Creates a horizontal bar chart with two datasets.
+/**
+ * Creates a horizontal barchart
+ * @param {string} id The html id
+ * @param {string[]} usernames 
+ * @param {string[]} labels The labels for the datasets
+ * @param {dict} data1 
+ * @param {dict} data2 
+ * @param {string} title The title of the chart
+ */
 function horizontalBarChart(id, usernames, labels, data1, data2, title){
 
     // Checks if element exists
@@ -138,6 +156,11 @@ function horizontalBarChart(id, usernames, labels, data1, data2, title){
     });
 }
 
+/**
+ * Checks if the current logged in user has an access token.
+ * Redirects the user to {verify} if the user doesn't have it.
+ * @return bool
+ */
 async function CheckAccesToken(){
 
     let data = await fetch("../ajax/check_access_token", {
@@ -166,7 +189,10 @@ async function CheckAccesToken(){
     return true;
 }
 
-// Creates a playlist for the user which is currently logged in
+/**
+ * Creates a playlist for the logged in user based on the songs from the usernames.
+ * @param {string[]} usernames 
+ */
 async function CreatePlaylist(usernames){
 
     updateTitle("Creating playlist...")

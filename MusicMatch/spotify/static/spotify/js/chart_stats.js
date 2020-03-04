@@ -12,7 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Updates the stats page for a new username
+/**
+ * Updates the content of the page based on the usernames.
+ * @param {string[]} usernames 
+ */
 async function UpdatePage(username){
 
     if(! await processingUsernames([username], false)){
@@ -21,8 +24,12 @@ async function UpdatePage(username){
     UpdateCharts(username);
 }
 
-// Updates the charts for a given username. This username has to be in 
-// the MM db.
+/**
+ * Updates the charts based on the usernames
+ * @param {string[]} usernames 
+ * 
+ * TODO more than two users
+ */
 async function UpdateCharts(username){
 
     updateTitle("Reading stats for " + username);
@@ -50,7 +57,11 @@ async function UpdateCharts(username){
     drawCharts(artistCount, genreCount);
 }
 
-// Draws the chart with the given data
+/**
+ * Creates a bar and pie chart with the data.
+ * @param {dict} artistCount 
+ * @param {dict} genreCount 
+ */
 function drawCharts(artistCount, genreCount){
     var ctx = document.getElementById('artistChart').getContext('2d');
     var myChart = new Chart(ctx, {
@@ -105,7 +116,7 @@ function drawCharts(artistCount, genreCount){
     });
 }
 
-// Colors used for the charts
+// Colors used for the charts. Format is used for chart.js
 var colors = [
     'rgba(255, 99, 132, 0.2)',
     'rgba(54, 162, 235, 0.2)',
@@ -134,7 +145,11 @@ var borderColors = [
     'rgba(0,0,128,1)',
 ]
 
-// Creates the colors for the pie chart. This is done by looping over colorPalette.
+/**
+ * Creates the colors for the pie chart. This is done by looping over colorPalette.
+ * @param {int} n The number of colors
+ * @param {string[]} colorPalette The available colors
+ */
 function createPieColors(n, colorPalette){
     
     pieColors = []

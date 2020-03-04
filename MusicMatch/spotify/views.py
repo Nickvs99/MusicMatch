@@ -1,6 +1,5 @@
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
+from django.http import JsonResponse
 from django.db import transaction
 
 import datetime
@@ -9,11 +8,25 @@ from Authentication.models import UserProfile
 
 from .func import *
 
-def stats(request):
+def stats_view(request):
 
     return render(request, "spotify/stats.html")
 
-def get_stats(request):
+def compare_view(request):
+
+    return render(request, "spotify/compare.html")
+
+def update_view(request):
+
+    return render(request, "spotify/update.html")
+
+def stats(request):
+    """
+    Returns the stats for a user. This user has to be an entry in the UserProfile table.
+    Returns:
+        artist_count: dict, key: artist name (str), value: count (int)
+        genre_count: dict, key: genre name (str), value: count (int)
+    """
 
     # TODO different syntax
     username = json.loads(request.body).get('username', None)
@@ -36,11 +49,18 @@ def get_stats(request):
     return JsonResponse(data)
 
 def compare(request):
+    """
+    Returns the data used for the comparison between two users.
+    Both users have to be an entry in the UserProfile table.
+    Returns:
+        artists: list (str) artist names 
+        user1_artist_count: dict, keys: artist name (str), value: count (int)
+        user2_artist_count: dict, keys: artist name (str), value: count (int)
 
-    return render(request, "spotify/compare.html")
-
-def get_comparison(request):
-    """ Get the comparison between two usernames. """
+        genres: list (str) genre names 
+        user1_genre_count: dict, keys: artist name (str), value: count (int)
+        user2_genre_count: dict, keys: artist name (str), value: count (int)
+    """
 
     jsonLoad = json.loads(request.body)
 
@@ -77,7 +97,9 @@ def get_comparison(request):
     return JsonResponse(data)
 
 def playlist(request):
-    """ Creates a playlist for username with all the songs both users have in their playlist."""
+    """
+    Creates a playlist for the logged in user with songs based on the username input.
+    """
 
     jsonLoad = json.loads(request.body)
 
@@ -104,7 +126,12 @@ def playlist(request):
     return JsonResponse(data)
 
 def validate_spotify_usernames(request):
-
+    """
+    Checks whether the usernames have a spotify account.
+    Returns:
+        usernames username: bool, True if the username has a spotify account
+        all_valid: bool, True when all usernames are valid
+    """
     jsonLoad = json.loads(request.body)
 
     usernames = jsonLoad["usernames"]
@@ -129,7 +156,12 @@ def validate_spotify_usernames(request):
     return JsonResponse(data)
 
 def validate_usernames(request):
-    
+    """
+    Checks whether the usernames have an enrie in the UserProfile table.
+    Returns:
+        usernames username: bool, True if the username has a spotify account
+        all_valid: bool, True when all usernames are valid
+    """
     jsonLoad = json.loads(request.body)
 
     usernames = jsonLoad["usernames"]
@@ -152,6 +184,12 @@ def validate_usernames(request):
     return JsonResponse(data)
 
 def check_access_token(request):
+    """
+    Checks wheter a user has an access token.
+    Returns:
+        loggedin: bool, True when the user is logged in
+        access_token: bool, True when the user has an access token
+    """
 
     data = {
         "loggedin": True,
@@ -172,32 +210,17 @@ def check_access_token(request):
     return JsonResponse(data)
     
 @transaction.atomic
-def write_data(request):
-
-    jsonLoad = json.loads(request.body)
-
-    username = jsonLoad["username"]
-
-    write_data_to_db(username)
-
-    data = {}
-    return JsonResponse(data)
-    
-
-def update_view(request):
-
-    return render(request, "spotify/update.html")
-
-@transaction.atomic
 def update(request):
-
+    """
+    Updates a user. 
+    If the user does not exist create an entry in the UserProfile table.
+    """
     jsonLoad = json.loads(request.body)
 
     username = jsonLoad["username"]
 
     user = UserProfile.objects.filter(pk=username).first()
 
-    # Create userprofile if it doesnt exist yet
     if user is None:
         user = UserProfile(username=username)
         user.save()
@@ -213,7 +236,12 @@ def update(request):
     return JsonResponse(data)
 
 def check_update(request):
-
+    """ 
+    Checks wheter a user has to be updated.
+    Returns:
+        update: bool, True when user does not exist or 
+            if it has been more than 14 days since the last update.
+    """
     data = {}
 
     jsonLoad = json.loads(request.body)
@@ -240,6 +268,10 @@ def check_update(request):
     return JsonResponse(data)
 
 def cache_results(request):
+    """
+    Caches the results for a user. These results are
+    artist_count and genre_count.
+    """
 
     jsonLoad = json.loads(request.body)
 
@@ -247,11 +279,9 @@ def cache_results(request):
 
     user_profile = UserProfile.objects.filter(username=username).first()
     
-    results = get_artist_count(user_profile)
+    results = get_data(user_profile)
 
-    # TODO sort results
     user_profile.artist_count = results[0]
-
     user_profile.genre_count = results[1]
 
     user_profile.save()

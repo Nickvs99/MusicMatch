@@ -1,5 +1,10 @@
-// Set of functions the stats pages need. Like validation etc.
+// Set of functions the stats pages might need. Like validation etc.
 
+/**
+ * The process of the usernames input. This makes sure that the input is valid, creates and updates profiles.
+ * @param {strings[]} usernames the updated users accounts
+ * @param {boolean} forced Should the usernames be forced to update
+ */
 async function processingUsernames(usernames, forced){
 
     let inValidUsernames = await validateUsernames(usernames);
@@ -20,11 +25,16 @@ async function processingUsernames(usernames, forced){
     return true
 }
 
+/**
+ * Manages the update procedure for the usernames. Checks if a update is needed
+ * and if so updates the profile.
+ * @param {strings[]} usernames the updated users accounts
+ * @param {boolean} forced Should the usernames be forced to update
+ */
 async function updateProfiles(usernames, forced){
     
     for(let i in usernames){
         let username = usernames[i];
-        console.log(username);
 
         if(!forced){
             
@@ -44,9 +54,8 @@ async function updateProfiles(usernames, forced){
             })
 
             let dataJson = await data.json();
-
+            
             forced = dataJson["update"];
-            console.log(forced);
         }
 
         if(!forced){
@@ -90,8 +99,14 @@ async function updateProfiles(usernames, forced){
     }
 }
 
-// Checks wheter the usernames are registered in the MM db.
-// Returns a list with all usernames which are not registered.
+
+/**
+ * Checks whether the usernames are an entry in the UserProfile db.
+ * Returns a list with all usernames which are not registered.
+ * @param {string[]} usernames
+ * 
+ * @returns {string[]}  All usernames who are not an entry in the UserProfile db.
+ */
 async function validateUsernames(usernames){
     
     updateTitle("Checking if accounts exist in database.");
@@ -122,8 +137,11 @@ async function validateUsernames(usernames){
     return inValidUsernames
 }
 
-// Checks wheter the usernames have a spotify account.
-// Returns true when all usernames have an account, else false.
+/**
+ * Checks wheter the usernames have a spotify account.
+ * @param {string[]} usernames
+ * @returns bool true when all usernames have a spotify account
+ */
 async function validateSpotify(usernames){
 
     updateTitle("Checking if accounts exist in spotify database.");
@@ -157,37 +175,17 @@ async function validateSpotify(usernames){
     return false
 }
 
-// Writes the data from the spotify db to the MM db. 
-// All usernames need to have a spotify account.
-async function writeData(usernames){
-    
-    updateTitle("Writing spotify data to account.")
-    for(let i in usernames){
-        let username = usernames[i];
-
-        // TODO these function should be able to run asynchronous, however
-        // removing the await will result with errors...
-        await fetch("../ajax/write_data", {
-            method: "post",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            mode: "same-origin",
-            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-            body: JSON.stringify({
-                "username": username
-            })        
-        });
-    }
-}
-
-// Update the title 
+/**
+ * Updates the innerText of the title div
+ * @param {string} title
+ */
 function updateTitle(title){
     document.getElementById("title").innerText = title;
 }
 
-// Clears all messages
+/**
+ * Removes all child elements of the messages div.
+ */
 function clearMessages(){
     let messages = document.getElementById("messages");
     while(messages.firstChild){
@@ -195,9 +193,14 @@ function clearMessages(){
     }
 }
 
-// Clears the charts. This is done by removing the old element and then creating 
-// a new element with the same attributes.
-// TODO seach for a cleaner solution. 
+
+
+/**
+ * Clears the charts. This is done by removing the old element and then creating 
+ * a new element with the same attributes.
+ * 
+ * TODO seach for a cleaner solution.
+ */
 function clearCharts(){
 
     let chartIDs = ["artistChart", "genreChart"];
@@ -217,7 +220,12 @@ function clearCharts(){
     }
 }
 
-// Create a information message to the user
+/**
+ * Create a information message to the user
+ * @param {string} context Choises are one of 
+ *          ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"]
+ * @param {*} message The message which has to be displayed.
+ */
 function createMessage(context, message){
 
     // Get parent object of new messageElement
@@ -238,5 +246,4 @@ function createMessage(context, message){
         messageElement.innerText = message;
     }
     messagesElement.appendChild(messageElement);
-
 }
