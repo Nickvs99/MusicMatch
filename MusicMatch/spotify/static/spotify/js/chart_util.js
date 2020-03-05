@@ -1,6 +1,12 @@
 // Set of functions the stats pages might need. Like validation etc.
 
+/**
+ * Returns the context for a fetch request
+ * 
+ * @param {dict} dict Dictionary with the variables used by the server.
+ */
 function getFetchContext(dict){
+    
     return {
         method: "post",
         headers: {
