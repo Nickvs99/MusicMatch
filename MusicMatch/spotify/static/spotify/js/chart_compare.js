@@ -70,29 +70,19 @@ async function UpdateCharts(usernames){
     updateTitle(`Loading comparison between ${usernames[0]} and ${usernames[1]}`);
 
     // Aquire data
-    let data = await fetch("../ajax/compare", {
-        method: "post",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        mode: "same-origin",
-        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-        body: JSON.stringify({
-            "usernames": usernames,
-        })  
-    });
+    let args = {"usernames": usernames};
+    let response = await fetch("/ajax/compare", getFetchContext(args));
 
     // Parse to json format
-    let dataJson = await data.json();
+    let data = await response.json();
 
-    let artists = dataJson["artists"];
-    let user1ArtistCount = dataJson["user1_artist_count"];
-    let user2ArtistCount = dataJson["user2_artist_count"];
+    let artists = data["artists"];
+    let user1ArtistCount = data["user1_artist_count"];
+    let user2ArtistCount = data["user2_artist_count"];
 
-    let genres = dataJson["genres"];
-    let user1GenreCount = dataJson["user1_genre_count"];
-    let user2GenreCount = dataJson["user2_genre_count"];
+    let genres = data["genres"];
+    let user1GenreCount = data["user1_genre_count"];
+    let user2GenreCount = data["user2_genre_count"];
 
     // Update charts
     horizontalBarChart("artistChart", usernames, artists, user1ArtistCount, user2ArtistCount, "Most in common artists");
@@ -163,24 +153,17 @@ function horizontalBarChart(id, usernames, labels, data1, data2, title){
  */
 async function CheckAccesToken(){
 
-    let data = await fetch("../ajax/check_access_token", {
-        method: "post",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        mode: "same-origin",
-        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-    })
+    let response = await fetch("/ajax/check_access_token", getFetchContext({}))
 
-    let dataJson = await data.json();
+    let data = await response.json();
 
-    if(!dataJson["loggedin"]){
+    if(!data["loggedin"]){
+
         createMessage("danger", "You have to login to create a playlist.")
         return false;
     }
 
-    if(!dataJson["access_token"]){
+    if(!data["access_token"]){
 
         window.location.href = "/verify"
         return false
@@ -197,18 +180,9 @@ async function CreatePlaylist(usernames){
 
     updateTitle("Creating playlist...")
 
-    await fetch("../ajax/playlist", {
-        method: "post",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        mode: "same-origin",
-        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-        body: JSON.stringify({
-            "usernames": usernames,
-        }) 
-    });
+    let args = {"usernames": usernames};
+
+    await fetch("/ajax/playlist", getFetchContext(args));
 
     createMessage("success", "Successfully created a playlist!")
     

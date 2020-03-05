@@ -1,5 +1,17 @@
 // Set of functions the stats pages might need. Like validation etc.
 
+function getFetchContext(dict){
+    return {
+        method: "post",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        mode: "same-origin",
+        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+        body: JSON.stringify(dict)
+    }
+}
 /**
  * The process of the usernames input. This makes sure that the input is valid, creates and updates profiles.
  * @param {strings[]} usernames the updated users accounts
@@ -36,26 +48,18 @@ async function updateProfiles(usernames, forced){
     for(let i in usernames){
         let username = usernames[i];
 
+        let args = {"username": username};
+
         if(!forced){
             
             updateTitle("Checking for update...");
-
-            let data = await fetch("../ajax/check_update", {
-                method: "post",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                mode: "same-origin",
-                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-                body: JSON.stringify({
-                    "username": username,
-                })  
-            })
-
-            let dataJson = await data.json();
             
-            forced = dataJson["update"];
+            let vars = {"usernames": username}
+            let response = await fetch("/ajax/check_update", getFetchContext(args))
+
+            let data = await response.json();
+            
+            forced = data["update"];
         }
 
         if(!forced){
@@ -64,33 +68,11 @@ async function updateProfiles(usernames, forced){
 
         updateTitle(`Updating ${username}'s profile...`);
 
-        await fetch("../ajax/update", {
-            method: "post",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            mode: "same-origin",
-            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-            body: JSON.stringify({
-                "username": username,
-            })   
-        });
+        await fetch("/ajax/update", getFetchContext(args));
 
         updateTitle(`Cashing results for ${username}'s profile...`);
 
-        await fetch("../ajax/cache_results", {
-            method: "post",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            mode: "same-origin",
-            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-            body: JSON.stringify({
-                "username": username,
-            })   
-        }); 
+        await fetch("/ajax/cache_results", getFetchContext(args)); 
 
         createMessage("success", `Updated ${username}'s profile`);
         
@@ -111,25 +93,15 @@ async function validateUsernames(usernames){
     
     updateTitle("Checking if accounts exist in database.");
 
-    let data = await fetch("../ajax/validate_usernames", {
-        method: "post",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        mode: "same-origin",
-        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-        body: JSON.stringify({
-            "usernames": usernames
-        })        
-    });
+    let args = {"usernames": usernames};
+    let response = await fetch("/ajax/validate_usernames", getFetchContext(args));
 
-    let dataJson = await data.json();
+    let data = await response.json();
 
     inValidUsernames = [];
-    for(let username in dataJson){
+    for(let username in data){
 
-        if (!dataJson[username]){
+        if (!data[username]){
             inValidUsernames.push(username);
         }
     }
@@ -146,28 +118,18 @@ async function validateSpotify(usernames){
 
     updateTitle("Checking if accounts exist in spotify database.");
     
-    let data = await fetch("../ajax/validate_spotify_usernames", {
-        method: "post",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        mode: "same-origin",
-        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-        body: JSON.stringify({
-            "usernames": usernames
-        })        
-    });
+    let args = {"usernames": usernames};
+    let response = await fetch("/ajax/validate_spotify_usernames", getFetchContext(args));
 
-    let dataJson = await data.json();
+    let data = await response.json();
 
-    if (dataJson["all_valid"]){
+    if (data["all_valid"]){
         return true
     }
 
-    for(let username in dataJson["usernames"]){
+    for(let username in data["usernames"]){
 
-        if(!dataJson["usernames"][username]){
+        if(!data["usernames"][username]){
             createMessage("danger", `${username} does not have a spotify account.`);
         }   
     }

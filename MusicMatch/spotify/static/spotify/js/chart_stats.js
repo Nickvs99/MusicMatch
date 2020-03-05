@@ -34,23 +34,13 @@ async function UpdateCharts(username){
 
     updateTitle("Reading stats for " + username);
     
-    let data = await fetch("../ajax/stats", {
-        method: "post",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        mode: "same-origin",
-        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-        body: JSON.stringify({
-            "username": username
-        })        
-    });
+    let args = {"username": username};
+    let response = await fetch("/ajax/stats", getFetchContext(args));
 
-    let dataJson = await data.json()
+    let data = await response.json()
 
-    artistCount = dataJson["artist_count"];
-    genreCount = dataJson["genre_count"]
+    artistCount = data["artist_count"];
+    genreCount = data["genre_count"]
 
     updateTitle("Stats for " + username)
 
