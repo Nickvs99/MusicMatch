@@ -363,6 +363,7 @@ def add_missing_artists_info(sp, artists_dict):
     artists_id = list(artists_dict.keys())
 
     spotify_limit = 50
+    count = 0
     # Since the limit of obtaining arists is 50, multiple requests have to be made.
     for i in range (ceil(len(artists_id)/spotify_limit)):
         
@@ -383,5 +384,7 @@ def add_missing_artists_info(sp, artists_dict):
 
                 genres.append(genre_obj) 
 
-            artist_obj = artists_dict[artists_id[artist_count]]
+            artist_obj = artists_dict[artists_id[count]]
             artist_obj.genres.add(*genres)
+
+            count += 1
