@@ -12,13 +12,13 @@ import json
 
 from utils.utils import get_env_var
 
-def index(request):
+def home_view(request):
     """ Homepage view """
 
     return render(request, "Authentication/index.html")
 
 def login_view(request):
-    """ Login view """
+    """ Login view. Manages the login process. """
 
     if request.method == 'GET':
         if request.user.is_authenticated:
@@ -40,7 +40,7 @@ def login_view(request):
             messages.success(request, "Logged in.")
 
             # Check if the user already has an access token.
-            user = UserProfile.objects.get(user=request.user)
+            user = UserProfile.objects.get(username=username)
             if user.access_token:
                 return redirect("index")
 
@@ -51,7 +51,7 @@ def login_view(request):
             return render(request, "Authentication/login.html")
 
 def logout_view(request):
-    """ The user is now logged out. """
+    """ Logs the user out. Then redirects to the login view."""
 
     if request.user.is_authenticated:
         logout(request)
@@ -62,8 +62,8 @@ def logout_view(request):
 
     return redirect("login")
 
-def register(request):
-    """ Register view. Has the field to register a user. """
+def register_view(request):
+    """ Register view. Has the field to register a user."""
 
     if request.method == 'GET':
         if request.user.is_authenticated:
@@ -96,7 +96,8 @@ def register(request):
         user.save()
 
         # Save it to the extended User model
-        user = UserProfile(user=user)
+        # NOTE when the userprofile already exists, a reference is made from the user object to the userprofile object
+        user = UserProfile(user=user, username=username)
         user.save()
         
         messages.success(request, "Successfully registered.")
@@ -157,7 +158,7 @@ def callback(request):
         messages.warning(request, "Some features will not work since you rejected access." )
         return redirect("index")
 
-    user = UserProfile.objects.get(user=request.user)
+    user = UserProfile.objects.get(username=request.user)
     user.access_token = access_token
     user.refresh_token = refresh_token
     user.save()

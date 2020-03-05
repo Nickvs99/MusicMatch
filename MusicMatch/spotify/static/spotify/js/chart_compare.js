@@ -30,157 +30,77 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Updated the page
+/**
+ * Updates the content of the page based on the usernames.
+ * @param {string[]} usernames 
+ */
 async function UpdatePage(usernames){
 
-    if(await validate_usernames(usernames)){
-        UpdateCharts(usernames[0], usernames[1]);   
+    if(! await processingUsernames(usernames, false)){
+        return
     }
+
+    UpdateCharts(usernames);
 }
 
-// Run the creation of the playlist
+/**
+ * Creates a playlist based on the usernames
+ * @param {string[]} usernames 
+ */
 async function RunCreatePlaylist(usernames){
-    if(await validate_usernames(usernames)){
 
-        CreatePlaylist(usernames[0], usernames[1]);
+    if(! await CheckAccesToken()){
+        return;
     }
+
+    if(! await processingUsernames(usernames, false)){
+        return
+    }
+    CreatePlaylist(usernames);
 }
 
-// Updates the charts based on the two usernames
-async function UpdateCharts(username1, username2){
+/**
+ * Updates the charts based on the usernames
+ * @param {string[]} usernames 
+ * 
+ * TODO more than two users
+ */
+async function UpdateCharts(usernames){
 
-    updateTitle(`Loading comparison between ${username1} and ${username2}`);
+    updateTitle(`Loading comparison between ${usernames[0]} and ${usernames[1]}`);
 
     // Aquire data
-    let data = await fetch("../ajax/compare", {
-        method: "post",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        mode: "same-origin",
-        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-        body: JSON.stringify({
-            "username1": username1,
-            "username2": username2
-        })  
-    });
+    let args = {"usernames": usernames};
+    let response = await fetch("/ajax/compare", getFetchContext(args));
 
     // Parse to json format
-    let dataJson = await data.json();
+    let data = await response.json();
 
-    let artists = dataJson["artists"];
-    let user1ArtistCount = dataJson["user1_artist_count"];
-    let user2ArtistCount = dataJson["user2_artist_count"];
+    let artists = data["artists"];
+    let user1ArtistCount = data["user1_artist_count"];
+    let user2ArtistCount = data["user2_artist_count"];
 
-    let genres = dataJson["genres"];
-    let user1GenreCount = dataJson["user1_genre_count"];
-    let user2GenreCount = dataJson["user2_genre_count"];
+    let genres = data["genres"];
+    let user1GenreCount = data["user1_genre_count"];
+    let user2GenreCount = data["user2_genre_count"];
 
     // Update charts
-    horizontalBarChart("artistChart", username1, username2, artists, user1ArtistCount, user2ArtistCount, "Most in common artists");
-    horizontalBarChart("genreChart", username1, username2, genres, user1GenreCount, user2GenreCount, "Most in common genres");
+    horizontalBarChart("artistChart", usernames, artists, user1ArtistCount, user2ArtistCount, "Most in common artists");
+    horizontalBarChart("genreChart", usernames, genres, user1GenreCount, user2GenreCount, "Most in common genres");
 
-    updateTitle(`Comparison between ${username1} and ${username2}`);
+    updateTitle(`Comparison between ${usernames[0]} and ${usernames[1]}`);
 }
 
-// Checks if all given usernames have a spotify account
-async function validate_usernames(usernames){
-
-    let data = await fetch("../ajax/validate_spotify_usernames", {
-        method: "post",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        mode: "same-origin",
-        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-        body: JSON.stringify({
-            "usernames": usernames
-        })  
-    });
-
-    let dataJson = await data.json();
-
-    for(let username in dataJson["usernames"]){
-
-        if(!dataJson["usernames"][username]){
-            createMessage("danger", username +" is not found in the database");  
-        }
-    }
-    
-    return dataJson["all_valid"]
-}
-// Update the title 
-function updateTitle(title){
-    document.getElementById("title").innerText = title;
-}
-
-// Clears all messages
-function clearMessages(){
-    let messages = document.getElementById("messages");
-    while(messages.firstChild){
-        messages.firstChild.remove();
-    }
-}
-
-// Clears the charts. This is done by removing the old element and then creating 
-// a new element with the same attributes.
-// TODO seach for a cleaner solution. 
-function clearCharts(){
-
-    let parentElement = document.getElementById("charts");
-
-    // Get all chart ids and remove old charts
-    let ids = [];
-    let charts = document.getElementsByClassName("chart");
-    while(charts[0]){
-        ids.push(charts[0].id);
-        charts[0].remove();
-    }
-    
-    for(let i in ids){
-
-        let id = ids[i];
-        let canvas = document.createElement("canvas");
-        canvas.id = id;
-
-        // Set the ratio of the canvas element to 1:1
-        canvas.width = 1;
-        canvas.height = 1;
-
-        canvas.classList.add("chart")
-
-        parentElement.appendChild(canvas);
-    }
-}
-
-// Create a information message to the user
-function createMessage(context, message){
-
-    // Get parent object of new messageElement
-    let messagesElement = document.getElementById("messages");
-
-    let messageElement = document.createElement("div");
-
-    // Bootstraps contextual classes 
-    let bootstrapContexts = ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"];
-    
-    if(bootstrapContexts.includes(context)){
-        messageElement.classList.add("alert", "alert-" + context);
-        messageElement.innerText = message;
-    }
-    else {
-        console.log(`ERROR: ${context} is an invalid context type. Choose from ${bootstrapContexts}`);
-        messageElement.classList.add("alert", "alert-danger");
-        messageElement.innerText = message;
-    }
-    messagesElement.appendChild(messageElement);
-
-}
-
-// Creates a horizontal bar chart with two datasets.
-function horizontalBarChart(id, username1, username2, labels, data1, data2, title){
+/**
+ * Creates a horizontal barchart
+ * @param {string} id The html id
+ * @param {string[]} usernames 
+ * @param {string[]} labels The labels for the datasets
+ * @param {dict} data1 
+ * @param {dict} data2 
+ * @param {string} title The title of the chart
+ */
+function horizontalBarChart(id, usernames, labels, data1, data2, title){
 
     // Checks if element exists
     var element = document.getElementById(id);
@@ -194,14 +114,14 @@ function horizontalBarChart(id, username1, username2, labels, data1, data2, titl
         data: {
             labels: labels,
             datasets: [{
-                label: username1,
+                label: usernames[0],
                 data: data1,
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 1,
 
             },{
-                label: username2,
+                label: usernames[1],
                 data: data2,
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
@@ -226,40 +146,45 @@ function horizontalBarChart(id, username1, username2, labels, data1, data2, titl
     });
 }
 
-async function CreatePlaylist(username1, username2){
+/**
+ * Checks if the current logged in user has an access token.
+ * Redirects the user to {verify} if the user doesn't have it.
+ * @return bool
+ */
+async function CheckAccesToken(){
+
+    let response = await fetch("/ajax/check_access_token", getFetchContext({}))
+
+    let data = await response.json();
+
+    if(!data["loggedin"]){
+
+        createMessage("danger", "You have to login to create a playlist.")
+        return false;
+    }
+
+    if(!data["access_token"]){
+
+        window.location.href = "/verify"
+        return false
+    }
+
+    return true;
+}
+
+/**
+ * Creates a playlist for the logged in user based on the songs from the usernames.
+ * @param {string[]} usernames 
+ */
+async function CreatePlaylist(usernames){
 
     updateTitle("Creating playlist...")
 
-    let data = await fetch("../ajax/playlist", {
-        method: "post",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        mode: "same-origin",
-        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-        body: JSON.stringify({
-            "username1": username1,
-            "username2": username2
-        }) 
-    });
+    let args = {"usernames": usernames};
 
-    let dataJson = await data.json();
-
-    // Check if another error occured
-    if(dataJson["error"]){
-
-        createMessage("danger", dataJson["error"]);
-
-        // If the error message has something to say about a access_token
-        if (dataJson["error"].includes("access_token")){
-
-            window.location.href = "../verify";
-        }
-        return
-    }
+    await fetch("/ajax/playlist", getFetchContext(args));
 
     createMessage("success", "Successfully created a playlist!")
-    updateTitle(`Comparison between ${username1} and ${username2}`);
-
+    
+    updateTitle(`Comparison between ${usernames[0]} and ${usernames[1]}`);
 }
