@@ -1,23 +1,6 @@
 // Set of functions the stats pages might need. Like validation etc.
 
-/**
- * Returns the context for a fetch request
- * 
- * @param {dict} dict Dictionary with the variables used by the server.
- */
-function getFetchContext(dict){
-    
-    return {
-        method: "post",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        mode: "same-origin",
-        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-        body: JSON.stringify(dict)
-    }
-}
+
 /**
  * The process of the usernames input. This makes sure that the input is valid, creates and updates profiles.
  * @param {strings[]} usernames the updated users accounts
@@ -89,11 +72,11 @@ async function updateProfiles(usernames, forced){
 
 
 /**
- * Checks whether the usernames are an entry in the UserProfile db.
+ * Checks whether the usernames are an entry in the SpotifyUser db.
  * Returns a list with all usernames which are not registered.
  * @param {string[]} usernames
  * 
- * @returns {string[]}  All usernames who are not an entry in the UserProfile db.
+ * @returns {string[]}  All usernames who are not an entry in the SpotifyUser db.
  */
 async function validateUsernames(usernames){
     

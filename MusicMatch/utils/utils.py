@@ -3,6 +3,7 @@ Some utility functions needed for all apps.
 """
 
 import os
+import json
 
 def get_env_var(env_var_name):
     """ Gets the enviroment variable. If the enviroment variable does not exist, raise an exception. """

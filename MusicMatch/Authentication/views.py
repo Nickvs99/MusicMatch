@@ -4,13 +4,15 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 
-from .models import UserProfile
+from .models import ExtendedUser
 
 import os
 import requests
 import json
 
-from utils.utils import get_env_var
+from utils.utils import *
+
+from spotify.func import get_sp, get_auth_sp
 
 def home_view(request):
     """ Homepage view """
@@ -40,7 +42,7 @@ def login_view(request):
             messages.success(request, "Logged in.")
 
             # Check if the user already has an access token.
-            user = UserProfile.objects.get(username=username)
+            user = ExtendedUser.objects.get(user__username=username)
             if user.access_token:
                 return redirect("index")
 
@@ -96,8 +98,7 @@ def register_view(request):
         user.save()
 
         # Save it to the extended User model
-        # NOTE when the userprofile already exists, a reference is made from the user object to the userprofile object
-        user = UserProfile(user=user, username=username)
+        user = ExtendedUser(user=user)
         user.save()
         
         messages.success(request, "Successfully registered.")
@@ -158,9 +159,15 @@ def callback(request):
         messages.warning(request, "Some features will not work since you rejected access." )
         return redirect("index")
 
-    user = UserProfile.objects.get(username=request.user)
+    user = ExtendedUser.objects.get(user__username=request.user)
     user.access_token = access_token
     user.refresh_token = refresh_token
     user.save()
+
+    # TODO link this response username to the extendeduser account
+    sp = get_auth_sp(user)
+    response = sp.current_user()
+
+    print_json(response)
 
     return redirect("index")

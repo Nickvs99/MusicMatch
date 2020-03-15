@@ -10,8 +10,8 @@ import spotipy.oauth2 as oauth2
 
 from django.contrib.auth.models import User
 
-from Authentication.models import UserProfile
-from spotify.models import Artist, Song, Genre
+from Authentication.models import ExtendedUser
+from spotify.models import Artist, Song, Genre, SpotifyUser
 
 from utils.utils import get_env_var
 
@@ -57,11 +57,11 @@ def get_songs(sp, username, playlist):
 
     return songs
 
-def get_data(user_profile):
+def get_data(user):
     """ 
     Gets the data from all the songs from a user
     Args:
-        user_profile: UserProfile object
+        user: SpotifyUser object
     Returns:
         artist_count: dict, keys:artists (str), value: count (int)
         genre_count: dict, keys:artists (str), value: count (int)
@@ -71,7 +71,7 @@ def get_data(user_profile):
     artists_count = {}
     genre_count = {}
 
-    for song in user_profile.songs.all():
+    for song in user.songs.all():
 
         for artist in song.artists.all():
 
@@ -153,7 +153,7 @@ def get_auth_sp(user):
     """
     Get an authorized spotipy object for the user.
     Args:
-        user: UserProfile object
+        user: ExtendedUser object
     Returns:
         authorized spotipy object
     """
@@ -185,7 +185,7 @@ def refresh_access_token(user):
     """
     Refreshes the access token for the user.
     Args:
-        user: UserProfile object
+        user: ExtendedUser object
     """
 
     # Refresh access token
@@ -277,19 +277,19 @@ def get_n_dict_and_count(n, keys, dict1, dict2):
 def write_data_to_db(username):
     """
     Writes the songs, artists and genres from username to the database.
-    Adds a relationship between the songs and the userprofile.
+    Adds a relationship between the songs and the SpotifyUser.
     Args: username, str
     """
 
     sp = get_sp()
 
-    userProfile =  UserProfile.objects.filter(username=username).first()
-    if userProfile is None:
-        userProfile = UserProfile(username=username)
-        userProfile.save()
+    user =  SpotifyUser.objects.filter(username=username).first()
+    if user is None:
+        user = SpotifyUser(username=username)
+        user.save()
     
-    userProfile.last_updated = datetime.date.today()
-    userProfile.save()
+    user.last_updated = datetime.date.today()
+    user.save()
 
     # dict with arists who are not yet in the database. These are grouped together,
     # since this will result in less calls to the spotify database.
@@ -307,7 +307,7 @@ def write_data_to_db(username):
             
             if Song.objects.filter(pk = song_id).exists():
 
-                userProfile.songs.add(Song.objects.filter(pk = song_id).first())
+                user.songs.add(Song.objects.filter(pk = song_id).first())
 
                 continue
   
@@ -320,7 +320,7 @@ def write_data_to_db(username):
             new_song = Song(id=song_id, name=song["track"]["name"])
             new_song.save()
 
-            userProfile.songs.add(new_song)
+            user.songs.add(new_song)
 
             artists = []
             for artist in song["track"]["artists"]:
@@ -368,7 +368,7 @@ def add_missing_artists_info(sp, artists_dict):
     for i in range (ceil(len(artists_id)/spotify_limit)):
         
         # Get json response for n artists
-        artists_response = sp.artists(artists_id[i * spotify_limit: (i + 1) + spotify_limit])
+        artists_response = sp.artists(artists_id[i * spotify_limit: (i + 1) * spotify_limit])
 
         for artist in artists_response["artists"]:
             
