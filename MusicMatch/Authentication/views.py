@@ -79,12 +79,10 @@ def register_view(request):
         # Get field from form
         username = request.POST["username"]
         password = request.POST["password"]
-        firstname = request.POST["firstname"]
-        lastname = request.POST["lastname"]
         email = request.POST["email"]
 
         # Check if all fields are filled in
-        if not (username and password and firstname and lastname and email):
+        if not (username and password and email):
             messages.error(request, "All fields are required")
             return render(request, "Authentication/register.html")
 
@@ -94,7 +92,7 @@ def register_view(request):
             messages.error(request, "Username already taken.")
             return render(request, "Authentication/register.html")
 
-        user = User.objects.create_user(username, email, password, first_name=firstname, last_name = lastname)
+        user = User.objects.create_user(username, email, password)
         user.save()
 
         # Save it to the extended User model
@@ -110,7 +108,7 @@ def validate_username(request):
     username = json.loads(request.body).get('username', None)
 
     data = {
-        'usernameTaken': User.objects.filter(username=username).exists(),
+        'valid_username': not User.objects.filter(username=username).exists(),
     }
 
     return JsonResponse(data)
