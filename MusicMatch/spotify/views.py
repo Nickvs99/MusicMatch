@@ -250,6 +250,11 @@ def check_update(request):
 
         return JsonResponse(data)
 
+    if user.last_updated is None:
+        data["update"] = True
+
+        return JsonResponse(data)
+
     # Check if it has been more than x days since last update
     delta = datetime.date.today() - user.last_updated
     if delta.days > 14:

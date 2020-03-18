@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 
 from .models import ExtendedUser
+from spotify.models import SpotifyUser
 
 import os
 import requests
@@ -157,15 +158,22 @@ def callback(request):
         messages.warning(request, "Some features will not work since you rejected access." )
         return redirect("index")
 
+    # Save the tokens to the extended user
     user = ExtendedUser.objects.get(user__username=request.user)
     user.access_token = access_token
     user.refresh_token = refresh_token
     user.save()
 
-    # TODO link this response username to the extendeduser account
+    # Get the profiles id and link it to the extended user
     sp = get_auth_sp(user)
     response = sp.current_user()
 
-    print_json(response)
+    spotify_account = SpotifyUser.objects.filter(username=response["id"]).first()
+    if spotify_account is None:
+        spotify_account = SpotifyUser(username=response["id"])
+        spotify_account.save()
+
+    user.spotify_account = spotify_account
+    user.save()
 
     return redirect("index")
