@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
+from django.core.mail import send_mail
+
 
 from .models import ExtendedUser
 from spotify.models import SpotifyUser
@@ -101,6 +103,24 @@ def register_view(request):
         user.save()
         
         messages.success(request, "Successfully registered.")
+
+        message = 'Thank you for signing up with MusicMatch!'
+
+        try:
+            send_mail(
+                    'confirmation email',
+                    message,
+                    get_env_var("EMAIL_HOST_USER"),
+                    [email],
+                    fail_silently = False
+                )
+        except:
+            print( '\n'.join((
+                "Possible solutions:",
+                " - Make sure your email and password are the right combination.",
+                " - Turn on less secure apps on your google account, visit https://myaccount.google.com/lesssecureapps?pli=1 to turn the feature on.",
+                " - Have a stable internet connection."
+            )))
 
         return redirect("login")
 
