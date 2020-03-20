@@ -4,9 +4,11 @@ Some utility functions needed for all apps.
 
 import os
 import json
+from cryptography.fernet import Fernet
+
 
 def get_env_var(env_var_name):
-    """ Gets the enviroment variable. If the enviroment variable does not exist, raise an exception. """
+    """Gets the enviroment variable. If the enviroment variable does not exist, raise an exception. """
 
     if not os.getenv(env_var_name):
         raise Exception(f"{env_var_name} is not set")
@@ -22,4 +24,30 @@ def print_dic(dic):
 
     for key, value in dic.items():
         print(key, value)
+
+def get_fernet_key():
+    """ Returns the Fernet key in byte format."""
+
+    return get_env_var("FERNET_KEY").encode()
+
+def encrypt_message(message):
+    """
+    Encrypts a message.
+    Args: message, str
+    Returns: str
+    """
+    f = Fernet(get_env_var("FERNET_KEY"))
+
+    return f.encrypt(message.encode()).decode("utf-8")
+
+def decrypt_message(message):
+    """
+    Decrypts a message.
+    Args: message, str
+    Returns: str
+    """
+    f = Fernet(get_env_var("FERNET_KEY"))
+
+    return f.decrypt(message.encode()).decode("utf-8")
+
 

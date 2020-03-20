@@ -9,6 +9,7 @@ urlpatterns = [
     path("register/", views.register_view, name="register"),
     path("verify/", views.verify, name="verify"),
     path("callback/", views.callback, name="callback"),
+    path("account/<str:message>/", views.account_message),
     path("ajax/validate_username", views.validate_username, name="validate_username")
 
 ]

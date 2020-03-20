@@ -104,11 +104,12 @@ def register_view(request):
         
         messages.success(request, "Successfully registered.")
 
-        message = 'Thank you for signing up with MusicMatch!'
+        link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"remove_email/{username}")
+        message = f'Hey {username}, \n\nThank you for signing up with MusicMatch! \n\n If this is not you, please click on the following link. This link will remove your email adres.\n {link}'
 
         try:
             send_mail(
-                    'confirmation email',
+                    'MusicMatch - confirmation email',
                     message,
                     get_env_var("EMAIL_HOST_USER"),
                     [email],
@@ -195,5 +196,33 @@ def callback(request):
 
     user.spotify_account = spotify_account
     user.save()
+
+    return redirect("index")
+
+def account_message(request, message):
+    """ 
+    Performs an action based on the encrypted message in the url.
+    Args:
+        message: str, encrypted message
+    """
+
+    message = decrypt_message(message)
+
+    # Gets the action and username from the message
+    index = message.find("/")
+    action = message[:index]
+    username = message[index + 1:]
+
+    if action == "remove_email":
+
+        user = User.objects.filter(username=username).first()
+        
+        if user is None:
+            messages.info(request, "The account associated with your email no longer exists.")
+        else:
+            user.email = ""
+            user.save()
+
+            messages.success(request, "Your email has been succesfully removed.")
 
     return redirect("index")
