@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         validateUsername();    
     };
 
-    document.getElementById("inputPasswordCheck").onchange = function(){
+    document.getElementById("inputConfirmPassword").onchange = function(){
 
         clearMessages();
         passwordCheck();
@@ -34,7 +34,8 @@ async function validateForm(){
     // errors. Instead of just one.
 
     let validForm = true;
-    if(!allFieldsCheck()){
+    let ids = ["inputUsername", "inputNewPassword", "inputConfirmPassword", "inputEmail"];
+    if(!allFieldsCheck(ids)){
         validForm = false;
     }
     if(!passwordCheck()){
@@ -68,41 +69,4 @@ async function validateUsername(){
         createMessage("danger", "This username is already taken");
     }
     return data["valid_username"]    
-}
-
-/**
- * Checks if the password and confirm password are the same.
- * 
- * @returns bool
- */
-function passwordCheck(){
-
-    let password1 = document.getElementById("inputPassword").value;
-    let password2 = document.getElementById("inputPasswordCheck").value;
-
-    if(password1 == password2){
-        return true;
-    }
-
-    createMessage("danger", "Passwords do not match");
-
-    return false
-}
-
-/**
- * Checks if all fields are filled in.
- * 
- * @returns bool
- */
-function allFieldsCheck(){
-
-    let elementsID = ["inputUsername", "inputPassword", "inputPasswordCheck", "inputEmail"];
-    for(let id of elementsID){
-        if(!document.getElementById(id).value){
-            createMessage("danger", "All fields are required.");
-            return false
-        }
-    }
-
-    return true
 }

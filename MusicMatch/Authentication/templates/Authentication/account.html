@@ -1,0 +1,61 @@
+{% extends "Base/layout.html" %}
+
+{% load static %}
+
+{% block title %}
+    Account - {{ user.user.username }}
+{% endblock %}
+
+{% block body %}
+    <h1>{{ username }}</h1>
+
+    <h3>Account info</h3>
+
+    <div class="row">
+        <div class="col-3">Email: </div>
+
+        <input class="col-7 form-control-plaintext hidden" type="text" placeholder="email" id="inputEmail"/>
+        <div class="col-7" id="emailValue">{{ user.user.email }}</div>
+        
+        <div class="col-2" id="editEmail">Edit</div>
+        <div class="col-2 hidden" id="saveEmail">Save</div>
+
+    </div>
+    <div class="row">
+        <div class="col-3">Spotify account: </div>
+        <div class="col-7">{{ user.spotify_account }}</div>
+        <div class="col-2" id="editSpotifyAccount">Edit</div>
+    </div>
+
+    <div class="row col-12" id="editPassword">Edit password</div>
+    
+    <form action="{% url 'reset_password' %}" class="hidden" method="post" id="formResetPassword">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-3">Old password</div>
+            <input class="col-9 form-control-plaintext" name="oldPassword" type="password" placeholder="old password" id="inputOldPassword">
+        </div>
+
+        <div class="row">
+            <div class="col-3">New password</div>
+            <input class="col-9 form-control-plaintext" name="newPassword" type="password" placeholder="new password" id="inputNewPassword">
+        </div>
+
+        <div class="row">
+            <div class="col-3">Confirm password</div>
+            <input class="col-9 form-control-plaintext" name="confirmPassword" type="password" placeholder="confirm password" id="inputConfirmPassword">
+        </div>
+
+        <input id="submitForm" class="btn btn-primary mb-2" value="Change password"/>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'Base/js/util.js' %}"></script>
+    <script src="{% static 'Authentication/js/auth_util.js' %}"></script>
+    <script src="{% static 'Authentication/js/account.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'Authentication/css/styles.css' %}">
+
+{% endblock %}

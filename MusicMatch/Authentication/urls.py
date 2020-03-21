@@ -9,7 +9,9 @@ urlpatterns = [
     path("register/", views.register_view, name="register"),
     path("verify/", views.verify, name="verify"),
     path("callback/", views.callback, name="callback"),
+    path("account/", views.account_view, name="account"),
+    path("account/reset_password", views.reset_password, name="reset_password"),
     path("account/<str:message>/", views.account_message),
-    path("ajax/validate_username", views.validate_username, name="validate_username")
-
+    path("ajax/validate_username", views.validate_username, name="validate_username"),
+    path("ajax/set_email", views.set_email),
 ]

@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.core.mail import send_mail
+from django.contrib.auth import update_session_auth_hash
 
 
 from .models import ExtendedUser
@@ -13,6 +13,7 @@ import os
 import requests
 import json
 
+from .func import *
 from utils.utils import *
 
 from spotify.func import get_sp, get_auth_sp
@@ -107,23 +108,25 @@ def register_view(request):
         link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"remove_email/{username}")
         message = f'Hey {username}, \n\nThank you for signing up with MusicMatch! \n\n If this is not you, please click on the following link. This link will remove your email adres.\n {link}'
 
-        try:
-            send_mail(
-                    'MusicMatch - confirmation email',
-                    message,
-                    get_env_var("EMAIL_HOST_USER"),
-                    [email],
-                    fail_silently = False
-                )
-        except:
-            print( '\n'.join((
-                "Possible solutions:",
-                " - Make sure your email and password are the right combination.",
-                " - Turn on less secure apps on your google account, visit https://myaccount.google.com/lesssecureapps?pli=1 to turn the feature on.",
-                " - Have a stable internet connection."
-            )))
-
+        send_email('MusicMatch - confirmation email', message, [email])
+              
         return redirect("login")
+
+def account_view(request):
+
+    if not request.user.is_authenticated:
+        messages.warning(request,  "You have to be logged in to see this page")
+        return redirect("index")
+
+    user = ExtendedUser.objects.filter(user=request.user).first()
+    context = {
+        "user": user,
+        "username": user.user.username,
+        "email": user.user.email,
+        "spotify_account": user.spotify_account,
+    }
+
+    return render(request, "Authentication/account.html", context)
 
 def validate_username(request):
 
@@ -226,3 +229,52 @@ def account_message(request, message):
             messages.success(request, "Your email has been succesfully removed.")
 
     return redirect("index")
+
+def set_email(request):
+
+    jsonLoad = json.loads(request.body)
+
+    email = jsonLoad["email"]
+
+    user = User.objects.filter(username=request.user.username).first()
+
+    user.email = email
+    user.save()
+
+    link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"remove_email/{request.user.username}")
+    message = f"Hey {request.user.username}\n\nYour email has successfully changed. If this is not you, please click on the following link. This link will remove your email adres.\n {link}"
+    send_email("MusicMatch - Change of email", message, [email])
+
+    data = {}
+    return JsonResponse(data)
+
+def reset_password(request):
+
+    if request.method == "get":
+        messages.error(request, "Invalid request")
+        return redirect("index")
+    
+    # Get field from form
+    old_password = request.POST["oldPassword"]
+    new_password = request.POST["newPassword"]
+    confirm_password = request.POST["confirmPassword"]
+
+    user = request.user
+    
+    if not user.check_password(old_password):
+        messages.error(request, "Invalid password")
+        return redirect("account")
+
+    if new_password != confirm_password:
+        messages.error(request, "Confirm password is not equal to the new password.")
+        return redirect("account")
+    
+    user.set_password(new_password)
+    user.save()
+
+    # Set password logs the user out. With this step is user is re-authenticated.
+    update_session_auth_hash(request, request.user)
+
+    messages.success(request, "Succesfully changed password")
+
+    return redirect("account")
