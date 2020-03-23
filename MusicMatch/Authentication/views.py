@@ -168,7 +168,7 @@ def verify(request):
 
     API_BASE = 'https://accounts.spotify.com'
     CLI_ID = get_env_var("CLIENT_ID")
-    REDIRECT_URI = get_env_var("REDIRECT_URI")
+    REDIRECT_URI = f"{get_env_var('DOMAIN')}/callback/"
     SCOPE = "playlist-modify-private"
     SHOW_DIALOG = True
     auth_url = f'{API_BASE}/authorize?client_id={CLI_ID}&response_type=code&redirect_uri={REDIRECT_URI}&scope={SCOPE}&show_dialog={SHOW_DIALOG}'
@@ -190,7 +190,7 @@ def callback(request):
     res = requests.post(auth_token_url, data={
         "grant_type":"authorization_code",
         "code":code,
-        "redirect_uri":"http://127.0.0.1:8000/callback/",
+        "redirect_uri":f"{get_env_var('DOMAIN')}/callback/",
         "client_id":get_env_var("CLIENT_ID"),
         "client_secret":get_env_var("CLIENT_SECRET")
         })
@@ -283,7 +283,7 @@ def account_message(request, encr_message):
             return redirect("login")
     else:
         messages.error(request, "Something went wrong on our end. Whoops")
-        
+
     return redirect("index")
 
 def set_email(request):
