@@ -281,8 +281,9 @@ def account_message(request, encr_message):
             user.save()
 
             return redirect("login")
-
-    messages.error(request, "Something went wrong on our end. Whoops")
+    else:
+        messages.error(request, "Something went wrong on our end. Whoops")
+        
     return redirect("index")
 
 def set_email(request):
