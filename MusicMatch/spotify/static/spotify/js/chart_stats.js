@@ -39,8 +39,8 @@ async function UpdateCharts(username){
 
     let data = await response.json()
 
-    artistCount = data["artist_count"];
-    genreCount = data["genre_count"]
+    let artistCount = data["artist_count"];
+    let genreCount = data["genre_count"]
 
     updateTitle("Stats for " + username)
 

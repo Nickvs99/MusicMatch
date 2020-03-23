@@ -144,9 +144,8 @@ function clearCharts(){
 
     let chartIDs = ["artistChart", "genreChart"];
 
-    for(let i in chartIDs){
+    for(let id of chartIDs){
 
-        let id = chartIDs[i];
         let element = document.getElementById(id);
         let cloneElement = element.cloneNode(false);
 
