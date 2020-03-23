@@ -2,6 +2,15 @@
 
 {% load static %}
 
+{% block scripts %}
+    <script src="{% static 'Base/js/util.js' %}"></script>
+    <script src="{% static 'Authentication/js/auth_util.js' %}"></script>
+    <script src="{% static 'Authentication/js/account.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'Authentication/css/styles.css' %}">
+
+{% endblock %}
+
 {% block title %}
     Account - {{ user.user.username }}
 {% endblock %}
@@ -49,13 +58,4 @@
 
         <input id="submitForm" class="btn btn-primary mb-2" value="Change password"/>
     </form>
-{% endblock %}
-
-{% block scripts %}
-    <script src="{% static 'Base/js/util.js' %}"></script>
-    <script src="{% static 'Authentication/js/auth_util.js' %}"></script>
-    <script src="{% static 'Authentication/js/account.js' %}"></script>
-
-    <link rel="stylesheet" href="{% static 'Authentication/css/styles.css' %}">
-
 {% endblock %}

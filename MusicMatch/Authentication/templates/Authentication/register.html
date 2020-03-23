@@ -2,6 +2,13 @@
 
 {% load static %}
 
+{% block scripts %}
+
+    <script src="{% static 'Authentication/js/auth_util.js' %}"></script>
+    <script src="{% static 'Authentication/js/register.js' %}"></script>
+
+{% endblock %}
+
 {% block title %}
     Register
 {% endblock %}
@@ -43,11 +50,4 @@
 
         <input id="submitForm" value="Register" class="btn btn-primary mb-2"/>
     </form>
-{% endblock %}
-
-{% block scripts %}
-
-    <script src="{% static 'Authentication/js/auth_util.js' %}"></script>
-    <script src="{% static 'Authentication/js/register.js' %}"></script>
-
 {% endblock %}

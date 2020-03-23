@@ -2,10 +2,6 @@
 
 {% load static %}
 
-{% block title %}
-    Stats
-{% endblock %}
-
 {% block scripts %}
 
     <link rel="stylesheet" href="{% static 'spotify/css/styles.css' %}">
@@ -14,6 +10,10 @@
     <script src="{% static 'spotify/js/chart_util.js' %}"></script>
     <script src="{% static 'spotify/js/chart_stats.js' %}"></script>
 
+{% endblock %}
+
+{% block title %}
+    Stats
 {% endblock %}
 
 {% block body %}
