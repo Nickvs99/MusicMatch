@@ -128,6 +128,28 @@ def account_view(request):
 
     return render(request, "Authentication/account.html", context)
 
+def forgot_password_view(request):
+
+    if request.method == "GET":
+        return render(request, "Authentication/forgot_password.html")
+
+    elif request.method == "POST":
+
+        username = request.POST["username"]
+        email = request.POST["email"]
+
+        # Check if the combination exists
+        if not User.objects .filter(username=username, email=email).exists():
+            messages.error(request, "The username - email combination does not exist.")
+            return render(request, "Authentication/forgot_password.html")
+        
+        link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"change_password/{username}")
+        message = f"Hey {username} \n\n. Please click on the following link for your password reset: \n\n {link}"
+        send_email("MusicMatch - Change of password", message, [email])
+
+        messages.success(request, "Check your email!")
+        return render(request, "Authentication/forgot_password.html")
+
 def validate_username(request):
 
     username = json.loads(request.body).get('username', None)
@@ -150,7 +172,7 @@ def verify(request):
     SCOPE = "playlist-modify-private"
     SHOW_DIALOG = True
     auth_url = f'{API_BASE}/authorize?client_id={CLI_ID}&response_type=code&redirect_uri={REDIRECT_URI}&scope={SCOPE}&show_dialog={SHOW_DIALOG}'
-    print(auth_url)
+
     return redirect(auth_url)
 
 def callback(request):
@@ -202,20 +224,20 @@ def callback(request):
 
     return redirect("index")
 
-def account_message(request, message):
+def account_message(request, encr_message):
     """ 
     Performs an action based on the encrypted message in the url.
     Args:
         message: str, encrypted message
     """
 
-    message = decrypt_message(message)
+    message = decrypt_message(encr_message)
 
     # Gets the action and username from the message
     index = message.find("/")
     action = message[:index]
     username = message[index + 1:]
-
+    print(action, username)
     if action == "remove_email":
 
         user = User.objects.filter(username=username).first()
@@ -228,6 +250,39 @@ def account_message(request, message):
 
             messages.success(request, "Your email has been succesfully removed.")
 
+    elif action == "change_password":
+
+        if request.method == "GET":
+
+            context = {
+                "username": username,
+                "message": encr_message
+            }
+            return render(request, "Authentication/change_password.html", context)
+
+        elif request.method == "POST":
+            
+            new_password = request.POST["newPassword"]
+            confirm_password = request.POST["confirmPassword"]
+
+            # Non js check
+            if new_password != confirm_password:
+                messages.error(request, "The passwords are not the same")
+                context = {
+                    "username": username,
+                    "message": encr_message
+                }
+
+                return render(request, "Authentication/change_password.html", context)
+
+            user = User.objects.filter(username=username).first()
+
+            user.set_password(new_password)
+            user.save()
+
+            return redirect("login")
+
+    messages.error(request, "Something went wrong on our end. Whoops")
     return redirect("index")
 
 def set_email(request):
