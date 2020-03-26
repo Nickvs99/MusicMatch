@@ -12,11 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordCheck();
     };
 
-    document.getElementById("submitForm").onclick = async function(){
-        if(await validateForm()){
-            document.getElementById("form").submit()
+    document.getElementById("formRegister").onsubmit = async function(){
+
+        // Since this is a async function the default behauviour is stopped
+        event.preventDefault();
+        event.stopPropagation();
+
+        let valid = await validateForm();
+        if(valid){
+            document.getElementById("formRegister").submit()
         }
-        
+        return false;
     }
 });
 
@@ -46,7 +52,6 @@ async function validateForm(){
     }
 
     console.log(validForm)
-
     return validForm
 } 
 

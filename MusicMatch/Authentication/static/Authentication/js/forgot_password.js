@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    document.getElementById("submitForm").onclick = () => {
+    document.getElementById("submitForm").onsubmit = () => {
 
         let ids = ["inputUsername", "inputEmail"];
         if(allFieldsCheck(ids)){
-            document.getElementById("formForgotPassword").submit()
+            return true;
         }
+        return false;
     }
 });

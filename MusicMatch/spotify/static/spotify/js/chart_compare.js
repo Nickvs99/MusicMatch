@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    document.getElementById("submitUsernames").onclick = () => {
+    document.getElementById("formCompare").onsubmit = () => {
         
         clearMessages();
         clearCharts();
@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let username2 = inputUsername2Element.value
         
         UpdatePage([username1, username2]);
+
+        return false;
     }
         
     document.getElementById("inputCreatePlaylist").onclick = () => {
@@ -25,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let inputUsername2Element = document.getElementById("inputUsername2");
         let username2 = inputUsername2Element.value;
 
-        RunCreatePlaylist([username1, username2])
+        RunCreatePlaylist([username1, username2]);
 
     }
 });

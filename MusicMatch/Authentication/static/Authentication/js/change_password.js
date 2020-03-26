@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    document.getElementById("submitForm").onclick = () => {
+    document.getElementById("formChangePassword").onsubmit = () => {
 
         let ids = ["inputNewPassword", "inputConfirmPassword"];
         if(allFieldsCheck(ids)){
-            document.getElementById("formChangePassword").submit()
+            return true;
         }
+        return false;
     }
 });

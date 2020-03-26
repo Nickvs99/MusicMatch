@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         this.style.display = "none";
     }
 
-    document.getElementById("submitForm").onclick = function(){
+    document.getElementById("formResetPassword").onsubmit = function(){
 
         clearMessages();
 

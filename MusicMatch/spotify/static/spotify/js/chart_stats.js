@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    document.getElementById("submitUsername").onclick = () => {
+    document.getElementById("submitForm").onsubmit = () => {
         
         clearMessages();
         clearCharts();
@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let username = inputUsernameElement.value
         
         UpdatePage(username);
+
+        return false;
     }
 });
 
