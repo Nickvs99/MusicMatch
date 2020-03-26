@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    document.getElementById("editEmail").onclick = function(){
+    document.getElementById("editEmail").onclick = () => {
 
         document.getElementById("emailValue").style.display = "none";
         document.getElementById("inputEmail").style.display = "block";
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
-    document.getElementById("saveEmail").onclick = async function(){
+    document.getElementById("saveEmail").onclick = async () => {
 
         clearMessages();
 
@@ -33,16 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    document.getElementById("editSpotifyAccount").onclick = function(){
+    document.getElementById("editSpotifyAccount").onclick = () => {
         window.location.href = "/verify"
     }
 
-    document.getElementById("editPassword").onclick = function(){
+    document.getElementById("editPassword").onclick = () => {
         document.getElementById("formResetPassword").style.display = "block";
         this.style.display = "none";
     }
 
-    document.getElementById("formResetPassword").onsubmit = function(){
+    document.getElementById("formResetPassword").onsubmit = () => {
 
         clearMessages();
 

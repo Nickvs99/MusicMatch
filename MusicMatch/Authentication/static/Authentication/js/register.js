@@ -6,13 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
         validateUsername();    
     };
 
-    document.getElementById("inputConfirmPassword").onchange = function(){
+    document.getElementById("inputConfirmPassword").onchange = () => {
 
         clearMessages();
         passwordCheck();
     };
 
-    document.getElementById("formRegister").onsubmit = async function(){
+    document.getElementById("formRegister").onsubmit = async () => {
 
         // Since this is a async function the default behauviour is stopped
         event.preventDefault();
