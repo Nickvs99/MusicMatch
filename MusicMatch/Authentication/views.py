@@ -219,8 +219,12 @@ def callback(request):
         spotify_account = SpotifyUser(username=response["id"])
         spotify_account.save()
 
-    user.spotify_account = spotify_account
-    user.save()
+    if hasattr(spotify_account, "extendeduser"):
+        messages.error(request, "This spotify account is already tied to another account.")
+    else:
+        messages.success(request, "Your spotify account is now tied to your musicmatch account. ")
+        user.spotify_account = spotify_account
+        user.save()
 
     return redirect("index")
 
