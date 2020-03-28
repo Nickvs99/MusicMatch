@@ -1,37 +1,77 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    document.getElementById("inputUsername").onchange = function(){
-        
-        // Clear all previous error messages
-        let elements = document.getElementsByClassName("inputUsernameError");
-        while(elements[0]){
-            elements[0].remove();
-        }
-        
-        let usernameInputElement = document.getElementById("inputUsername");
-        let username = usernameInputElement.value;
+    document.getElementById("inputUsername").onchange = async function(){
 
-        CheckUsername(username);
+        clearMessages();
+        validateUsername();    
     };
+
+    document.getElementById("inputConfirmPassword").onchange = () => {
+
+        clearMessages();
+        passwordCheck();
+    };
+
+    document.getElementById("formRegister").onsubmit = async () => {
+
+        // Since this is a async function the default behauviour is stopped
+        event.preventDefault();
+        event.stopPropagation();
+
+        let valid = await validateForm();
+        if(valid){
+            document.getElementById("formRegister").submit()
+        }
+        return false;
+    }
 });
 
-// Check if username exists
-async function CheckUsername(username){
+/**
+ * Checks wheter the form is valid. The form is valid when all fields are filled
+ * in, password and confirm password are the same and the username does not yet exist.
+ * 
+ * @returns bool True when form is valid
+ */
+async function validateForm(){
 
+    clearMessages();
+
+    // Three seperated if statements are used, since this will display all of the
+    // errors. Instead of just one.
+
+    let validForm = true;
+    let ids = ["inputUsername", "inputNewPassword", "inputConfirmPassword", "inputEmail"];
+    if(!allFieldsCheck(ids)){
+        validForm = false;
+    }
+    if(!passwordCheck()){
+        validForm = false;
+    }
+    if(!await validateUsername()){
+        validForm = false;
+    }
+
+    console.log(validForm)
+    return validForm
+} 
+
+/**
+ * Checks if the username is an entry in the ExtendedUser db.
+ * 
+ * @returns bool True when the username does not exist
+ */
+async function validateUsername(){
+    
+    let usernameInputElement = document.getElementById("inputUsername");
+    let username = usernameInputElement.value;
+    
     let args = {"username": username};
-
-    // TODO absolute path or relate from root or django template
     let response = await fetch("/ajax/validate_username", getFetchContext(args));
 
     let data = await response.json();
 
-    if (data["usernameTaken"]){
-            
-        let newElement = document.createElement("Small");
-        newElement.innerHTML = "This username already exists";
-        newElement.classList.add("inputUsernameError");
-
-        let usernameInputElement = document.getElementById("inputUsername");
-        usernameInputElement.parentNode.insertBefore(newElement, usernameInputElement.nextSibling);
+    if(!data["valid_username"]){
+        createMessage("danger", "This username is already taken");
     }
+    return data["valid_username"]    
 }

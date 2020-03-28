@@ -2,10 +2,6 @@
 
 {% load static %}
 
-{% block title %}
-    Update profile
-{% endblock %}
-
 {% block scripts %}
 
     <script src="{% static 'spotify/js/chart_util.js' %}"></script>
@@ -13,15 +9,19 @@
 
 {% endblock %}
 
+{% block title %}
+    Update profile
+{% endblock %}
+
 {% block body %}
     <h3 id="title">Update profile</h3>
 
-    <div class="form-group row">
+    <form class="form-group row" id="formUpdate">
         <div class="col-8 col-sm-10">
             <input name="username" class="form-control-plaintext" type="text" placeholder="Update user..." id="inputUsername"/>
         </div>
-        <div id="submitUsername" class="btn btn-primary col-3 col-sm-2">Update</div>
-    </div>
+        <button id="submitUsername" class="btn btn-primary col-3 col-sm-2">Update</button>
+    </form>
 
 {% endblock %}
 

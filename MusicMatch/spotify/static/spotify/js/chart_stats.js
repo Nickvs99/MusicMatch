@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    document.getElementById("submitUsername").onclick = () => {
+    document.getElementById("submitForm").onsubmit = () => {
         
         clearMessages();
         clearCharts();
@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let username = inputUsernameElement.value
         
         UpdatePage(username);
+
+        return false;
     }
 });
 
@@ -39,8 +41,8 @@ async function UpdateCharts(username){
 
     let data = await response.json()
 
-    artistCount = data["artist_count"];
-    genreCount = data["genre_count"]
+    let artistCount = data["artist_count"];
+    let genreCount = data["genre_count"]
 
     updateTitle("Stats for " + username)
 

@@ -15,7 +15,9 @@
    
     <div class="ml-auto">
         {% if request.user.is_authenticated %}
-            {{ request.user.username }}
+            <a href="{% url 'account' %}">
+                <div>{{request.user.username}}</button>
+            </a>
             <a href="{% url 'logout' %}">
                 <button class="btn btn-outline-secondary" type="button">Sign out</button>
             </a>

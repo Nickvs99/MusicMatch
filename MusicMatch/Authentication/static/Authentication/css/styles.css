@@ -5,20 +5,17 @@
 
 .img-left {
   float: left;
-  margin-right: 10px;
 }
 
 .img-right {
   float: right;
-  margin-left: 10 px;
 }
 
 .img-text-block {
   clear: both;
-  margin-top:10px;
-  margin-bottom:10px;
 }
 
-
-
+.hidden {
+  display: none;
+}
 /*# sourceMappingURL=styles.css.map */

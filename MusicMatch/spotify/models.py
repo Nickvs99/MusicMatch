@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+from jsonfield import JSONField
 
 class Genre(models.Model):
 
@@ -30,3 +30,18 @@ class Song(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+class SpotifyUser(models.Model):
+
+    username = models.CharField(max_length=250, primary_key=True, default="")
+
+    songs = models.ManyToManyField(Song, blank=True)
+
+    last_updated = models.DateField(null=True, default=None)
+
+    # Cashed results
+    artist_count = JSONField(null=True, default=None)
+    genre_count = JSONField(null=True, default=None)
+
+    def __str__(self):
+        return f"{self.username}"

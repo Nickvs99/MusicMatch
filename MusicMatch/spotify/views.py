@@ -4,7 +4,7 @@ from django.db import transaction
 
 import datetime
 
-from Authentication.models import UserProfile
+from Authentication.models import ExtendedUser
 
 from .func import *
 
@@ -22,24 +22,19 @@ def update_view(request):
 
 def stats(request):
     """
-    Returns the stats for a user. This user has to be an entry in the UserProfile table.
+    Returns the stats for a user. This user has to be an entry in the SpotifyUser table.
     Returns:
         artist_count: dict, key: artist name (str), value: count (int)
         genre_count: dict, key: genre name (str), value: count (int)
     """
 
-    # TODO different syntax
     username = json.loads(request.body).get('username', None)
 
-    user_profile = UserProfile.objects.filter(pk=username).first()
+    user = SpotifyUser.objects.filter(pk=username).first()
 
-    artist_count = user_profile.artist_count
-
-    genre_count = user_profile.genre_count
-
-    frequent_artists = get_n_heighest_from_dict(artist_count, 10)
+    frequent_artists = get_n_heighest_from_dict(user.artist_count, 10)
     
-    frequent_genres = get_n_heighest_from_dict(genre_count, 15)
+    frequent_genres = get_n_heighest_from_dict(user.genre_count, 15)
 
     data = {
         "artist_count": frequent_artists,
@@ -51,7 +46,7 @@ def stats(request):
 def compare(request):
     """
     Returns the data used for the comparison between two users.
-    Both users have to be an entry in the UserProfile table.
+    Both users have to be an entry in the SpotifyUser table.
     Returns:
         artists: list (str) artist names 
         user1_artist_count: dict, keys: artist name (str), value: count (int)
@@ -66,8 +61,8 @@ def compare(request):
 
     usernames = jsonLoad["usernames"]
 
-    user1 = UserProfile.objects.filter(pk=usernames[0]).first()
-    user2 = UserProfile.objects.filter(pk=usernames[1]).first()
+    user1 = SpotifyUser.objects.filter(pk=usernames[0]).first()
+    user2 = SpotifyUser.objects.filter(pk=usernames[1]).first()
 
     user1_artist_count = user1.artist_count
     user1_genre_count = user1.genre_count
@@ -105,10 +100,10 @@ def playlist(request):
 
     usernames = jsonLoad["usernames"]
 
-    user = UserProfile.objects.get(pk=request.user.username)
+    user = ExtendedUser.objects.get(user__username=request.user.username)
 
-    user1 = UserProfile.objects.get(pk=usernames[0])
-    user2 = UserProfile.objects.get(pk=usernames[1])
+    user1 = SpotifyUser.objects.get(pk=usernames[0])
+    user2 = SpotifyUser.objects.get(pk=usernames[1])
 
     sp = get_auth_sp(user)
 
@@ -120,7 +115,7 @@ def playlist(request):
         if song in user1_songs:
             in_common_songs.append(song.id)
 
-    create_playlist(sp, request.user.username, usernames, in_common_songs)
+    create_playlist(sp, user.user.username, usernames, in_common_songs)
     
     data = {}
     return JsonResponse(data)
@@ -157,7 +152,7 @@ def validate_spotify_usernames(request):
 
 def validate_usernames(request):
     """
-    Checks whether the usernames have an enrie in the UserProfile table.
+    Checks whether the usernames have an enrie in the SpotifyUser table.
     Returns:
         usernames username: bool, True if the username has a spotify account
         all_valid: bool, True when all usernames are valid
@@ -173,7 +168,7 @@ def validate_usernames(request):
     all_valid = True
     for username in usernames:
         
-        if not UserProfile.objects.filter(pk=username).exists():
+        if not SpotifyUser.objects.filter(pk=username).exists():
 
             data[username] = False
             all_valid = False
@@ -201,9 +196,9 @@ def check_access_token(request):
 
         return JsonResponse(data)
 
-    user_profile = UserProfile.objects.filter(pk=request.user.username).first()
+    user = ExtendedUser.objects.filter(user__username=request.user.username).first()
 
-    if user_profile.access_token == "":
+    if user.access_token == "":
         data["access_token"] = False
         return JsonResponse(data)
 
@@ -213,21 +208,20 @@ def check_access_token(request):
 def update(request):
     """
     Updates a user. 
-    If the user does not exist create an entry in the UserProfile table.
+    If the user does not exist, create an entry in the SpotifyUser table.
     """
     jsonLoad = json.loads(request.body)
 
     username = jsonLoad["username"]
 
-    user = UserProfile.objects.filter(pk=username).first()
+    user = SpotifyUser.objects.filter(pk=username).first()
 
     if user is None:
-        user = UserProfile(username=username)
+        user = SpotifyUser(username=username)
         user.save()
 
+    # Clear all song relationships with this user
     if user.songs:
-
-        # Clear all song relationships with this user
         user.songs.clear()
 
     write_data_to_db(username)
@@ -248,15 +242,20 @@ def check_update(request):
 
     username = jsonLoad["username"]
 
-    userProfile =  UserProfile.objects.filter(username=username).first()
-    if userProfile is None:
+    user =  SpotifyUser.objects.filter(username=username).first()
+    if user is None:
 
         data["update"] = True
 
         return JsonResponse(data)
 
+    if user.last_updated is None:
+        data["update"] = True
+
+        return JsonResponse(data)
+
     # Check if it has been more than x days since last update
-    delta = datetime.date.today() - userProfile.last_updated
+    delta = datetime.date.today() - user.last_updated
     if delta.days > 14:
         
         data["update"] = True
@@ -277,14 +276,14 @@ def cache_results(request):
 
     username = jsonLoad["username"]
 
-    user_profile = UserProfile.objects.filter(username=username).first()
+    user = SpotifyUser.objects.filter(username=username).first()
     
-    results = get_data(user_profile)
+    results = get_data(user)
 
-    user_profile.artist_count = results[0]
-    user_profile.genre_count = results[1]
+    user.artist_count = results[0]
+    user.genre_count = results[1]
 
-    user_profile.save()
+    user.save()
 
     data = {}
     return JsonResponse(data)
