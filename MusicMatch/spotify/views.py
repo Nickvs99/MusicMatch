@@ -28,7 +28,6 @@ def stats(request):
         genre_count: dict, key: genre name (str), value: count (int)
     """
 
-    # TODO different syntax
     username = json.loads(request.body).get('username', None)
 
     user = SpotifyUser.objects.filter(pk=username).first()

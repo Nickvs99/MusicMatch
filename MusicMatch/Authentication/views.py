@@ -73,7 +73,7 @@ def register_view(request):
 
     if request.method == 'GET':
         if request.user.is_authenticated:
-            messages.warning(request, 'You have to logout, to register a new user.')
+            messages.warning(request, 'Please logout before registering a new user')
             return redirect("index")
 
         return render(request, "Authentication/register.html")
@@ -107,12 +107,15 @@ def register_view(request):
 
         link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"remove_email/{username}")
         message = f'Hey {username}, \n\nThank you for signing up with MusicMatch! \n\n If this is not you, please click on the following link. This link will remove your email adres.\n {link}'
-
         send_email('MusicMatch - confirmation email', message, [email])
               
         return redirect("login")
 
 def account_view(request):
+    """ 
+    Account view. View info about the authenticated profile and let the user edit its 
+    email, spotify_account and password.
+    """
 
     if not request.user.is_authenticated:
         messages.warning(request,  "You have to be logged in to see this page")
@@ -129,6 +132,7 @@ def account_view(request):
     return render(request, "Authentication/account.html", context)
 
 def forgot_password_view(request):
+    """ Lets the user change its password when it has forgotten his. """
 
     if request.method == "GET":
         return render(request, "Authentication/forgot_password.html")
@@ -144,13 +148,19 @@ def forgot_password_view(request):
             return render(request, "Authentication/forgot_password.html")
         
         link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"change_password/{username}")
-        message = f"Hey {username} \n\n. Please click on the following link for your password reset: \n\n {link}"
+        message = f"Hey {username} \n\n. Please click on the following link to reset your password: \n\n {link}"
         send_email("MusicMatch - Change of password", message, [email])
 
         messages.success(request, "Check your email!")
         return render(request, "Authentication/forgot_password.html")
 
 def validate_username(request):
+    """
+    Checks if a username is already taken or not. 
+    Returns:
+        dict:
+            "valid_username": bool
+    """
 
     username = json.loads(request.body).get('username', None)
 
@@ -180,6 +190,8 @@ def callback(request):
     authorization-code-flow Step 2.
     Get the refresh and access tokens.
     https://developer.spotify.com/documentation/general/guides/authorization-guide/
+
+    Link spotify account to current authenticated account.
     """
 
     code = request.GET.get('code')
@@ -241,7 +253,7 @@ def account_message(request, encr_message):
     index = message.find("/")
     action = message[:index]
     username = message[index + 1:]
-    print(action, username)
+
     if action == "remove_email":
 
         user = User.objects.filter(username=username).first()
@@ -256,12 +268,13 @@ def account_message(request, encr_message):
 
     elif action == "change_password":
 
+        context = {
+            "username": username,
+            "message": encr_message
+        }
+
         if request.method == "GET":
 
-            context = {
-                "username": username,
-                "message": encr_message
-            }
             return render(request, "Authentication/change_password.html", context)
 
         elif request.method == "POST":
@@ -269,13 +282,9 @@ def account_message(request, encr_message):
             new_password = request.POST["newPassword"]
             confirm_password = request.POST["confirmPassword"]
 
-            # Non js check
             if new_password != confirm_password:
+                
                 messages.error(request, "The passwords are not the same")
-                context = {
-                    "username": username,
-                    "message": encr_message
-                }
 
                 return render(request, "Authentication/change_password.html", context)
 
@@ -284,13 +293,16 @@ def account_message(request, encr_message):
             user.set_password(new_password)
             user.save()
 
+            messages.success(request, "Successfully changed password.")
+
             return redirect("login")
     else:
-        messages.error(request, "Something went wrong on our end. Whoops")
+        messages.error(request, "Something went wrong on our end. Sorry for the inconvenience.")
 
     return redirect("index")
 
 def set_email(request):
+    """ Change the email of the currently authenticated user. """
 
     jsonLoad = json.loads(request.body)
 
@@ -309,6 +321,7 @@ def set_email(request):
     return JsonResponse(data)
 
 def reset_password(request):
+    """ Resets the password of the currently loggedin user. """
 
     if request.method == "get":
         messages.error(request, "Invalid request")
