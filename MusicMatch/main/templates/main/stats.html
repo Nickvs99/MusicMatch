@@ -1,0 +1,36 @@
+{% extends "main/layout.html" %}
+
+{% load static %}
+
+{% block scripts %}
+
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+    <script src="{% static 'main/js/chart_util.js' %}"></script>
+    <script src="{% static 'main/js/chart_stats.js' %}"></script>
+
+{% endblock %}
+
+{% block title %}
+    Stats
+{% endblock %}
+
+{% block body %}
+
+    <form class="form-group row" id="submitForm">
+        <div class="col-8 col-sm-10">
+            <input name="username" class="form-control-plaintext" type="text" placeholder="Search username..." id="inputUsername"/>
+        </div>
+        <button type="submit" id="submitUsername" class="btn btn-primary col-3 col-sm-2">Search</button>
+    </form>
+
+    <h3 id="title">Stats</h3>
+
+    <div id="charts">
+        <canvas class="chart" id="artistChart" width="400" height="400"></canvas>        
+
+        <canvas class="chart" id="genreChart" width="400" height="400"></canvas>    
+    </div>
+
+{% endblock %}

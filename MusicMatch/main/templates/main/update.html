@@ -1,0 +1,27 @@
+{% extends "main/layout.html" %}
+
+{% load static %}
+
+{% block scripts %}
+
+    <script src="{% static 'main/js/chart_util.js' %}"></script>
+    <script src="{% static 'main/js/update.js' %}"></script>
+
+{% endblock %}
+
+{% block title %}
+    Update profile
+{% endblock %}
+
+{% block body %}
+    <h3 id="title">Update profile</h3>
+
+    <form class="form-group row" id="formUpdate">
+        <div class="col-8 col-sm-10">
+            <input name="username" class="form-control-plaintext" type="text" placeholder="Update user..." id="inputUsername"/>
+        </div>
+        <button id="submitUsername" class="btn btn-primary col-3 col-sm-2">Update</button>
+    </form>
+
+{% endblock %}
+
