@@ -1,0 +1,42 @@
+{% extends "main/layout.html" %}
+
+{% load static %}
+
+{% block scripts %}
+
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    
+    <script src="{% static 'main/js/chart_util.js' %}"></script>
+    <script src="{% static 'main/js/chart_compare.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+    Compare
+{% endblock %}
+
+
+{% block body %}
+
+    <form class="form-group row" id="formCompare">
+
+        <input name="username1" id="inputUsername1" class="form-control-plaintext col-4 col-sm-5" type="text" placeholder="Search for user..."/>
+
+        <input name="username2" id="inputUsername2" class="form-control-plaintext col-4 col-sm-5" type="text" placeholder="Search for user..."/>
+
+        <button type="submit" id="submitUsernames" class="btn btn-primary col-3 col-sm-2">Search</button>
+    </form>
+
+    
+    <div class="row">
+        <h3 id="title">Comparison</h3>
+        <button id="inputCreatePlaylist" class="btn btn-primary mb-2 ml-auto">Create Playlist</button>
+    </div>
+    
+    <div id="charts">
+        <canvas class="chart" id="artistChart" width="400" height="400"></canvas>
+
+        <canvas class="chart" id="genreChart" width="400" height="400"></canvas>
+    </div>
+{% endblock %}
