@@ -1,3 +1,16 @@
+body {
+  width: 100%;
+}
+
+button {
+  border: 1px solid;
+  border-radius: 10px;
+  border-color: grey;
+  padding: 10px 15px;
+  background-color: transparent;
+  margin: 5px 2px;
+}
+
 .main {
   margin-left: 15%;
   margin-right: 15%;
@@ -38,5 +51,33 @@
 .chart {
   margin: 0 auto;
   max-width: 575px;
+}
+
+.content {
+  padding: 0 18px;
+  overflow: hidden;
+  background-color: transparent;
+  width: 100%;
+  -webkit-transition: max-height 0.2s ease-out;
+  transition: max-height 0.2s ease-out;
+  max-height: 0px;
+}
+
+.navbar {
+  background-color: #FFF3F3;
+  width: 100%;
+}
+
+.navbarCollapseItem {
+  display: block;
+  color: black;
+  font-size: 20px;
+  margin: 5px 0px;
+}
+
+.navbar-right {
+  position: absolute;
+  top: 6px;
+  right: 16px;
 }
 /*# sourceMappingURL=styles.css.map */

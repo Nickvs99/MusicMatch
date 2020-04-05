@@ -1,34 +1,33 @@
-<nav class="navbar navbar-expand-sm navbar-light bg-light">
+<nav class="navbar navbar-expand-sm navbar-light">
 
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapseContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+    <button class="collapsible" type="button">
+        <!-- TODO Custom icon -->
+        Menu
     </button> 
 
-    <div class="collapse navbar-collapse" id="navbarCollapseContent">
-        <ul class="navbar-nav">
-            <a class="navbar-brand" href="{% url 'index' %}">Home</a>
-            <a class="navbar-brand" href="{% url 'stats' %}">Stats</a> 
-            <a class="navbar-brand" href="{% url 'compare' %}">Compare</a> 
-            <a class="navbar-brand" href="{% url 'update' %}">Update</a> 
-        </ul>
+    <div class="content">
+        <a class="navbarCollapseItem" href="{% url 'index' %}">Home</a>
+        <a class="navbarCollapseItem" href="{% url 'stats' %}">Stats</a> 
+        <a class="navbarCollapseItem" href="{% url 'compare' %}">Compare</a> 
+        <a class="navbarCollapseItem" href="{% url 'update' %}">Update</a> 
     </div>
    
-    <div class="ml-auto">
+    <div class="navbar-right">
         {% if request.user.is_authenticated %}
-            <a href="{% url 'account' %}">
-                <div>{{request.user.username}}</button>
+            <a id="usernameButton" href="{% url 'account' %}">
+                <button>{{request.user.username}}</button>
             </a>
             <a href="{% url 'logout' %}">
-                <button class="btn btn-outline-secondary" type="button">Sign out</button>
+                <button type="button">Sign out</button>
             </a>
 
         {% else %}
             <a href="{% url 'login' %}">
-                <button class="btn btn-outline-primary" type="button">Login</button>
+                <button type="button">Login</button>
             </a>
             
-            <a  href="{% url 'register' %}">
-                <button class="btn btn-outline-secondary" type="button">Register</button>
+            <a href="{% url 'register' %}">
+                <button type="button">Register</button>
             </a>
         {% endif %}
     </div>
