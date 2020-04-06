@@ -12,22 +12,19 @@
 
 {% block body %}
     
-    <h1>Music Match</h1>
+    <h1 class="title">Music Match</h1>
 
-    <div class="img-text-block">
-        <img class="img-homepage img-left" src="{% static 'main/img/stats.png' %}" alt="View your stats">
-        MusicMatch lets you view your music taste! Varying from your favorite artists to your favorite genres. And not just your own! 
-        With one simple search request you can view any of your friends music style.
-    </div>
+    <form class="flexbox">
+        <input name="username" class="input-text" type="text" placeholder="username" id="inputUsername"/>
+        <button type="submit" class="add-user-button">+</button>
 
-    <div class=img-text-block>
-        <img class="img-homepage img-right" src="{% static 'main/img/compare.png' %}" alt="Compare your stats">
-        MusicMatch lets you compare your music taste with others. All you need is their spotify username. You can view which artist and 
-        genres you have in common. 
-    </div>
-    <div class=img-text-block>
-        <img class="img-homepage img-left" src="{% static 'main/img/share_playlist.jpg' %}" alt="Make a collabarative playlist">
-        Create and listen to a custom made spotify playlist. This playlist will contain songs based on the music taste of 2 users. Ideal for
-        listening to music when you are with the two of you.
-    </div>
+    </form>
+
+    <hr>
+    
+    <ul>
+        <li class="bullet-text">View your music taste</li>
+        <li class="bullet-text">Compare with others</li>
+        <li class="bullet-text">Enjoy music with them</li>
+    </ul>
 {% endblock %}

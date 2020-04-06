@@ -1,5 +1,7 @@
 $main-margin-side:15%;
 $theme-color-light: #FFF3F3;
+$theme-color-bright: #FF7272;
+$border-color: #707070;
 
 body {
     width:100%;
@@ -8,12 +10,30 @@ body {
 button { 
     border: 1px solid;
     border-radius: 10px;
-    border-color:grey;
+    border-color:$border-color;
     padding: 10px 15px;
     background-color: transparent;
     margin: 5px 2px;
 }
 
+li {
+	margin: 0;
+	padding: 20px 0 20px 40px;
+	list-style: none;
+	background-image: url("../img/music_note.png");
+	background-repeat: no-repeat;
+	background-position: left center;
+	background-size: 40px;
+}
+
+ul {
+    padding: 0px;
+}
+
+hr {
+    margin: 30px 0px;
+}
+ 
 .main {
     margin-left: $main-margin-side;
     margin-right: $main-margin-side;
@@ -28,24 +48,6 @@ button {
     .row {
       margin-left:0px;
     }
-}
-
-.img-homepage {
-    max-width: 50%;
-    min-width: 150px;
-
-}
-
-.img-left{
-    float:left;
-}
-
-.img-right {
-    float:right;
-}
-
-.img-text-block {
-    clear: both;
 }
 
 .hidden {
@@ -84,4 +86,28 @@ button {
     position: absolute;
     top: 6px;
     right: 16px;
+}
+
+.input-text { 
+    border: 1px solid;
+    border-color: $border-color;
+    border-radius: 10px;
+    padding: 2px 0px 2px 10px; 
+    margin: 5px 2px;
+    flex:1;
+}
+
+.flexbox {
+    display:flex;
+}
+
+.title {
+    color: $theme-color-bright;
+    margin:20px 0px;
+}
+
+.bullet-text {
+    font-size: 20px;
+    font-weight: 600;
+    font-style: italic;
 }
