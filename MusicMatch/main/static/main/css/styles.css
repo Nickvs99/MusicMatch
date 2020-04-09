@@ -30,6 +30,15 @@ hr {
   margin: 30px 0px;
 }
 
+footer {
+  background-color: #FFF3F3;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 0 0 0 10px;
+}
+
 .main {
   margin-left: 15%;
   margin-right: 15%;
@@ -160,5 +169,12 @@ hr {
   100% {
     max-height: 100px;
   }
+}
+
+.footer-item {
+  display: inline-block;
+  margin: 10px;
+  color: #707070;
+  font-weight: 500;
 }
 /*# sourceMappingURL=styles.css.map */

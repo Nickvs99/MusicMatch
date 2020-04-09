@@ -2,6 +2,7 @@ $main-margin-side:15%;
 $theme-color-light: #FFF3F3;
 $theme-color-bright: #FF7272;
 $border-color: #707070;
+$font-color: #707070;
 
 body {
     width:100%;
@@ -34,7 +35,16 @@ ul {
 hr {
     margin: 30px 0px;
 }
- 
+
+footer {
+    background-color: $theme-color-light;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 0 0 0 10px;
+}
+
 .main {
     margin-left: $main-margin-side;
     margin-right: $main-margin-side;
@@ -153,3 +163,9 @@ hr {
     }
 }
 
+.footer-item{
+    display: inline-block;
+    margin: 10px;
+    color: $font-color;
+    font-weight: 500;
+}
