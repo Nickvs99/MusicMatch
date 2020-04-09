@@ -1,5 +1,6 @@
 body {
   width: 100%;
+  font-size: 16px;
 }
 
 button {
@@ -93,6 +94,24 @@ hr {
           flex: 1;
 }
 
+.add-user {
+  background-color: #CBFFC0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.do-nothing {
+  background-color: #DCDCDC;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.remove-user {
+  background-color: #FF7272;
+  font-size: 18px;
+  font-weight: bolder;
+}
+
 .flexbox {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -108,5 +127,38 @@ hr {
   font-size: 20px;
   font-weight: 600;
   font-style: italic;
+}
+
+.submit {
+  background-color: #FFF3F3;
+}
+
+.expand {
+  -webkit-animation: expand 0.2s ease-out;
+          animation: expand 0.2s ease-out;
+}
+
+.shrink {
+  -webkit-animation: expand 0.2s ease-in-out;
+          animation: expand 0.2s ease-in-out;
+  animation-direction: reverse;
+}
+
+@-webkit-keyframes expand {
+  0% {
+    max-height: 0px;
+  }
+  100% {
+    max-height: 100px;
+  }
+}
+
+@keyframes expand {
+  0% {
+    max-height: 0px;
+  }
+  100% {
+    max-height: 100px;
+  }
 }
 /*# sourceMappingURL=styles.css.map */

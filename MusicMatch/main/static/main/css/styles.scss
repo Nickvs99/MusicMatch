@@ -5,6 +5,7 @@ $border-color: #707070;
 
 body {
     width:100%;
+    font-size: 16px;
 }
   
 button { 
@@ -97,6 +98,24 @@ hr {
     flex:1;
 }
 
+.add-user {
+    background-color: #CBFFC0;
+    font-size:18px;
+    font-weight: bold;
+}
+
+.do-nothing{
+    background-color: #DCDCDC;
+    font-size:18px;
+    font-weight: bold;
+}
+
+.remove-user {
+    background-color: $theme-color-bright;
+    font-size:18px;
+    font-weight: bolder;
+}
+
 .flexbox {
     display:flex;
 }
@@ -111,3 +130,26 @@ hr {
     font-weight: 600;
     font-style: italic;
 }
+
+.submit {
+    background-color: $theme-color-light;
+}
+
+.expand {
+    animation: expand 0.2s ease-out;
+}
+
+.shrink {
+    animation: expand 0.2s ease-in-out;
+    animation-direction: reverse;
+}
+
+@keyframes expand {
+    0% {
+        max-height: 0px;
+    }
+    100% {
+        max-height: 100px;
+    }
+}
+

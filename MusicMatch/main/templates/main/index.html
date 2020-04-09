@@ -14,10 +14,14 @@
     
     <h1 class="title">Music Match</h1>
 
-    <form class="flexbox">
-        <input name="username" class="input-text" type="text" placeholder="username" id="inputUsername"/>
-        <button type="submit" class="add-user-button">+</button>
+    <form id="formUsernames">
 
+        <div class="flexbox user-field">
+            <input name="username" class="input-text" type="text" placeholder="username" id="inputUsername"/>
+            <button class="add-user">+</button>
+        </div>
+
+        <button type="submit" class="submit" id="submitForm">Submit</button>
     </form>
 
     <hr>
