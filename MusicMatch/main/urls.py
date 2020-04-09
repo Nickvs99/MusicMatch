@@ -16,7 +16,8 @@ urlpatterns = [
     path("account/", views.account_view, name="account"),
     path("account/reset_password", views.reset_password, name="reset_password"),
     path("account/<str:encr_message>/", views.account_message, name="account_message"),
-    
+    path("error/construction", views.construction, name="construction"),
+
     path("ajax/validate_username", ajax.validate_username, name="validate_username"),
     path("ajax/set_email", ajax.set_email),
     path("ajax/playlist", ajax.playlist, name="playlist"),

@@ -323,3 +323,7 @@ def reset_password(request):
     messages.success(request, "Succesfully changed password")
 
     return redirect("account")
+
+def construction(request):
+
+    return render(request, "main/construction.html")
