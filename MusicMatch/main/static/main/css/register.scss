@@ -1,0 +1,24 @@
+$error-color:red;
+
+.f-row{
+    margin: 15px 5px 5px 5px;
+}
+
+.register-label {
+    margin:0 0 2px 0;
+    font-size: 14px;
+    font-weight:bold;
+
+}
+
+.register-input {
+    width:100%;
+}
+
+.invalid-input {
+    border-color: $error-color;
+}
+
+.error-text {
+    color: $error-color;
+}

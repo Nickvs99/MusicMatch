@@ -10,13 +10,16 @@ function passwordCheck(){
     let password1 = document.getElementById("inputNewPassword").value;
     let password2 = document.getElementById("inputConfirmPassword").value;
 
+    let confirmField = document.getElementById("inputConfirmPassword").parentNode;
+    removeErrorMessages(confirmField);
+
     if(password1 == password2){
         return true;
     }
 
-    createMessage("danger", "Passwords do not match");
+    addErrorMessage(confirmField, "Passwords do not match");
 
-    return false
+    return false;
 }
 
 /**
@@ -27,12 +30,44 @@ function passwordCheck(){
  */
 function allFieldsCheck(ids){
 
+    let valid = true;
     for(let id of ids){
-        if(!document.getElementById(id).value){
-            createMessage("danger", "All fields are required.");
-            return false
+        let el = document.getElementById(id)  
+        if(!el.value){ 
+
+            addErrorMessage(el.parentNode, "This field is required");
+            valid = false;
         }
     }
 
-    return true
+    return valid
+}
+
+function removeErrorMessages(element){
+    for(let child of element.children){
+
+        // remove message
+        if(child.classList.contains("error-text")){
+            child.remove();
+        }
+
+        // remove invalid style on input
+        if(child.classList.contains("input-text")){
+            child.classList.remove("invalid-input");
+        }
+    }
+}
+
+function addErrorMessage(parent, message){
+
+    let errorElement = document.createElement("small");
+    errorElement.classList.add("error-text");
+    errorElement.innerHTML = message;
+
+    parent.appendChild(errorElement);
+    for(let child of parent.children){
+        if(child.classList.contains("input-text")){
+            child.classList.add("invalid-input")
+        }
+    }
 }

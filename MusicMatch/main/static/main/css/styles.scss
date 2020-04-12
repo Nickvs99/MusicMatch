@@ -100,12 +100,23 @@ footer {
     right: 16px;
 }
 
+.user-field{
+    margin: 5px 0px;
+}
+
+.input-user-field {
+    margin:0 2px;
+}
+
 .input-text { 
     border: 1px solid;
     border-color: $border-color;
     border-radius: 10px;
     padding: 2px 0px 2px 10px; 
-    margin: 5px 2px;
+    height:50px;
+}
+
+.flex-1{
     flex:1;
 }
 
@@ -113,18 +124,21 @@ footer {
     background-color: #CBFFC0;
     font-size:18px;
     font-weight: bold;
+    margin:0;
 }
 
 .do-nothing{
     background-color: #DCDCDC;
     font-size:18px;
     font-weight: bold;
+    margin:0;
 }
 
 .remove-user {
     background-color: $theme-color-bright;
     font-size:18px;
-    font-weight: bolder;
+    font-weight: bold;
+    margin:0;
 }
 
 .flexbox {
@@ -134,6 +148,11 @@ footer {
 .title {
     color: $theme-color-bright;
     margin:20px 0px;
+}
+
+.text {
+    font-size:20px;
+    font-weight: 600;
 }
 
 .bullet-text {

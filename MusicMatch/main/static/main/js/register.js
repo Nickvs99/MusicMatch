@@ -34,13 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
  */
 async function validateForm(){
 
-    clearMessages();
 
     // Three seperated if statements are used, since this will display all of the
     // errors. Instead of just one.
 
     let validForm = true;
     let ids = ["inputUsername", "inputNewPassword", "inputConfirmPassword", "inputEmail"];
+    for(let id of ids){
+        let el = document.getElementById(id).parentNode;
+        removeErrorMessages(el);
+    }
     if(!allFieldsCheck(ids)){
         validForm = false;
     }
@@ -51,7 +54,6 @@ async function validateForm(){
         validForm = false;
     }
 
-    console.log(validForm)
     return validForm
 } 
 
@@ -64,6 +66,10 @@ async function validateUsername(){
     
     let usernameInputElement = document.getElementById("inputUsername");
     let username = usernameInputElement.value;
+
+    // Remove possible previous error message
+    let userField = usernameInputElement.parentNode;
+    removeErrorMessages(userField);
     
     let args = {"username": username};
     let response = await fetch("/ajax/validate_username", getFetchContext(args));
@@ -71,7 +77,9 @@ async function validateUsername(){
     let data = await response.json();
 
     if(!data["valid_username"]){
-        createMessage("danger", "This username is already taken");
+        let userField = usernameInputElement.parentNode;
+        
+        addErrorMessage(userField, "This username is already taken");
     }
     return data["valid_username"]    
 }
