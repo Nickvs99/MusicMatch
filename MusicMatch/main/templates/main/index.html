@@ -4,6 +4,7 @@
 
 {% block scripts %}
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    <script src="{% static 'main/js/home.js' %}"></script>
 {% endblock %}
 
 {% block title %}
@@ -17,7 +18,7 @@
     <form id="formUsernames">
 
         <div class="flexbox user-field">
-            <input name="username" class="input-text flex-1 input-user-field" type="text" placeholder="username" id="inputUsername"/>
+            <input name="username" class="input-text flex-1 input-user-field" type="text" placeholder="username"/>
             <button class="add-user">+</button>
         </div>
 

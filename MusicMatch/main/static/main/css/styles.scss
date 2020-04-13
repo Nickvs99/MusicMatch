@@ -191,5 +191,76 @@ footer {
     font-weight: 500;
     // margin-top: auto;
     // margin-bottom: 0;
+}
 
+.background{
+    backdrop-filter: blur(4px);
+
+    width:100vw;
+    height:100vh;
+
+    position:fixed;
+    top:0;
+    left:0;
+
+    // z-index: 0;
+}
+
+$login-padding-left: 15px;
+$login-padding-right:10px;
+.login-block {
+    background-color: white;
+
+    width:90%;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);   
+    
+    border: 1px groove $border-color;
+    border-radius: 20px;
+
+    overflow: hidden;
+}
+
+.login-row {
+    overflow:hidden;
+    padding-left: $login-padding-left;
+    padding-right: $login-padding-right;
+    display: flex;
+    margin-top:10px;
+}
+
+
+.login-label {
+    width:40%;
+    align-self: center;
+    font-weight:bold;
+    font-size: 18px;
+}
+
+.login-input {
+    width:60%;
+    float:right;
+}
+
+#forgot-link {
+    float: left;
+    align-self: center;
+}
+
+.signup-bar {
+    background-color: $theme-color-light;
+    margin-top:10px;
+    padding:10px $login-padding-right 10px $login-padding-left;
+}
+
+.text-link {
+    color:#111111;
+    text-decoration: underline;
+}
+
+#login-title {
+    padding-left: $login-padding-left;
+    padding-right: $login-padding-right;
 }

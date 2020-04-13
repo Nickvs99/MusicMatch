@@ -1,32 +1,31 @@
-{% extends "main/layout.html" %}
-
-{% block title %}
-    Login
-{% endblock %}
-
-{% block body %}
-
-    <h1>Login</h1>
+<div id="loginBlock" class="hidden login-block">
+    <h1 class="title" id="login-title">Login</h1>
 
     <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
-        <div class="form-group row">
-            <label for="inputEmail" class="col-3 col-sm-2 col-form-label">Username</label>
-            <div class="col">
-                <input name="username" class="form-control-plaintext" type="text" placeholder="username" id="inputUsername"/>
-            </div>
+        <div class="login-row">
+            <label for="inputUsernameLogin" class="login-label">Username</label>
+            <input name="username" class="input-text login-input" type="text" placeholder="username" id="inputUsernameLogin"/>
         </div>
         
-        <div class="form-group row">
-            <label for="inputPassword" class="col-3 col-sm-2 col-form-label">Password</label>
-            <div class="col">
-                <input name="password" class="form-control-plaintext" type="password" placeholder="password" id=inputPassword/>
-            </div>
+        <div class="login-row">
+            <label for="inputPassword" class="login-label">Password</label>
+            <input name="password" class="input-text login-input" type="password" placeholder="password" id=inputPassword/>
         </div>
-        <input type="submit" value="Login" class="btn btn-primary mb-2"/>
+
+        <div class="login-row">
+            <a href="{% url 'forgot_password' %}" class="text-link" id="forgot-link">
+                Forgot password?
+            </a>
+            <button type="submit" class="submit">Login</button>
+        </div>
+
+        <div class="signup-bar">
+            Don't have an account? <a href="{% url 'register' %}"class="text-link">Register!</a>
+        </div>
+        
     </form>
-    <a href="{% url 'forgot_password' %}">
-        Forgot password?
-    </a>
+
+</div>
     
-{% endblock %}
+    
