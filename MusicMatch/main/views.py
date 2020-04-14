@@ -73,7 +73,7 @@ def logout_view(request):
     else:
         messages.warning(request,"You are already logged out.")
 
-    return redirect("login")
+    return redirect("index")
 
 def register_view(request):
     """ Register view. Has the field to register a user."""
@@ -107,8 +107,7 @@ def register_view(request):
         user.save()
 
         # Save it to the extended User model
-        user = ExtendedUser(user=user)
-        user.save()
+        ExtendedUser(user=user).save()
         
         messages.success(request, "Successfully registered.")
 
@@ -116,7 +115,8 @@ def register_view(request):
         message = f'Hey {username}, \n\nThank you for signing up with MusicMatch! \n\n If this is not you, please click on the following link. This link will remove your email adres.\n {link}'
         send_email('MusicMatch - confirmation email', message, [email])
               
-        return redirect("login")
+        login(request, user)
+        return redirect("index")
 
 def account_view(request):
     """ 
@@ -286,7 +286,7 @@ def account_message(request, encr_message):
 
             messages.success(request, "Successfully changed password.")
 
-            return redirect("login")
+            return redirect("index")
     else:
         messages.error(request, "Something went wrong on our end. Sorry for the inconvenience.")
 
