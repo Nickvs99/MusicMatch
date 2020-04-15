@@ -224,19 +224,8 @@ $login-padding-right:10px;
 }
 
 .login-row {
-    overflow:hidden;
     padding-left: $login-padding-left;
     padding-right: $login-padding-right;
-    display: flex;
-    margin-top:10px;
-}
-
-
-.login-label {
-    width:40%;
-    align-self: center;
-    font-weight:bold;
-    font-size: 18px;
 }
 
 .login-input {
@@ -263,4 +252,28 @@ $login-padding-right:10px;
 #login-title {
     padding-left: $login-padding-left;
     padding-right: $login-padding-right;
+}
+
+.f-row{
+    margin: 15px 5px 5px 5px;
+}
+
+.label-form {
+    margin:0 0 2px 0;
+    font-size: 14px;
+    font-weight:bold;
+
+}
+
+.input-form {
+    width:100%;
+}
+
+$error-color: red;
+.invalid-input {
+    border-color: $error-color;
+}
+
+.error-text {
+    color: $error-color;
 }

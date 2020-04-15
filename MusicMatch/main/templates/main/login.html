@@ -3,17 +3,17 @@
 
     <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
-        <div class="login-row">
-            <label for="inputUsernameLogin" class="login-label">Username</label>
-            <input name="username" class="input-text login-input" type="text" placeholder="username" id="inputUsernameLogin"/>
+        <div class="f-row login-row">
+            <label for="inputUsernameLogin" class="label-form">Username</label>
+            <input name="username" class="input-text input-form" type="text" placeholder="username" id="inputUsernameLogin"/>
         </div>
         
-        <div class="login-row">
-            <label for="inputPassword" class="login-label">Password</label>
-            <input name="password" class="input-text login-input" type="password" placeholder="password" id=inputPassword/>
+        <div class="f-row login-row">
+            <label for="inputPassword" class="label-form">Password</label>
+            <input name="password" class="input-text input-form" type="password" placeholder="password" id=inputPassword/>
         </div>
 
-        <div class="login-row">
+        <div class="f-row login-row">
             <a href="{% url 'forgot_password' %}" class="text-link" id="forgot-link">
                 Forgot password?
             </a>

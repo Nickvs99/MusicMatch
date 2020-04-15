@@ -232,22 +232,8 @@ footer {
 }
 
 .login-row {
-  overflow: hidden;
   padding-left: 15px;
   padding-right: 10px;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  margin-top: 10px;
-}
-
-.login-label {
-  width: 40%;
-  -ms-flex-item-align: center;
-      -ms-grid-row-align: center;
-      align-self: center;
-  font-weight: bold;
-  font-size: 18px;
 }
 
 .login-input {
@@ -276,5 +262,27 @@ footer {
 #login-title {
   padding-left: 15px;
   padding-right: 10px;
+}
+
+.f-row {
+  margin: 15px 5px 5px 5px;
+}
+
+.label-form {
+  margin: 0 0 2px 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.input-form {
+  width: 100%;
+}
+
+.invalid-input {
+  border-color: red;
+}
+
+.error-text {
+  color: red;
 }
 /*# sourceMappingURL=styles.css.map */

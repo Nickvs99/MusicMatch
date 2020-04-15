@@ -6,7 +6,6 @@
 
     <script src="{% static 'main/js/auth_util.js' %}"></script>
     <script src="{% static 'main/js/register.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'main/css/register.css' %}">
 
 {% endblock %}
 
@@ -22,23 +21,23 @@
         {% csrf_token %}
 
         <div class="f-row">
-            <label for="inputUsername" class="register-label">Username </label>
-            <input name="username" class="input-text register-input" type="text" placeholder="username" id="inputUsername"/>
+            <label for="inputUsername" class="label-form">Username </label>
+            <input name="username" class="input-text input-form" type="text" placeholder="username" id="inputUsername"/>
         </div>
 
         <div class="f-row">
-            <label for="inputPassword" class="register-label">Password </label>
-            <input name="password" class="input-text register-input" type="password" placeholder="password" id="inputNewPassword"/>
+            <label for="inputPassword" class="label-form">Password </label>
+            <input name="password" class="input-text input-form" type="password" placeholder="password" id="inputNewPassword"/>
         </div>
 
         <div class="f-row">
-            <label for="inputPasswordConfirm" class="register-label">Confirm password </label>
-            <input name="passwordCheck" class="input-text register-input" type="password" placeholder="confirm password" id="inputConfirmPassword"/>
+            <label for="inputPasswordConfirm" class="label-form">Confirm password </label>
+            <input name="passwordCheck" class="input-text input-form" type="password" placeholder="confirm password" id="inputConfirmPassword"/>
         </div>
 
         <div class="f-row">
-            <label for="inputEmail" class="register-label">Email </label>
-            <input name="email" class="input-text register-input" type="text" placeholder="email" id="inputEmail"/>
+            <label for="inputEmail" class="label-form">Email </label>
+            <input name="email" class="input-text input-form" type="text" placeholder="email" id="inputEmail"/>
         </div>
 
         <button type="submit" id="submitForm" class="submit">Register</button>
