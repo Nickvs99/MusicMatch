@@ -34,12 +34,9 @@ def login_view(request):
     """ Login view. Manages the login process. """
 
     if request.method == 'GET':
-        if request.user.is_authenticated:
-            messages.warning(request, "You are already logged in.")
 
-            return redirect("index")
-
-        return render(request, "main/login.html")
+        # TODO auto expand login form
+        return redirect("index")
     
     elif request.method =='POST':
 
@@ -61,7 +58,9 @@ def login_view(request):
 
         else:
             messages.error(request, "Invalid credentials.")
-            return render(request, "main/login.html")
+
+            # TODO auto collapse login form
+            return redirect("index")
 
 def logout_view(request):
     """ Logs the user out. Then redirects to the login view."""
@@ -126,6 +125,7 @@ def account_view(request):
 
     if not request.user.is_authenticated:
         messages.warning(request,  "You have to be logged in to see this page")
+        # TODO auto collapse login form
         return redirect("index")
 
     user = ExtendedUser.objects.filter(user=request.user).first()
