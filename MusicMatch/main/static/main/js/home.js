@@ -5,6 +5,35 @@ document.addEventListener('DOMContentLoaded', () => {
     let userField = document.getElementById("formUsernames").children[0];
     let addButton = userField.children[1];
     addButton.onclick = addUserField;
+
+	document.getElementById("formUsernames").onsubmit = async () => {
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		let ids = ["benefits-list", "stats-single-username", "stats-comparison"]
+		hideElementsByIds(ids);
+
+		let usernames = getUserNames();
+
+		if(! await processingUsernames(usernames, false)){
+			return false;
+		}
+
+		if(usernames.length == 1){
+			showElementsByIds(["stats-single-username"]);
+			createSingleCharts(usernames[0]);
+		}
+		else {
+			console.log("COMPARISON")
+			showElementsByIds(["stats-comparison"]);
+			createComparisonCharts(usernames);
+		}
+
+		updateTitle("DONE")
+		console.log(usernames);
+		return false;
+    };
 });
 
 function addUserField() {
@@ -15,7 +44,7 @@ function addUserField() {
     let userField = this.parentNode;
   
     let clone = userField.cloneNode(true);
-    clone.children[1].value = null;
+    clone.children[0].value = null;
   
     form.insertBefore(clone, document.getElementById("submitForm"));
   
@@ -53,9 +82,9 @@ function addUserField() {
     this.onclick = removeUserField;
   
     return false; 
-  }
+}
   
-  function removeUserField() {
+function removeUserField() {
   
     // Set the shrink animation
     this.parentNode.classList.add("shrink");
@@ -76,4 +105,399 @@ function addUserField() {
     }
   
     return false;
-  }
+}
+
+function getUserNames(){
+
+    let usernames = [];
+
+	let userFields = document.getElementsByClassName("user-field");
+    for(let userField of userFields){
+    	let username = userField.children[0].value;
+    	usernames.push(username);
+    }
+    return usernames;
+}
+
+function hideElementsByIds(ids){
+
+	for(let id of ids){
+		document.getElementById(id).classList.add("hidden");
+	}
+}
+
+function showElementsByIds(ids){
+	
+	for(let id of ids){
+		document.getElementById(id).classList.remove("hidden");
+	}
+}
+
+/**
+ * The process of the usernames input. This makes sure that the input is valid, creates and updates profiles.
+ * @param {strings[]} usernames the updated users accounts
+ * @param {boolean} forced Should the usernames be forced to update
+ */
+async function processingUsernames(usernames, forced){
+
+    let inValidUsernames = await validateUsernames(usernames);
+    
+    if(inValidUsernames.length != 0){
+
+        let valid = await validateSpotify(inValidUsernames);
+
+        if(!valid){
+            // TODO better title
+            updateTitle("Stats")
+            return false
+        }
+    }
+
+    await updateProfiles(usernames, forced);
+
+    return true
+}
+
+/**
+ * Manages the update procedure for the usernames. Checks if a update is needed
+ * and if so updates the profile.
+ * @param {strings[]} usernames the updated users accounts
+ * @param {boolean} forced Should the usernames be forced to update
+ */
+async function updateProfiles(usernames, forced){
+    
+    for(let i in usernames){
+        let username = usernames[i];
+
+        let args = {"username": username};
+
+        if(!forced){
+            
+            updateTitle("Checking for update...");
+            
+            let vars = {"usernames": username}
+            let response = await fetch("/ajax/check_update", getFetchContext(args))
+
+            let data = await response.json();
+            
+            forced = data["update"];
+        }
+
+        if(!forced){
+            continue
+        } 
+
+        updateTitle(`Updating ${username}'s profile...`);
+
+        await fetch("/ajax/update", getFetchContext(args));
+
+        updateTitle(`Cashing results for ${username}'s profile...`);
+
+        await fetch("/ajax/cache_results", getFetchContext(args)); 
+
+        createMessage("success", `Updated ${username}'s profile`);
+        
+        updateTitle("Updated profile");
+        
+    }
+}
+
+
+/**
+ * Checks whether the usernames are an entry in the SpotifyUser db.
+ * Returns a list with all usernames which are not registered.
+ * @param {string[]} usernames
+ * 
+ * @returns {string[]}  All usernames who are not an entry in the SpotifyUser db.
+ */
+async function validateUsernames(usernames){
+    
+    updateTitle("Checking if accounts exist in database.");
+
+    let args = {"usernames": usernames};
+    let response = await fetch("/ajax/validate_usernames", getFetchContext(args));
+
+    let data = await response.json();
+
+    inValidUsernames = [];
+    for(let username in data){
+
+        if (!data[username]){
+            inValidUsernames.push(username);
+        }
+    }
+
+    return inValidUsernames
+}
+
+/**
+ * Checks wheter the usernames have a spotify account.
+ * @param {string[]} usernames
+ * @returns bool true when all usernames have a spotify account
+ */
+async function validateSpotify(usernames){
+
+    updateTitle("Checking if accounts exist in spotify database.");
+    
+    let args = {"usernames": usernames};
+    let response = await fetch("/ajax/validate_spotify_usernames", getFetchContext(args));
+
+    let data = await response.json();
+
+    if (data["all_valid"]){
+        return true
+    }
+
+    for(let username in data["usernames"]){
+
+        if(!data["usernames"][username]){
+            createMessage("danger", `${username} does not have a spotify account.`);
+        }   
+    }
+
+    return false
+}
+
+/**
+ * Updates the innerText of the title div
+ * @param {string} title
+ */
+function updateTitle(title){
+    document.getElementById("title").innerText = title;
+}
+
+/**
+ * Clears the charts. This is done by removing the old element and then creating 
+ * a new element with the same attributes.
+ * 
+ * TODO seach for a cleaner solution.
+ */
+function clearCharts(){
+
+    let chartIDs = ["artistChart", "genreChart"];
+
+    for(let id of chartIDs){
+
+        let element = document.getElementById(id);
+        let cloneElement = element.cloneNode(false);
+
+        // Set  the elements after the title
+        let chartsElement = document.getElementById("charts");
+        chartsElement.appendChild(cloneElement);
+
+        
+        element.remove();
+    }
+}
+
+/**
+ * Updates the charts based on the usernames
+ * @param {string[]} usernames 
+ * 
+ * TODO more than two users
+ */
+async function createSingleCharts(username){
+
+    updateTitle("Reading stats for " + username);
+    
+    let args = {"username": username};
+    let response = await fetch("/ajax/stats", getFetchContext(args));
+
+    let data = await response.json()
+
+    let artistCount = data["artist_count"];
+    let genreCount = data["genre_count"]
+
+    updateTitle("Stats for " + username)
+
+    drawCharts(artistCount, genreCount);
+}
+
+/**
+ * Updates the charts based on the usernames
+ * @param {string[]} usernames 
+ * 
+ * TODO more than two users
+ */
+async function createComparisonCharts(usernames){
+
+    updateTitle(`Loading comparison between ${usernames[0]} and ${usernames[1]}`);
+
+    // Aquire data
+    let args = {"usernames": usernames};
+    let response = await fetch("/ajax/compare", getFetchContext(args));
+
+    // Parse to json format
+    let data = await response.json();
+
+    let artists = data["artists"];
+    let user1ArtistCount = data["user1_artist_count"];
+    let user2ArtistCount = data["user2_artist_count"];
+
+    let genres = data["genres"];
+    let user1GenreCount = data["user1_genre_count"];
+    let user2GenreCount = data["user2_genre_count"];
+
+    // Update charts
+    horizontalBarChart("artistChartComparison", usernames, artists, user1ArtistCount, user2ArtistCount, "Most in common artists");
+    horizontalBarChart("genreChartComparison", usernames, genres, user1GenreCount, user2GenreCount, "Most in common genres");
+
+    updateTitle(`Comparison between ${usernames[0]} and ${usernames[1]}`);
+}
+
+/**
+ * Creates a bar and pie chart with the data.
+ * @param {dict} artistCount 
+ * @param {dict} genreCount 
+ */
+function drawCharts(artistCount, genreCount){
+    var ctx = document.getElementById('artistChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(artistCount),
+            datasets: [{
+                label: "Count",
+                data: Object.values(artistCount),
+                backgroundColor: colors,
+                borderColor: borderColors,
+                borderWidth: 1 
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            responsive: true,
+            title: {
+                display: true,
+                text: "Most popular artists"
+            }
+        }
+    });
+
+    // Piechart which visualises the genre distribution
+    var ctx = document.getElementById('genreChart').getContext('2d');
+    var myPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            datasets: [{
+                data: Object.values(genreCount),
+                backgroundColor: createPieColors(Object.keys(genreCount).length, colors),
+                borderColor: 'rgba(255,255,255,255)',
+                borderWidth:1,
+            }],
+        
+            // These labels appear in the legend and in the tooltips when hovering different arcs
+            labels: Object.keys(genreCount)
+        },
+        options: {
+            title: {
+                display: true,
+                text: "Most popular genres"
+            },
+        }
+    });
+}
+
+// Colors used for the charts. Format is used for chart.js
+var colors = [
+    'rgba(255, 99, 132, 0.2)',
+    'rgba(54, 162, 235, 0.2)',
+    'rgba(255, 206, 86, 0.2)',
+    'rgba(75, 192, 192, 0.2)',
+    'rgba(153, 102, 255, 0.2)',
+    'rgba(255, 159, 64, 0.2)',
+    'rgba(255, 170, 170, 0.2)',
+    'rgba(128, 0,0,0.2)',
+    'rgba(210, 245, 60,0.2)',
+    'rgba(0,0,128,0.2)',
+]
+
+// BorderColors used for the charts
+// TODO link them to colors
+var borderColors = [
+    'rgba(255, 99, 132, 1)',
+    'rgba(54, 162, 235, 1)',
+    'rgba(255, 206, 86, 1)',
+    'rgba(75, 192, 192, 1)',
+    'rgba(153, 102, 255, 1)',
+    'rgba(255, 159, 64, 1)',
+    'rgba(255, 170, 170, 1)',
+    'rgba(128, 0,0,1)',
+    'rgba(210, 245, 60,1)',
+    'rgba(0,0,128,1)',
+]
+
+/**
+ * Creates the colors for the pie chart. This is done by looping over colorPalette.
+ * @param {int} n The number of colors
+ * @param {string[]} colorPalette The available colors
+ */
+function createPieColors(n, colorPalette){
+    
+    pieColors = []
+    for( let i = 0; i < n; i++){
+        pieColors.push(colorPalette[i % colorPalette.length])
+    }
+    return pieColors
+}
+
+/**
+ * Creates a horizontal barchart
+ * @param {string} id The html id
+ * @param {string[]} usernames 
+ * @param {string[]} labels The labels for the datasets
+ * @param {dict} data1 
+ * @param {dict} data2 
+ * @param {string} title The title of the chart
+ */
+function horizontalBarChart(id, usernames, labels, data1, data2, title){
+
+    // Checks if element exists
+    var element = document.getElementById(id);
+    if (!element){
+        return;
+    }
+    
+    var ctx = element.getContext('2d');
+    var myGenreChart = new Chart(ctx, {
+        type: 'horizontalBar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: usernames[0],
+                data: data1,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1,
+
+            },{
+                label: usernames[1],
+                data: data2,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1,
+            }],
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    display: true,
+                    ticks: {
+                        beginAtZero: true,
+                    }
+                }]
+            },
+            title: {
+                display: true,
+                text: title,
+            },
+            responsive: true,
+        }
+    });
+}

@@ -5,6 +5,9 @@
 {% block scripts %}
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <script src="{% static 'main/js/home.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
 {% endblock %}
 
 {% block title %}
@@ -13,7 +16,7 @@
 
 {% block body %}
     
-    <h1 class="title">Music Match</h1>
+    <h1 class="title" id="title">Music Match</h1>
 
     <form id="formUsernames">
 
@@ -26,10 +29,25 @@
     </form>
 
     <hr>
-    
-    <ul>
+
+    <ul id="benefits-list">
         <li class="bullet-text">View your music taste</li>
         <li class="bullet-text">Compare with others</li>
         <li class="bullet-text">Enjoy music together</li>
     </ul>
+
+    <div id="stats-single-username" class="hidden">
+        <canvas class="chart" id="artistChart" width="400" height="400"></canvas>        
+
+        <canvas class="chart" id="genreChart" width="400" height="400"></canvas>    
+    </div>
+
+    <div id="stats-comparison" class="hidden">
+        <canvas class="chart" id="artistChartComparison" width="400" height="400"></canvas>
+
+        <canvas class="chart" id="genreChartComparison" width="400" height="400"></canvas>
+    </div>
+    
+    
+
 {% endblock %}

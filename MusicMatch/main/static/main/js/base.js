@@ -14,8 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-
-
     document.getElementById("button-login").onclick = createLoginScreen;
 });
 
