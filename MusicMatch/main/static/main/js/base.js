@@ -14,7 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    document.getElementById("button-login").onclick = createLoginScreen;
+    if(document.getElementById("button-login")){
+      document.getElementById("button-login").onclick = createLoginScreen;
+    }
 });
 
 
