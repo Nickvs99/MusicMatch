@@ -34,6 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
 		console.log(usernames);
 		return false;
     };
+
+    document.getElementById("inputCreatePlaylist").onclick = () => {
+
+        clearMessages();
+
+        let usernames = getUserNames();
+
+        RunCreatePlaylist(usernames);
+
+    }
 });
 
 function addUserField() {
@@ -113,7 +123,10 @@ function getUserNames(){
 
 	let userFields = document.getElementsByClassName("user-field");
     for(let userField of userFields){
-    	let username = userField.children[0].value;
+        let username = userField.children[0].value;
+        if (username ==""){
+            continue;
+        }
     	usernames.push(username);
     }
     return usernames;
@@ -500,4 +513,64 @@ function horizontalBarChart(id, usernames, labels, data1, data2, title){
             responsive: true,
         }
     });
+}
+
+/**
+ * Checks if the current logged in user has an access token.
+ * Redirects the user to {verify} if the user doesn't have it.
+ * @return bool
+ */
+async function CheckAccesToken(){
+
+    let response = await fetch("/ajax/check_access_token", getFetchContext({}))
+
+    let data = await response.json();
+
+    if(!data["loggedin"]){
+
+        createMessage("danger", "You have to login to create a playlist.")
+        return false;
+    }
+
+    if(!data["access_token"]){
+
+        window.location.href = "/verify"
+        return false
+    }
+
+    return true;
+}
+
+/**
+ * Creates a playlist for the logged in user based on the songs from the usernames.
+ * @param {string[]} usernames 
+ */
+async function CreatePlaylist(usernames){
+
+    updateTitle("Creating playlist...")
+
+    let args = {"usernames": usernames};
+
+    await fetch("/ajax/playlist", getFetchContext(args));
+
+    createMessage("success", "Successfully created a playlist!")
+    
+    updateTitle(`Comparison between ${usernames[0]} and ${usernames[1]}`);
+}
+
+
+/**
+ * Creates a playlist based on the usernames
+ * @param {string[]} usernames 
+ */
+async function RunCreatePlaylist(usernames){
+
+    if(! await CheckAccesToken()){
+        return;
+    }
+
+    if(! await processingUsernames(usernames, false)){
+        return
+    }
+    CreatePlaylist(usernames);
 }
