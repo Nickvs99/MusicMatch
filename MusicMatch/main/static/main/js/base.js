@@ -32,12 +32,12 @@ function createLoginScreen(){
   let body = document.getElementsByTagName("body")[0];
   body.insertBefore(background, loginForm);
 
-  loginForm.style.display="block";
-  loginForm.ba = "blur(0%)";
+  showElementsByIds(["loginBlock"]);
+   loginForm.ba = "blur(0%)";
 
   background.onclick = () => {
     background.remove();
-    loginForm.style.display = "none";
+    hideElementsByIds(["loginBlock"])
   }
 
 }
