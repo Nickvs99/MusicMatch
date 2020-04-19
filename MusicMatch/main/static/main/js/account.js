@@ -2,21 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById("editEmail").onclick = () => {
 
-        document.getElementById("emailValue").style.display = "none";
-        document.getElementById("inputEmail").style.display = "block";
-        document.getElementById("editEmail").style.display = "none";
-        document.getElementById("saveEmail").style.display = "block";
-
+        hideElementsByIds(["emailValue", "editEmail"]);
+        showElementsByIds(["inputEmail", "saveEmail"]);
     }
 
     document.getElementById("saveEmail").onclick = async () => {
 
         clearMessages();
-
-        document.getElementById("emailValue").style.display = "block";
-        document.getElementById("inputEmail").style.display = "none";
-        document.getElementById("editEmail").style.display = "block";
-        document.getElementById("saveEmail").style.display = "none";
 
         let emailValue = document.getElementById("inputEmail").value;
         if (emailValue == ""){
@@ -26,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let args = {"email": emailValue};
         let response = await fetch("/ajax/set_email", getFetchContext(args));
+
+        hideElementsByIds(["inputEmail", "saveEmail"]); 
+        showElementsByIds(["emailValue", "editEmail"]);
 
         createMessage("success", "Successfully changed email.");
 
@@ -38,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById("editPassword").onclick = () => {
-        document.getElementById("formResetPassword").style.display = "block";
-        this.style.display = "none";
+        hideElementsByIds(["editPassword"]);
+        showElementsByIds(["formResetPassword"])
     }
 
     document.getElementById("formResetPassword").onsubmit = () => {

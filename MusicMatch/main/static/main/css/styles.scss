@@ -63,7 +63,7 @@ footer {
 }
 
 .hidden {
-    display:none;
+    display:none !important; 
 }
 
 .chart {
@@ -164,7 +164,9 @@ footer {
 .submit {
     display: block;
     background-color: $theme-color-light;
-    margin-left:auto; margin-right:0;}
+    margin-left:auto;
+    margin-right:0;
+}
 
 .expand {
     animation: expand 0.2s ease-out;
@@ -276,4 +278,19 @@ $error-color: red;
 
 .error-text {
     color: $error-color;
+}
+
+.inline {
+    display: inline-block;
+}
+
+.img-inline {
+    display: inline-block;
+    width:16px;
+}
+
+#editPassword {
+
+    margin-left:0px;
+
 }

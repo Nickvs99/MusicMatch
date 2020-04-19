@@ -41,3 +41,17 @@ function createLoginScreen(){
   }
 
 }
+
+function hideElementsByIds(ids){
+
+	for(let id of ids){
+		document.getElementById(id).classList.add("hidden");
+	}
+}
+
+function showElementsByIds(ids){
+	
+	for(let id of ids){
+		document.getElementById(id).classList.remove("hidden");
+	}
+}

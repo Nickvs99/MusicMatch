@@ -132,19 +132,6 @@ function getUserNames(){
     return usernames;
 }
 
-function hideElementsByIds(ids){
-
-	for(let id of ids){
-		document.getElementById(id).classList.add("hidden");
-	}
-}
-
-function showElementsByIds(ids){
-	
-	for(let id of ids){
-		document.getElementById(id).classList.remove("hidden");
-	}
-}
 
 /**
  * The process of the usernames input. This makes sure that the input is valid, creates and updates profiles.

@@ -16,46 +16,48 @@
 {% endblock %}
 
 {% block body %}
-    <h1>{{ username }}</h1>
+    <h1 class="title">{{ username }}</h1>
 
-    <h3>Account info</h3>
+    <h3 class="title">Account info</h3>
 
-    <div class="row">
-        <div class="col-3">Email: </div>
+    <div class="f-row">
+        <div class="label-form">Email: </div>
 
-        <input class="col-7 form-control-plaintext hidden" type="text" placeholder="email" id="inputEmail"/>
-        <div class="col-7" id="emailValue">{{ user.user.email }}</div>
+        <input class="input-text hidden" type="text" placeholder="email" id="inputEmail" style="width:90%"/>
+        <div class="inline" id="emailValue">{{ user.user.email }}</div>
         
-        <div class="col-2" id="editEmail">Edit</div>
-        <div class="col-2 hidden" id="saveEmail">Save</div>
+        <img src="{% static 'main/img/edit.svg' %}" id="editEmail" class="img-inline">
+        <img src="{% static 'main/img/save.png' %}" id="saveEmail" class="img-inline hidden">
 
     </div>
-    <div class="row">
-        <div class="col-3">Spotify account: </div>
-        <div class="col-7">{{ user.spotify_account }}</div>
-        <div class="col-2" id="editSpotifyAccount">Edit</div>
+    <div class="f-row">
+        <div class="label-form">Spotify account: </div>
+        <div class="inline">{{ user.spotify_account }}</div>
+        <img src="{% static 'main/img/edit.svg' %}" id="editSpotifyAccount" class="img-inline">
     </div>
 
-    <div class="row col-12" id="editPassword">Edit password</div>
+    <div class="f-row">
+        <button class="submit" id="editPassword">Edit password</button>
+    </div>
     
     <form action="{% url 'reset_password' %}" class="hidden" method="post" id="formResetPassword">
         {% csrf_token %}
 
-        <div class="row">
-            <div class="col-3">Old password</div>
-            <input class="col-9 form-control-plaintext" name="oldPassword" type="password" placeholder="old password" id="inputOldPassword">
+        <div class="f-row">
+            <div class="label-form">Old password</div>
+            <input class="input-text input-form" name="oldPassword" type="password" placeholder="old password" id="inputOldPassword">
         </div>
 
-        <div class="row">
-            <div class="col-3">New password</div>
-            <input class="col-9 form-control-plaintext" name="newPassword" type="password" placeholder="new password" id="inputNewPassword">
+        <div class="f-row">
+            <div class="label-form">New password</div>
+            <input class="input-text input-form" name="newPassword" type="password" placeholder="new password" id="inputNewPassword">
         </div>
 
-        <div class="row">
-            <div class="col-3">Confirm password</div>
-            <input class="col-9 form-control-plaintext" name="confirmPassword" type="password" placeholder="confirm password" id="inputConfirmPassword">
+        <div class="f-row">
+            <div class="label-form">Confirm password</div>
+            <input class="input-text input-form" name="confirmPassword" type="password" placeholder="confirm password" id="inputConfirmPassword">
         </div>
 
-        <button type="submit" id="submitForm" class="btn btn-primary mb-2">Change password</button>
+        <button type="submit" id="submitForm" class="submit">Change password</button>
     </form>
 {% endblock %}
