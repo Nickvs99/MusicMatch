@@ -4,7 +4,7 @@ cffi==1.14.0
 chardet==3.0.4
 cryptography==2.8
 DateTime==4.3
-Django==3.0.4
+Django==3.0.7
 idna==2.8
 jsonfield==3.1.0
 pycparser==2.20
