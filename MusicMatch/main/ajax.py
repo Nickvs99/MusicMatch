@@ -19,6 +19,12 @@ def stats(request):
 
     user = SpotifyUser.objects.filter(pk=username).first()
 
+    total_artists = get_total_artists(user)
+
+    total_songs = get_total_songs(user)
+
+    total_genres = get_total_genres(user)
+
     frequent_artists = get_n_heighest_from_dict(user.artist_count, 10)
     
     frequent_genres = get_n_heighest_from_dict(user.genre_count, 15)
@@ -26,6 +32,9 @@ def stats(request):
     data = {
         "artist_count": frequent_artists,
         "genre_count": frequent_genres,
+        "total_songs": total_songs,
+        "total_artists": total_artists,
+        "total_genres": total_genres,
     }
 
     return JsonResponse(data)

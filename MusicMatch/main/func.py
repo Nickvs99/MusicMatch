@@ -413,3 +413,16 @@ def send_email(subject, message, recipients):
             " - Have a stable internet connection."
         )))
 
+def get_total_songs(user):
+
+    return user.songs.count()
+
+def get_total_artists(user):
+
+    return len(user.artist_count)
+
+def get_total_genres(user):
+
+    return len(user.genre_count)
+
+

@@ -267,6 +267,15 @@ function updateTitle(title){
 }
 
 /**
+ * Updates the innerText of a div
+ * @param {string} id
+ * @param {string} text
+ */
+function innerText(id, text) {
+    document.getElementById(id).innerText = text;
+}
+
+/**
  * Clears the charts. This is done by removing the old element and then creating 
  * a new element with the same attributes.
  * 
@@ -306,11 +315,23 @@ async function createSingleCharts(username){
     let data = await response.json()
 
     let artistCount = data["artist_count"];
-    let genreCount = data["genre_count"]
+    let genreCount = data["genre_count"];
 
-    updateTitle("Stats for " + username)
+    console.log(data["total_songs"])
+
+    updateTitle("Stats for " + username);
+
+    innerText("stats-block-total-songs", data["total_songs"]);
+
+    innerText("stats-block-total-artists", data["total_artists"]);
+
+    innerText("stats-block-total-genres", data["total_genres"]);
 
     drawCharts(artistCount, genreCount);
+}
+
+function statBlock(number, label) {
+    
 }
 
 /**
