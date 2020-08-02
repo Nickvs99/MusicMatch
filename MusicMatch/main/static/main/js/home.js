@@ -327,11 +327,9 @@ async function createSingleCharts(username){
 
     innerText("stats-block-total-genres", data["total_genres"]);
 
-    drawCharts(artistCount, genreCount);
-}
+    createArtistChart(artistCount);
 
-function statBlock(number, label) {
-    
+    // drawCharts(artistCount, genreCount);
 }
 
 /**
@@ -364,6 +362,39 @@ async function createComparisonCharts(usernames){
     horizontalBarChart("genreChartComparison", usernames, genres, user1GenreCount, user2GenreCount, "Most in common genres");
 
     updateTitle(`Comparison between ${usernames[0]} and ${usernames[1]}`);
+}
+/**
+ * Create the artist chart.
+ * @param {dict} artistCount 
+ */
+function createArtistChart(artistCount) {
+
+    let chartElement = document.getElementById("stats-chart-artists");
+
+    let maxValue = Object.values(artistCount)[0];
+    let position = 1;
+    for (const [key, value] of Object.entries(artistCount)) {
+        
+        let fractionOfMax = value / maxValue;
+
+        createChartBlock(chartElement, position, key, value, fractionOfMax);
+
+        position += 1;
+      }
+}
+
+function createChartBlock(parent, position, artistName, value, fraction) {
+
+    let newElement = document.createElement("div");
+    parent.appendChild(newElement);
+
+    newElement.classList.add("chart-block");
+
+    const baseHeight = 300;
+    newElement.style.height = `${fraction  * baseHeight}px`;
+
+    let text = `#${position}, ${artistName}, ${value}`;
+    newElement.innerText = text;
 }
 
 /**

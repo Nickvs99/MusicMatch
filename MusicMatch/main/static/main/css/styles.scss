@@ -1,6 +1,7 @@
 $main-margin-side:15%;
 $theme-color-light: #FFF3F3;
 $theme-color-bright: #FF7272;
+$theme-border: 1px solid $theme-color-bright;
 $border-color: #707070;
 $font-color: #707070;
 
@@ -299,11 +300,8 @@ $error-color: red;
     margin: 20px auto 20px auto;
 
     background-color: $theme-color-light;
-
-    border-color: $theme-color-bright;
+    border: $theme-border;
     border-radius: 20px;
-    border-width: 1px;
-    border-style: solid;
 }
 
 .stats-block-value {
@@ -318,4 +316,32 @@ $error-color: red;
     // background-color: $theme-color-light;
     font-size: 16px;
     padding-bottom: 10px;
+}
+
+#stats-chart-artists {
+    margin: 20px 0px;
+}
+
+.horizontal-slider {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
+
+.horizontal-slider-elemnet {
+    flex: 0 0 auto;
+}
+
+.chart-block {
+    @include horizontal-slider-elemnet;
+    width: 130px;
+    background-color: $theme-color-light;
+    
+    border: $theme-border;
+    border-left-style: none;
+}
+
+// This to prevent double borders
+.chart-block:nth-child(1) {
+    border-left: $theme-border;
 }
