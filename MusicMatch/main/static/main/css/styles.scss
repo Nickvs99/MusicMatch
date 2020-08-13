@@ -318,30 +318,82 @@ $error-color: red;
     padding-bottom: 10px;
 }
 
-#stats-chart-artists {
-    margin: 20px 0px;
-}
-
-.horizontal-slider {
+@mixin horizontal-slider {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
 }
 
-.horizontal-slider-elemnet {
+@mixin horizontal-slider-elemnet {
     flex: 0 0 auto;
+}
+
+#stats-chart-artists {
+    @include horizontal-slider;
+
+    // margin and padding seem to cancel, however this is done have an initial gap for the first element
+    // but it dissapears when scrolling
+    margin: 20px -10px;
+    padding: 0px 10px;
 }
 
 .chart-block {
     @include horizontal-slider-elemnet;
-    width: 130px;
+    
+    width: 85%;
+    height: 110px;
+    
     background-color: $theme-color-light;
     
     border: $theme-border;
     border-left-style: none;
+    position: relative;
 }
 
-// This to prevent double borders
 .chart-block:nth-child(1) {
+
+    // This to prevent double borders
     border-left: $theme-border;
+}
+
+.chart-block:nth-last-child(1) {
+    &:after {
+        // Adds an pseudo element to create space after the last chart-block
+        position: absolute;
+        width:10px;
+        left:100%;  
+
+        // content seems to need a value, thus fully transparent text is used
+        overflow: hidden;
+        opacity: 0;
+        content: "C";
+    }
+}
+
+.chart-position-label {
+    font-style: italic;
+    font-size: 22px;
+    font-weight: 500;
+
+    position: absolute;
+    left: 2px;
+    top: -7px;
+}
+
+.chart-artist-name-label {
+    font-size: 28px;
+    font-weight: 400;
+    
+    position: absolute;
+    left: 10%;
+    top: 20%;
+}
+
+.chart-value-label {
+    font-size: 18px;
+    font-weight: 400;
+    
+    position: absolute;
+    left: 10%;
+    top: 50%;
 }

@@ -371,30 +371,39 @@ function createArtistChart(artistCount) {
 
     let chartElement = document.getElementById("stats-chart-artists");
 
-    let maxValue = Object.values(artistCount)[0];
+    removeChildren(chartElement);
+    
     let position = 1;
     for (const [key, value] of Object.entries(artistCount)) {
         
-        let fractionOfMax = value / maxValue;
-
-        createChartBlock(chartElement, position, key, value, fractionOfMax);
+        createChartBlock(chartElement, position, key, value);
 
         position += 1;
       }
 }
 
-function createChartBlock(parent, position, artistName, value, fraction) {
+function createChartBlock(parent, position, artistName, value) {
 
     let newElement = document.createElement("div");
     parent.appendChild(newElement);
 
     newElement.classList.add("chart-block");
 
-    const baseHeight = 300;
-    newElement.style.height = `${fraction  * baseHeight}px`;
+    let positionElement = document.createElement("div");
+    positionElement.classList.add("chart-position-label");
+    positionElement.innerText = `#${position}`;
 
-    let text = `#${position}, ${artistName}, ${value}`;
-    newElement.innerText = text;
+    let artistNameElement = document.createElement("div");
+    artistNameElement.classList.add("chart-artist-name-label");
+    artistNameElement.innerText = `${artistName}`;
+    
+    let valueElement = document.createElement("div");
+    valueElement.classList.add("chart-value-label");
+    valueElement.innerText = `${value} songs`;
+
+    for(let element of [positionElement, artistNameElement, valueElement]) {
+        newElement.appendChild(element);
+    }
 }
 
 /**

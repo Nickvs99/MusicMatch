@@ -57,3 +57,14 @@ function clearMessages(){
         messages.firstChild.remove();
     }
 }
+
+/**
+ * Removes all children from the parent element
+ * @param {*} parent 
+ */
+function removeChildren(parent) {
+
+    while(parent.firstChild) {
+        parent.firstChild.remove();
+    }
+}

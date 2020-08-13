@@ -321,35 +321,63 @@ footer {
 }
 
 #stats-chart-artists {
-  margin: 20px 0px;
-}
-
-.horizontal-slider {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: nowrap;
       flex-wrap: nowrap;
   overflow-x: auto;
-}
-
-.horizontal-slider-elemnet {
-  -webkit-box-flex: 0;
-      -ms-flex: 0 0 auto;
-          flex: 0 0 auto;
+  margin: 20px -10px;
+  padding: 0px 10px;
 }
 
 .chart-block {
   -webkit-box-flex: 0;
       -ms-flex: 0 0 auto;
           flex: 0 0 auto;
-  width: 200px;
+  width: 85%;
+  height: 110px;
   background-color: #FFF3F3;
   border: 1px solid #FF7272;
   border-left-style: none;
+  position: relative;
 }
 
 .chart-block:nth-child(1) {
   border-left: 1px solid #FF7272;
+}
+
+.chart-block:nth-last-child(1):after {
+  position: absolute;
+  width: 10px;
+  left: 100%;
+  overflow: hidden;
+  opacity: 0;
+  content: "C";
+}
+
+.chart-position-label {
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 500;
+  position: absolute;
+  left: 2px;
+  top: -7px;
+}
+
+.chart-artist-name-label {
+  font-size: 28px;
+  font-weight: 400;
+  position: absolute;
+  left: 10%;
+  top: 20%;
+}
+
+.chart-value-label {
+  font-size: 18px;
+  font-weight: 400;
+  position: absolute;
+  left: 10%;
+  top: 50%;
 }
 /*# sourceMappingURL=styles.css.map */
