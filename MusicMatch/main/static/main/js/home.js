@@ -327,9 +327,9 @@ async function createSingleCharts(username){
 
     innerText("stats-block-total-genres", data["total_genres"]);
 
-    createArtistChart(artistCount);
-
-    // drawCharts(artistCount, genreCount);
+    createChartBlockSlider("stats-chart-artists", artistCount);
+    
+    createChartBlockSlider("stats-chart-genres", genreCount);
 }
 
 /**
@@ -365,24 +365,25 @@ async function createComparisonCharts(usernames){
 }
 /**
  * Create the artist chart.
+ * @param {string} id
  * @param {dict} artistCount 
  */
-function createArtistChart(artistCount) {
+function createChartBlockSlider(id, dict) {
 
-    let chartElement = document.getElementById("stats-chart-artists");
+    let chartElement = document.getElementById(id);
 
     removeChildren(chartElement);
     
     let position = 1;
-    for (const [key, value] of Object.entries(artistCount)) {
+    for (const [key, value] of Object.entries(dict)) {
         
         createChartBlock(chartElement, position, key, value);
 
         position += 1;
-      }
+    }
 }
 
-function createChartBlock(parent, position, artistName, value) {
+function createChartBlock(parent, position, key, value) {
 
     let newElement = document.createElement("div");
     parent.appendChild(newElement);
@@ -393,15 +394,15 @@ function createChartBlock(parent, position, artistName, value) {
     positionElement.classList.add("chart-position-label");
     positionElement.innerText = `#${position}`;
 
-    let artistNameElement = document.createElement("div");
-    artistNameElement.classList.add("chart-artist-name-label");
-    artistNameElement.innerText = `${artistName}`;
+    let keyElement = document.createElement("div");
+    keyElement.classList.add("chart-key-label");
+    keyElement.innerText = capitalize(`${key}`);
     
     let valueElement = document.createElement("div");
     valueElement.classList.add("chart-value-label");
     valueElement.innerText = `${value} songs`;
 
-    for(let element of [positionElement, artistNameElement, valueElement]) {
+    for(let element of [positionElement, keyElement, valueElement]) {
         newElement.appendChild(element);
     }
 }

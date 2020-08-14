@@ -320,7 +320,7 @@ footer {
   padding-bottom: 10px;
 }
 
-#stats-chart-artists {
+.chart-block-slider {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -365,9 +365,11 @@ footer {
   top: -7px;
 }
 
-.chart-artist-name-label {
+.chart-key-label {
   font-size: 28px;
   font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   position: absolute;
   left: 10%;
   top: 20%;

@@ -328,7 +328,7 @@ $error-color: red;
     flex: 0 0 auto;
 }
 
-#stats-chart-artists {
+.chart-block-slider {
     @include horizontal-slider;
 
     // margin and padding seem to cancel, however this is done have an initial gap for the first element
@@ -380,9 +380,11 @@ $error-color: red;
     top: -7px;
 }
 
-.chart-artist-name-label {
+.chart-key-label {
     font-size: 28px;
     font-weight: 400;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     
     position: absolute;
     left: 10%;
