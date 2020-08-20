@@ -11,22 +11,22 @@ document.addEventListener('DOMContentLoaded', () => {
 		event.preventDefault();
 		event.stopPropagation();
 
-		let ids = ["benefits-list", "stats-single-username", "stats-comparison"]
+		let ids = ["benefits-list", "stats-page", "input-create-playlist"]
 		hideElementsByIds(ids);
 
 		let usernames = getUserNames();
 
 		if(! await processingUsernames(usernames, false)){
 			return false;
-		}
+        }
+        
+        showElementById("stats-page");
 
 		if(usernames.length == 1){
-			showElementsByIds(["stats-single-username"]);
 			createSingleCharts(usernames[0]);
 		}
 		else {
 			console.log("COMPARISON")
-			showElementsByIds(["stats-comparison"]);
 			createComparisonCharts(usernames);
 		}
 
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		return false;
     };
 
-    document.getElementById("inputCreatePlaylist").onclick = () => {
+    document.getElementById("input-create-playlist").onclick = () => {
 
         clearMessages();
 
@@ -309,6 +309,12 @@ async function createSingleCharts(username){
 
     updateTitle("Reading stats for " + username);
     
+    hideElementsByIds(["stats-block-1-2", "stats-block-2-2", "stats-block-3-2"]);
+
+    let statsPage = document.getElementById("stats-page");
+    statsPage.classList.remove("stats-page-double");
+    statsPage.classList.add("stats-page-single");
+
     let args = {"username": username};
     let response = await fetch("/ajax/stats", getFetchContext(args));
 
@@ -317,19 +323,25 @@ async function createSingleCharts(username){
     let artistCount = data["artist_count"];
     let genreCount = data["genre_count"];
 
-    console.log(data["total_songs"])
 
     updateTitle("Stats for " + username);
 
-    innerText("stats-block-total-songs", data["total_songs"]);
+    statsBlock("stats-block-1-1", data["total_songs"], "Songs");
+    
+    statsBlock("stats-block-2-1", data["total_artists"], "Artists");
+    
+    statsBlock("stats-block-3-1", data["total_genres"], "Genres");
 
-    innerText("stats-block-total-artists", data["total_artists"]);
-
-    innerText("stats-block-total-genres", data["total_genres"]);
-
+    
     createChartBlockSlider("stats-chart-artists", artistCount);
     
     createChartBlockSlider("stats-chart-genres", genreCount);
+}
+
+function statsBlock(id, value, label) {
+    let statsBlock = document.getElementById(id);
+    statsBlock.children[0].innerText = value;
+    statsBlock.children[1].innerText = label;
 }
 
 /**
@@ -342,24 +354,35 @@ async function createComparisonCharts(usernames){
 
     updateTitle(`Loading comparison between ${usernames[0]} and ${usernames[1]}`);
 
+    showElementsByIds(["stats-block-1-2", "stats-block-2-2", "stats-block-3-2"]);
+
+    let statsPage = document.getElementById("stats-page");
+    statsPage.classList.add("stats-page-double");
+    statsPage.classList.remove("stats-page-single");
+
     // Aquire data
     let args = {"usernames": usernames};
     let response = await fetch("/ajax/compare", getFetchContext(args));
 
     // Parse to json format
     let data = await response.json();
+    console.log(data);
 
-    let artists = data["artists"];
-    let user1ArtistCount = data["user1_artist_count"];
-    let user2ArtistCount = data["user2_artist_count"];
+    createChartBlockSlider("stats-chart-artists", data["artist_comparison"]);
+    
+    createChartBlockSlider("stats-chart-genres", data["genre_comparison"]);
 
-    let genres = data["genres"];
-    let user1GenreCount = data["user1_genre_count"];
-    let user2GenreCount = data["user2_genre_count"];
+    statsBlock("stats-block-1-1", 55, "Songs in common");
+    
+    statsBlock("stats-block-1-2", 78, "Unique songs");
 
-    // Update charts
-    horizontalBarChart("artistChartComparison", usernames, artists, user1ArtistCount, user2ArtistCount, "Most in common artists");
-    horizontalBarChart("genreChartComparison", usernames, genres, user1GenreCount, user2GenreCount, "Most in common genres");
+    statsBlock("stats-block-2-1", 23, "Artists in common");
+    
+    statsBlock("stats-block-2-2", 43, "Unique artists");
+
+    statsBlock("stats-block-3-1", 6, "Genres in common");
+
+    statsBlock("stats-block-3-2", 13, "Unique genres");
 
     updateTitle(`Comparison between ${usernames[0]} and ${usernames[1]}`);
 }
@@ -383,27 +406,20 @@ function createChartBlockSlider(id, dict) {
     }
 }
 
-function createChartBlock(parent, position, key, value) {
+function createChartBlock(parent, position, key, values) {
 
-    let newElement = document.createElement("div");
-    parent.appendChild(newElement);
+    let newElement = createElement(parent, "chart-block");
 
-    newElement.classList.add("chart-block");
-
-    let positionElement = document.createElement("div");
-    positionElement.classList.add("chart-position-label");
-    positionElement.innerText = `#${position}`;
-
-    let keyElement = document.createElement("div");
-    keyElement.classList.add("chart-key-label");
-    keyElement.innerText = capitalize(`${key}`);
+    createElement(newElement, "chart-position-label", `#${position}`);
+    createElement(newElement, "chart-key-label", capitalize(`${key}`));  
     
-    let valueElement = document.createElement("div");
-    valueElement.classList.add("chart-value-label");
-    valueElement.innerText = `${value} songs`;
-
-    for(let element of [positionElement, keyElement, valueElement]) {
-        newElement.appendChild(element);
+    if(Array.isArray(values)) {
+        for(let value of values) {
+            createElement(newElement, "chart-value-label", `${value} songs`);
+        }
+    }
+    else {
+        createElement(newElement, "chart-value-label", `${values} songs`);
     }
 }
 

@@ -72,3 +72,36 @@ function removeChildren(parent) {
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+function hideElementById(id) {
+    console.log(id)
+    document.getElementById(id).classList.add("hidden");
+}
+
+function hideElementsByIds(ids){
+	for(let id of ids) {
+        hideElementById(id);
+	}
+}
+
+function showElementById(id) {
+    document.getElementById(id).classList.remove("hidden");
+}
+
+function showElementsByIds(ids){	
+	for(let id of ids) {
+        showElementById(id);
+	}
+}
+
+function createElement(parent, cssClass, text) {
+    let element = document.createElement("div");
+    element.classList.add(cssClass);
+    parent.appendChild(element);
+
+    if(arguments.length == 3) {
+        element.innerText = text;
+    }
+
+    return element;
+}

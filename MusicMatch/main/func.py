@@ -425,4 +425,32 @@ def get_total_genres(user):
 
     return len(user.genre_count)
 
+def get_dict_comparison(dict1, dict2):
+    """ 
+    Compares two dictionaries based on their keys and values
+    Args:
+        dict1, dict2: dict{key: string, value: int/float}
+    Returns:
+        list_coparison: list[string, list[float, float]], sorted decreasingly 
+            based on the values from dict1 and dict2
+    """
 
+    user1_total = get_total_dict_value(dict1)
+    user2_total = get_total_dict_value(dict2)
+
+    # Create an dictionary where a dict key has a certain comparison value
+    dict_comparison = {}
+    for key in dict1:
+        if key in dict2:
+            user1_count = dict1[key]
+            user2_count = dict2[key]
+            dict_comparison[key] = (user1_count / user1_total) * (user2_count / user2_total)
+    
+    # sort the dictionary based on the comparison value
+    dict_comparison = sort_dict_value(dict_comparison)
+
+    # replace comparison value with the initial 
+    for key in dict_comparison:
+        dict_comparison[key] = [dict1[key], dict2[key]]
+
+    return dict_comparison

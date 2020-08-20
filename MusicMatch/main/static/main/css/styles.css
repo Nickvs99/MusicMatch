@@ -299,10 +299,77 @@ footer {
   margin-left: 0px;
 }
 
+#stats-page {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
+  -ms-grid-rows: auto;
+      grid-template-rows: auto;
+  gap: 20px 10px;
+  margin-bottom: 10px;
+}
+
+#stats-block-1-1 {
+  -ms-grid-row: 1;
+  -ms-grid-column: 1;
+  grid-area: stats-block-1-1;
+}
+
+#stats-block-1-2 {
+  -ms-grid-row: 1;
+  -ms-grid-column: 2;
+  grid-area: stats-block-1-2;
+}
+
+#stats-block-2-1 {
+  -ms-grid-row: 2;
+  -ms-grid-column: 1;
+  grid-area: stats-block-2-1;
+}
+
+#stats-block-2-2 {
+  -ms-grid-row: 2;
+  -ms-grid-column: 2;
+  grid-area: stats-block-2-2;
+}
+
+#stats-block-3-1 {
+  -ms-grid-row: 4;
+  -ms-grid-column: 1;
+  grid-area: stats-block-3-1;
+}
+
+#stats-block-3-2 {
+  -ms-grid-row: 4;
+  -ms-grid-column: 2;
+  grid-area: stats-block-3-2;
+}
+
+#stats-chart-artists {
+  -ms-grid-row: 3;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 2;
+  grid-area: chart-artists;
+}
+
+#stats-chart-genres {
+  -ms-grid-row: 5;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 2;
+  grid-area: chart-genres;
+}
+
+.stats-page-single {
+      grid-template-areas: "stats-block-1-1 stats-block-1-1" "stats-block-2-1 stats-block-2-1" "chart-artists chart-artists" "stats-block-3-1 stats-block-3-1" "chart-genres chart-genres";
+}
+
+.stats-page-double {
+      grid-template-areas: "stats-block-1-1 stats-block-1-2" "stats-block-2-1 stats-block-2-2" "chart-artists chart-artists" "stats-block-3-1 stats-block-3-2" "chart-genres chart-genres";
+}
+
 .stats-block {
   max-width: 400px;
-  width: 80%;
-  margin: 20px auto 20px auto;
   background-color: #FFF3F3;
   border: 1px solid #FF7272;
   border-radius: 20px;
@@ -327,8 +394,9 @@ footer {
   -ms-flex-wrap: nowrap;
       flex-wrap: nowrap;
   overflow-x: auto;
-  margin: 20px -10px;
-  padding: 0px 10px;
+  overflow-y: hidden;
+  margin: 0 -10px;
+  padding: 0 10px;
 }
 
 .chart-block {
@@ -336,7 +404,6 @@ footer {
       -ms-flex: 0 0 auto;
           flex: 0 0 auto;
   width: 85%;
-  height: 110px;
   background-color: #FFF3F3;
   border: 1px solid #FF7272;
   border-left-style: none;
@@ -360,7 +427,7 @@ footer {
   font-style: italic;
   font-size: 22px;
   font-weight: 500;
-  position: absolute;
+  position: relative;
   left: 2px;
   top: -7px;
 }
@@ -370,16 +437,23 @@ footer {
   font-weight: 400;
   text-overflow: ellipsis;
   white-space: nowrap;
-  position: absolute;
+  max-width: -webkit-fit-content;
+  max-width: -moz-fit-content;
+  max-width: fit-content;
+  position: relative;
+  top: -20px;
   left: 10%;
-  top: 20%;
 }
 
 .chart-value-label {
   font-size: 18px;
   font-weight: 400;
-  position: absolute;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  position: relative;
+  top: -20px;
   left: 10%;
-  top: 50%;
+  margin-top: -8px;
 }
 /*# sourceMappingURL=styles.css.map */

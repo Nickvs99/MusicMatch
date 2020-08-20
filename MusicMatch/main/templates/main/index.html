@@ -30,41 +30,50 @@
 
     <hr>
 
+    <button id="input-create-playlist" class="submit hidden">Create Playlist</button>
+
     <ul id="benefits-list">
         <li class="bullet-text">View your music taste</li>
         <li class="bullet-text">Compare with others</li>
         <li class="bullet-text">Enjoy music together</li>
     </ul>
 
-    <div id="stats-single-username" class="hidden">
-
-        <div class="stats-block">
-            <div id="stats-block-total-songs" class="stats-block-value"></div>
-            <div class="stats-block-label">Songs</div>
+    <div id="stats-page" class="hidden">
+        
+        
+        <div class="stats-block" id="stats-block-1-1">
+            <div class="stats-block-value"></div>
+            <div class="stats-block-label"></div>
         </div>
 
-        <div class="stats-block">
-            <div id="stats-block-total-artists" class="stats-block-value"></div>
-            <div class="stats-block-label">Artists</div>
+        <div class="stats-block" id="stats-block-1-2">
+            <div class="stats-block-value"></div>
+            <div class="stats-block-label"></div>
+        </div>
+        <div class="stats-block" id="stats-block-2-1">
+            <div class="stats-block-value"></div>
+            <div class="stats-block-label"></div>
+        </div>
+
+        <div class="stats-block" id="stats-block-2-2">
+            <div class="stats-block-value"></div>
+            <div class="stats-block-label"></div>
         </div>
 
         <div id="stats-chart-artists" class="chart-block-slider"></div>
 
-        <div class="stats-block">
+        <div class="stats-block" id="stats-block-3-1">
             <div id="stats-block-total-genres" class="stats-block-value"></div>
-            <div class="stats-block-label">Genres</div>
+            <div class="stats-block-label"></div>
+        </div>
+
+        <div class="stats-block" id="stats-block-3-2">
+            <div class="stats-block-value"></div>
+            <div class="stats-block-label"></div>
         </div>
 
         <div id="stats-chart-genres" class="chart-block-slider"></div>
 
-    </div>
-
-    <div id="stats-comparison" class="hidden">
-        <button id="inputCreatePlaylist" class="submit">Create Playlist</button>
-
-        <canvas class="chart" id="artistChartComparison" width="400" height="400"></canvas>
-
-        <canvas class="chart" id="genreChartComparison" width="400" height="400"></canvas>
     </div>
     
 {% endblock %}

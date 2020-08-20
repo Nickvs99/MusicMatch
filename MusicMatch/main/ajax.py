@@ -66,24 +66,16 @@ def compare(request):
     user2_artist_count = user2.artist_count
     user2_genre_count = user2.genre_count
 
-    artists_sorted_all = get_frequent_keys(user1_artist_count, user2_artist_count)
+    artist_comparison = get_dict_comparison(user1_artist_count, user2_artist_count)
 
-    artists, user1_artist_count, user2_artist_count = get_n_dict_and_count(10, artists_sorted_all, user1_artist_count, user2_artist_count)
+    genre_comparison = get_dict_comparison(user1_genre_count, user2_genre_count)
 
-    genres_sorted_all = get_frequent_keys(user1_genre_count, user2_genre_count)
+    data = {
+        "artist_comparison": artist_comparison,
+        "genre_comparison": genre_comparison,
 
-    genres, user1_genre_count, user2_genre_count = get_n_dict_and_count(10, genres_sorted_all, user1_genre_count, user2_genre_count)
-
-    data = {}
+    }
     
-    # Set data in dict 
-    data["artists"] = artists
-    data["user1_artist_count"] = user1_artist_count
-    data["user2_artist_count"] = user2_artist_count
-
-    data["genres"] = genres
-    data["user1_genre_count"] = user1_genre_count
-    data["user2_genre_count"] = user2_genre_count
 
     return JsonResponse(data)
 

@@ -294,10 +294,66 @@ $error-color: red;
     margin-left:0px;
 }
 
+#stats-page {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+
+    gap: 20px 10px;
+
+    margin-bottom: 10px;
+}
+
+// TODO there has to be another way to organize the chart blocks
+#stats-block-1-1 {
+    grid-area: stats-block-1-1;
+}
+#stats-block-1-2 {
+    grid-area: stats-block-1-2;
+}
+#stats-block-2-1 {
+    grid-area: stats-block-2-1;
+}
+#stats-block-2-2 {
+    grid-area: stats-block-2-2;
+}
+#stats-block-3-1 {
+    grid-area: stats-block-3-1;
+}
+#stats-block-3-2 {
+    grid-area: stats-block-3-2;
+}
+
+#stats-chart-artists {
+    grid-area: chart-artists;
+}
+#stats-chart-genres {
+    grid-area: chart-genres;
+}
+
+.stats-page-single {
+    grid-template-areas:
+        "stats-block-1-1 stats-block-1-1"
+        "stats-block-2-1 stats-block-2-1"
+        "chart-artists chart-artists"
+        "stats-block-3-1 stats-block-3-1"
+        "chart-genres chart-genres"
+    ;
+}
+
+.stats-page-double {
+    grid-template-areas:
+        "stats-block-1-1 stats-block-1-2"
+        "stats-block-2-1 stats-block-2-2"
+        "chart-artists chart-artists"
+        "stats-block-3-1 stats-block-3-2"
+        "chart-genres chart-genres"
+    ;
+}
+
+
 .stats-block {
     max-width: 400px;
-    width: 80%;
-    margin: 20px auto 20px auto;
 
     background-color: $theme-color-light;
     border: $theme-border;
@@ -308,7 +364,6 @@ $error-color: red;
     font-size: 50px;
     font-weight: 600;
     text-align: center;
-
 }
 
 .stats-block-label {
@@ -322,6 +377,7 @@ $error-color: red;
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
+    overflow-y: hidden;
 }
 
 @mixin horizontal-slider-elemnet {
@@ -333,15 +389,14 @@ $error-color: red;
 
     // margin and padding seem to cancel, however this is done have an initial gap for the first element
     // but it dissapears when scrolling
-    margin: 20px -10px;
-    padding: 0px 10px;
+    margin: 0 -10px;
+    padding: 0 10px;
 }
 
 .chart-block {
     @include horizontal-slider-elemnet;
     
     width: 85%;
-    height: 110px;
     
     background-color: $theme-color-light;
     
@@ -375,27 +430,35 @@ $error-color: red;
     font-size: 22px;
     font-weight: 500;
 
-    position: absolute;
+    position: relative;
     left: 2px;
     top: -7px;
+}
+
+@mixin chart-label-offset {
+    position: relative;
+    top: -20px;
+    left: 10%;
 }
 
 .chart-key-label {
     font-size: 28px;
     font-weight: 400;
+    
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: fit-content;
     
-    position: absolute;
-    left: 10%;
-    top: 20%;
+    @include chart-label-offset();
 }
 
 .chart-value-label {
     font-size: 18px;
     font-weight: 400;
+
+    width: fit-content;
     
-    position: absolute;
-    left: 10%;
-    top: 50%;
+    @include chart-label-offset();
+
+    margin-top: -8px;
 }
