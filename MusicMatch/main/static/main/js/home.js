@@ -26,7 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			createSingleCharts(usernames[0]);
 		}
 		else {
-			console.log("COMPARISON")
+            showElementById("input-create-playlist");
+
 			createComparisonCharts(usernames);
 		}
 
@@ -55,8 +56,9 @@ function addUserField() {
   
     let clone = userField.cloneNode(true);
     clone.children[0].value = null;
-  
-    form.insertBefore(clone, document.getElementById("submitForm"));
+    
+    // TODO prototype
+    userField.parentNode.insertBefore(clone, userField.nextSibling);
   
     // Convert this add button to a remove button
     let width = this.offsetWidth;
@@ -85,8 +87,7 @@ function addUserField() {
     // Set the expand animation
     clone.classList.add("expand");
     clone.addEventListener("animationend", () => {
-    clone.classList.remove("expand");
-  
+        clone.classList.remove("expand");
     });
   
     this.onclick = removeUserField;
