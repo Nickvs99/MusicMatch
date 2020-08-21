@@ -71,9 +71,17 @@ def compare(request):
     genre_comparison = get_dict_comparison(user1_genre_count, user2_genre_count)
 
     data = {
+        "unique_songs": get_unique_songs(user1.songs, user2.songs),
+        "shared_songs": get_shared_songs(user1.songs, user2.songs),
+        
+        "unique_artists": get_unique_keys(user1_artist_count, user2_artist_count),
+        "shared_artists": get_shared_keys(user1_artist_count, user2_artist_count),
+        
+        "unique_genres": get_unique_keys(user1_genre_count, user2_genre_count),
+        "shared_genres": get_shared_keys(user1_genre_count, user2_genre_count),
+
         "artist_comparison": artist_comparison,
         "genre_comparison": genre_comparison,
-
     }
     
 

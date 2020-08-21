@@ -372,17 +372,17 @@ async function createComparisonCharts(usernames){
     
     createChartBlockSlider("stats-chart-genres", data["genre_comparison"]);
 
-    statsBlock("stats-block-1-1", 55, "Songs in common");
+    statsBlock("stats-block-1-1", data["shared_songs"], "Songs in common");
     
-    statsBlock("stats-block-1-2", 78, "Unique songs");
+    statsBlock("stats-block-1-2", data["unique_songs"], "Unique songs");
 
-    statsBlock("stats-block-2-1", 23, "Artists in common");
+    statsBlock("stats-block-2-1", data["shared_artists"], "Artists in common");
     
-    statsBlock("stats-block-2-2", 43, "Unique artists");
+    statsBlock("stats-block-2-2", data["unique_artists"], "Unique artists");
 
-    statsBlock("stats-block-3-1", 6, "Genres in common");
+    statsBlock("stats-block-3-1", data["shared_genres"], "Genres in common");
 
-    statsBlock("stats-block-3-2", 13, "Unique genres");
+    statsBlock("stats-block-3-2", data["unique_genres"], "Unique genres");
 
     updateTitle(`Comparison between ${usernames[0]} and ${usernames[1]}`);
 }

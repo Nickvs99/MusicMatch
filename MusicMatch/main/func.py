@@ -454,3 +454,71 @@ def get_dict_comparison(dict1, dict2):
         dict_comparison[key] = [dict1[key], dict2[key]]
 
     return dict_comparison
+
+def get_unique_songs(songs1, songs2):
+    """
+    Get the total number of unique songs across two song query sets.
+    Args:
+        songs1, songs2: Queryset of songs
+
+    Returns:
+        int: The total number of unique songs
+    """
+
+    song_count = songs1.count()
+
+    for song in songs2.all():
+        if not songs1.filter(id=song.id).exists():
+            song_count += 1
+
+    return song_count
+
+def get_shared_songs(songs1, songs2):
+    """
+    Get the total number of songs which occur in both querysets.
+    Args:
+        songs1, songs2: Queryset of songs
+
+    Returns:
+        int: The total number of shared songs
+    """
+
+    song_count = 0
+    for song in songs2.all():
+        if songs1.filter(id=song.id).exists():
+            song_count += 1
+
+    return song_count
+
+def get_unique_keys(dict1, dict2):
+    """
+    Get the total number of unique keys in the dictionaries.
+    Args:
+        dict1, dict2: dict
+    Returns:
+        int: Total number of unique keys
+    """
+
+    key_count = len(dict1);
+
+    for key in dict2.keys():
+        if key not in dict1:
+            key_count += 1
+    
+    return key_count
+
+def get_shared_keys(dict1, dict2):
+    """
+    Get the total number of shared keys across both dictionaries.
+    Args:
+        dict1, dict2: dict
+    Returns:
+        int: Total number of shared keys
+    """
+    key_count = 0;
+
+    for key in dict2.keys():
+        if key in dict1:
+            key_count += 1
+    
+    return key_count
