@@ -334,9 +334,9 @@ async function createSingleCharts(username){
     statsBlock("stats-block-3-1", data["total_genres"], "Genres");
 
     
-    createChartBlockSlider("stats-chart-artists", artistCount);
+    createChartBlockSlider("stats-chart-artists", artistCount, " songs");
     
-    createChartBlockSlider("stats-chart-genres", genreCount);
+    createChartBlockSlider("stats-chart-genres", genreCount, " genres");
 }
 
 function statsBlock(id, value, label) {
@@ -367,11 +367,13 @@ async function createComparisonCharts(usernames){
 
     // Parse to json format
     let data = await response.json();
-    console.log(data);
 
-    createChartBlockSlider("stats-chart-artists", data["artist_comparison"]);
-    
-    createChartBlockSlider("stats-chart-genres", data["genre_comparison"]);
+    createChartBlockSlider("stats-chart-artists", data["artist_comparison"], " songs");
+    chartBlockSliderLegend("stats-chart-artists", "Artist comparison", usernames);
+
+    createChartBlockSlider("stats-chart-genres", data["genre_comparison"], " genres");
+    chartBlockSliderLegend("stats-chart-genres", "Genre comparison", usernames);
+
 
     statsBlock("stats-block-1-1", data["shared_songs"], "Songs in common");
     
@@ -392,36 +394,60 @@ async function createComparisonCharts(usernames){
  * @param {string} id
  * @param {dict} artistCount 
  */
-function createChartBlockSlider(id, dict) {
+function createChartBlockSlider(id, dict, valueSuffix) {
 
     let chartElement = document.getElementById(id);
 
     removeChildren(chartElement);
     
     let position = 1;
-    for (const [key, value] of Object.entries(dict)) {
+    for (const [key, values] of Object.entries(dict)) {
         
-        createChartBlock(chartElement, position, key, value);
+        let valuesSuffix = appendSuffix(values, valueSuffix);
+
+        createChartBlock(chartElement, position, key, valuesSuffix);
 
         position += 1;
     }
+}
+
+/**
+ * Created a chart block which is used as a legend and thus has no #position
+ * @param {string} id The id of the chart
+ * @param {string} title The title displayed on the created chart block
+ * @param {string[]} legendItems The legend items on the created chart block
+ */
+
+function chartBlockSliderLegend(id, title, legendItems) {
+    
+    let chartElement = document.getElementById(id);
+
+    let chartBlock = createChartBlock(chartElement, null, title, legendItems);
+
+    chartElement.insertBefore(chartBlock, chartElement.firstChild);
 }
 
 function createChartBlock(parent, position, key, values) {
 
     let newElement = createElement(parent, "chart-block");
 
-    createElement(newElement, "chart-position-label", `#${position}`);
+    let positionElement = createElement(newElement, "chart-position-label", `#${position}`); 
+    if(!position) {
+        positionElement.style.visibility = "hidden";
+    }
+    
     createElement(newElement, "chart-key-label", capitalize(`${key}`));  
     
     if(Array.isArray(values)) {
         for(let value of values) {
-            createElement(newElement, "chart-value-label", `${value} songs`);
+            createElement(newElement, "chart-value-label", value);
         }
     }
     else {
-        createElement(newElement, "chart-value-label", `${values} songs`);
+        createElement(newElement, "chart-value-label", values);
     }
+
+    return newElement;
 }
 
 /**

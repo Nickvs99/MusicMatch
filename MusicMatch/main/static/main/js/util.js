@@ -105,3 +105,24 @@ function createElement(parent, cssClass, text) {
 
     return element;
 }
+
+/**
+ * Appends a string to the end of all the items of the values
+ * @param {string} values 
+ * @param {string} valueSuffix 
+ */
+function appendSuffix(values, valueSuffix) {
+
+    if (Array.isArray(values)) {
+
+        let returnValues = [];
+        for(let i = 0; i < values.length; i++) {
+            returnValues.push(values[i] + valueSuffix);
+        }
+
+        return returnValues;
+    }
+    else {
+        return values + valueSuffix;
+    }
+}
