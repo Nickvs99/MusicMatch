@@ -439,11 +439,15 @@ function createChartBlock(parent, position, key, values) {
     createElement(newElement, "chart-key-label", capitalize(`${key}`));  
     
     if(Array.isArray(values)) {
+
+        newElement.classList.add("chart-block-height-2");
         for(let value of values) {
             createElement(newElement, "chart-value-label", value);
         }
     }
     else {
+        newElement.classList.add("chart-block-height-1");
+
         createElement(newElement, "chart-value-label", values);
     }
 
