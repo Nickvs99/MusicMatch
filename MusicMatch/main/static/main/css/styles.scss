@@ -1,8 +1,11 @@
 $main-margin-side:15%;
 $theme-color-light: #FFF3F3;
 $theme-color-bright: #FF7272;
+
 $theme-border: 1px solid $theme-color-bright;
 $border-color: #707070;
+$border-radius: 20px;
+
 $font-color: #707070;
 
 body {
@@ -357,7 +360,7 @@ $error-color: red;
 
     background-color: $theme-color-light;
     border: $theme-border;
-    border-radius: 20px;
+    border-radius: $border-radius;
 }
 
 .stats-block-value {
@@ -403,27 +406,41 @@ $error-color: red;
     border: $theme-border;
     border-left-style: none;
     position: relative;
-}
 
-.chart-block:nth-child(1) {
+    &:first-child{
 
-    // This to prevent double borders
-    border-left: $theme-border;
-}
+        // This to prevent double borders
+        border-left: $theme-border;
+    
+        border-top-left-radius: $border-radius;
+        border-bottom-left-radius: $border-radius;
+    
+        >.chart-position-label {
+            
+            position: relative;
+            left: 7px;
+            top: -5px;
+        }
+    }
 
-.chart-block:nth-last-child(1) {
-    &:after {
-        // Adds an pseudo element to create space after the last chart-block
-        position: absolute;
-        width:10px;
-        left:100%;  
+    &:last-child {
+        border-top-right-radius: $border-radius;
+        border-bottom-right-radius: $border-radius;
 
-        // content seems to need a value, thus fully transparent text is used
-        overflow: hidden;
-        opacity: 0;
-        content: "C";
+        &:after {
+            // Adds an pseudo element to create space after the last chart-block
+            position: absolute;
+            width:10px;
+            left:100%;  
+    
+            // content seems to need a value, thus fully transparent text is used
+            overflow: hidden;
+            opacity: 0;
+            content: "C";
+        }
     }
 }
+
 
 .chart-block-height-1 {
     height: 88px;

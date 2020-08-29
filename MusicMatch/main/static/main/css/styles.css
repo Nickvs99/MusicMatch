@@ -410,11 +410,24 @@ footer {
   position: relative;
 }
 
-.chart-block:nth-child(1) {
+.chart-block:first-child {
   border-left: 1px solid #FF7272;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
 }
 
-.chart-block:nth-last-child(1):after {
+.chart-block:first-child > .chart-position-label {
+  position: relative;
+  left: 7px;
+  top: -5px;
+}
+
+.chart-block:last-child {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.chart-block:last-child:after {
   position: absolute;
   width: 10px;
   left: 100%;
