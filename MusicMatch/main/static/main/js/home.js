@@ -11,14 +11,21 @@ document.addEventListener('DOMContentLoaded', () => {
 		event.preventDefault();
 		event.stopPropagation();
 
-		let ids = ["benefits-list", "stats-page", "input-create-playlist"]
-		hideElementsByIds(ids);
-
+        clearMessages();
+        
 		let usernames = getUserNames();
+
+        if(usernames.length == 0) {
+            createMessage('danger', 'No input found');
+            return false;
+        }
 
 		if(! await processingUsernames(usernames, false)){
 			return false;
         }
+        
+		let ids = ["benefits-list", "stats-page", "input-create-playlist"]
+        hideElementsByIds(ids);
         
         showElementById("stats-page");
 
@@ -31,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			createComparisonCharts(usernames);
 		}
 
-		updateTitle("DONE")
 		console.log(usernames);
 		return false;
     };
@@ -149,7 +155,7 @@ async function processingUsernames(usernames, forced){
 
         if(!valid){
             // TODO better title
-            updateTitle("Stats")
+            updateTitle("MusicMatch");
             return false
         }
     }
@@ -197,9 +203,7 @@ async function updateProfiles(usernames, forced){
         await fetch("/ajax/cache_results", getFetchContext(args)); 
 
         createMessage("success", `Updated ${username}'s profile`);
-        
-        updateTitle("Updated profile");
-        
+                
     }
 }
 
@@ -213,7 +217,7 @@ async function updateProfiles(usernames, forced){
  */
 async function validateUsernames(usernames){
     
-    updateTitle("Checking if accounts exist in database.");
+    updateTitle("Checking if accounts exist in database...");
 
     let args = {"usernames": usernames};
     let response = await fetch("/ajax/validate_usernames", getFetchContext(args));
@@ -238,7 +242,7 @@ async function validateUsernames(usernames){
  */
 async function validateSpotify(usernames){
 
-    updateTitle("Checking if accounts exist in spotify database.");
+    updateTitle("Checking if accounts exist in spotify database...");
     
     let args = {"usernames": usernames};
     let response = await fetch("/ajax/validate_spotify_usernames", getFetchContext(args));
@@ -651,6 +655,7 @@ async function CreatePlaylist(usernames){
 
     createMessage("success", "Successfully created a playlist!")
     
+    // Reset title 
     updateTitle(`Comparison between ${usernames[0]} and ${usernames[1]}`);
 }
 
