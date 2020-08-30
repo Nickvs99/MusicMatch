@@ -25,13 +25,9 @@ def stats(request):
 
     total_genres = get_total_genres(user)
 
-    frequent_artists = get_n_heighest_from_dict(user.artist_count, 10)
-    
-    frequent_genres = get_n_heighest_from_dict(user.genre_count, 15)
-
     data = {
-        "artist_count": frequent_artists,
-        "genre_count": frequent_genres,
+        "artist_count": user.artist_count,
+        "genre_count": user.genre_count,
         "total_songs": total_songs,
         "total_artists": total_artists,
         "total_genres": total_genres,

@@ -93,30 +93,6 @@ def get_data(user):
 
     return artists_count, genre_count
 
-def get_n_heighest_from_dict(dictionary, n):
-    """ 
-    Return the n most frequent artists and their respective count.
-    Args:
-        dictionary (dictionary): A sorted dictionary
-        n (int): Get the top n items.
-    Returns:
-        dictionary
-    """
-    # TODO better function name
-
-    # Get the n heightest values and their respective key. Store these in a dictionay
-    frequent_dictionary = {}
-    count = 0
-    for key in dictionary:
-        frequent_dictionary[key] = dictionary[key]
-
-        count += 1
-        if count == n:
-            break
-
-
-    return frequent_dictionary
-
 def get_sp():
     """
     Obtains a spotipy object. With this object you can make calls to
