@@ -55,6 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function addUserField() {
 
+    const maxUserField = 2;
+
     let form = document.getElementById("formUsernames");
   
     // Get the userfield associated with the button
@@ -79,15 +81,16 @@ function addUserField() {
   
     // If the maximum number of fields is required, set the cloned button
     // to an action which does nothing
-    if (form.children.length >= 6){
-      button.onclick = () => {return false};
-      button.classList.remove("add-user");
-      button.classList.add("do-nothing");
-      button.innerHTML = "O";
-      button.style.width = width + "px";
+    if (form.children.length >= maxUserField + 1) {
+        button.classList.remove("add-user");
+        button.classList.add("remove-user");
+        button.innerHTML = "-";
+        button.style.width = width + "px";
+
+        button.onclick = removeUserField;
     }
     else {
-      button.onclick = addUserField;
+        button.onclick = addUserField;
     }
   
     // Set the expand animation
@@ -108,19 +111,26 @@ function removeUserField() {
     this.parentNode.addEventListener("animationend", () => {
       this.parentNode.remove();
     });
+
+    // Remove the user-field-button class so it doesn't show up in  element searches
+    this.classList.remove("user-field-button");
   
     let form = document.getElementById("formUsernames");
-    let lastUserField = form.children[form.children.length - 2].children[1];
+    let activeButtons = form.getElementsByClassName("user-field-button");
+
+    if(activeButtons.length == 0) {
+        return false;
+    }
+
+    let lastActiveButton = activeButtons[activeButtons.length - 1];
   
     // When a userfield is removed, set the last button to an add button
     // since there are now less than the max amount of field.
-    if(!lastUserField.classList.contains("add-user")){
-      lastUserField.classList.remove("do-nothing");
-      lastUserField.classList.add("add-user");
-      lastUserField.innerHTML = "+";
-      lastUserField.onclick = addUserField
-    }
-  
+    lastActiveButton.classList.remove("remove-user");
+    lastActiveButton.classList.add("add-user");
+    lastActiveButton.innerHTML = "+";
+    lastActiveButton.onclick = addUserField;
+    
     return false;
 }
 
