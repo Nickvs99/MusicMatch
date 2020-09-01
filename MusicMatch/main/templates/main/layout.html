@@ -22,17 +22,17 @@
 
     </head>
     <body>
-        {% include "main/header.html" %}
+        {% include "main/components/header.html" %}
 
         
         <div class="main">
-            {% include "main/messages.html" %}
+            {% include "main/components/messages.html" %}
             {% block body %} {% endblock %}
         </div>
 
-        {% include "main/footer.html" %}
+        {% include "main/components/footer.html" %}
 
-        {% include "main/login.html" %}
+        {% include "main/components/login.html" %}
 
     </body>
 </html>

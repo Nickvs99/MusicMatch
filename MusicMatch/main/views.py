@@ -15,20 +15,20 @@ from .util import *
 
 def stats_view(request):
 
-    return render(request, "main/stats.html")
+    return render(request, "main/legacy/stats.html")
 
 def compare_view(request):
 
-    return render(request, "main/compare.html")
+    return render(request, "main/legacy/compare.html")
 
 def update_view(request):
 
-    return render(request, "main/update.html")
+    return render(request, "main/pages/update.html")
 
 def home_view(request):
     """ Homepage view """
 
-    return render(request, "main/index.html")
+    return render(request, "main/pages/index.html")
 
 def login_view(request):
     """ Login view. Manages the login process. """
@@ -82,7 +82,7 @@ def register_view(request):
             messages.warning(request, 'Please logout before registering a new user')
             return redirect("index")
 
-        return render(request, "main/register.html")
+        return render(request, "main/pages/register.html")
 
     elif request.method == 'POST':
 
@@ -94,13 +94,13 @@ def register_view(request):
         # Check if all fields are filled in
         if not (username and password and email):
             messages.error(request, "All fields are required")
-            return render(request, "main/register.html")
+            return render(request, "main/pages/register.html")
 
         # Check if username is already taken
         user = User.objects.filter(username=username)
         if user:
             messages.error(request, "Username already taken.")
-            return render(request, "main/register.html")
+            return render(request, "main/pages/register.html")
 
         user = User.objects.create_user(username, email, password)
         user.save()
@@ -136,13 +136,13 @@ def account_view(request):
         "spotify_account": user.spotify_account,
     }
 
-    return render(request, "main/account.html", context)
+    return render(request, "main/pages/account.html", context)
 
 def forgot_password_view(request):
     """ Lets the user change its password when it has forgotten his. """
 
     if request.method == "GET":
-        return render(request, "main/forgot_password.html")
+        return render(request, "main/pages/forgot_password.html")
 
     elif request.method == "POST":
 
@@ -152,14 +152,14 @@ def forgot_password_view(request):
         # Check if the combination exists
         if not User.objects .filter(username=username, email=email).exists():
             messages.error(request, "The username - email combination does not exist.")
-            return render(request, "main/forgot_password.html")
+            return render(request, "main/pages/forgot_password.html")
         
         link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"change_password/{username}")
         message = f"Hey {username} \n\n. Please click on the following link to reset your password: \n\n {link}"
         send_email("MusicMatch - Change of password", message, [email])
 
         messages.success(request, "Check your email!")
-        return render(request, "main/forgot_password.html")
+        return render(request, "main/pages/forgot_password.html")
 
 def verify(request):
     """ 
@@ -266,7 +266,7 @@ def account_message(request, encr_message):
 
         if request.method == "GET":
 
-            return render(request, "main/change_password.html", context)
+            return render(request, "main/pages/change_password.html", context)
 
         elif request.method == "POST":
             
@@ -277,7 +277,7 @@ def account_message(request, encr_message):
                 
                 messages.error(request, "The passwords are not the same")
 
-                return render(request, "main/change_password.html", context)
+                return render(request, "main/pages/change_password.html", context)
 
             user = User.objects.filter(username=username).first()
 
@@ -326,4 +326,4 @@ def reset_password(request):
 
 def construction(request):
 
-    return render(request, "main/construction.html")
+    return render(request, "main/pages/construction.html")
