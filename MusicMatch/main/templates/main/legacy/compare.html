@@ -3,13 +3,11 @@
 {% load static %}
 
 {% block scripts %}
-
-    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-    
-    <script src="{% static 'main/js/chart_util.js' %}"></script>
-    <script src="{% static 'main/js/chart_compare.js' %}"></script>
+ 
+    <script src="{% static 'main/js/legacy/chart_compare.js' %}"></script>
+    <script src="{% static 'main/js/legacy/chart_util.js' %}"></script>
+    <script src="{% static 'main/js/util.js' %}"></script>
 {% endblock %}
 
 {% block title %}
@@ -32,6 +30,12 @@
     <div class="row">
         <h3 id="title">Comparison</h3>
         <button id="inputCreatePlaylist" class="btn btn-primary mb-2 ml-auto">Create Playlist</button>
+    </div>
+
+    <div id="charts">
+        <canvas class="chart" id="artistChart" width="400" height="400"></canvas>        
+
+        <canvas class="chart" id="genreChart" width="400" height="400"></canvas>    
     </div>
     
 

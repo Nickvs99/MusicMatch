@@ -1,4 +1,10 @@
-document.addEventListener('DOMContentLoaded', () => {
+/**
+ * Dependencies:
+ *      form_util.js
+ *      util.js
+ */
+
+ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById("editEmail").onclick = () => {
 

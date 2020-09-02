@@ -1,4 +1,4 @@
-// Set of functions all pages might needS
+// Set of functions all pages might need
 
 
 /**
@@ -69,12 +69,14 @@ function removeChildren(parent) {
     }
 }
 
+/**
+ * Capitalize the first character of a string
+ */
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 function hideElementById(id) {
-    console.log(id)
     document.getElementById(id).classList.add("hidden");
 }
 
@@ -94,6 +96,12 @@ function showElementsByIds(ids){
 	}
 }
 
+/**
+ * Create a div element
+ * @param {DOMElement} parent 
+ * @param {string} cssClass 
+ * @param {string} text optional
+ */
 function createElement(parent, cssClass, text) {
     let element = document.createElement("div");
     element.classList.add(cssClass);
@@ -125,4 +133,21 @@ function appendSuffix(values, valueSuffix) {
     else {
         return values + valueSuffix;
     }
+}
+
+/**
+ * Updates the innerText of the title div
+ * @param {string} title
+ */
+function updateTitle(title){
+    document.getElementById("title").innerText = title;
+}
+
+/**
+ * Updates the innerText of a div
+ * @param {string} id
+ * @param {string} text
+ */
+function innerText(id, text) {
+    document.getElementById(id).innerText = text;
 }

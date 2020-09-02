@@ -1,4 +1,10 @@
-document.addEventListener('DOMContentLoaded', () => {
+/**
+ * Dependancies:
+ *      legacy/chart_util.js
+ *      util.js
+ */
+
+ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById("formCompare").onsubmit = () => {
         

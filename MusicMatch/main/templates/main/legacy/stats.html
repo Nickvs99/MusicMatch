@@ -3,12 +3,11 @@
 {% load static %}
 
 {% block scripts %}
-
-    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
-    <script src="{% static 'main/js/chart_util.js' %}"></script>
-    <script src="{% static 'main/js/chart_stats.js' %}"></script>
+    <script src="{% static 'main/js/legacy/chart_util.js' %}"></script>
+    <script src="{% static 'main/js/legacy/chart_stats.js' %}"></script>
+    <script src="{% static 'main/js/util.js' %}"></script>
 
 {% endblock %}
 

@@ -1,4 +1,10 @@
-document.addEventListener('DOMContentLoaded', () => {
+/**
+ * Dependancies:
+ *      legacy/chart_util.js
+ *      util.js
+ */
+
+ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById("submitForm").onsubmit = () => {
         
@@ -55,14 +61,18 @@ async function UpdateCharts(username){
  * @param {dict} genreCount 
  */
 function drawCharts(artistCount, genreCount){
+
+    const maxArtists = 10;
+    const maxGenres = 15;
+
     var ctx = document.getElementById('artistChart').getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: Object.keys(artistCount),
+            labels: Object.keys(artistCount).slice(0, maxArtists),
             datasets: [{
                 label: "Count",
-                data: Object.values(artistCount),
+                data: Object.values(artistCount).slice(0, maxArtists),
                 backgroundColor: colors,
                 borderColor: borderColors,
                 borderWidth: 1 
@@ -90,14 +100,14 @@ function drawCharts(artistCount, genreCount){
         type: 'pie',
         data: {
             datasets: [{
-                data: Object.values(genreCount),
+                data: Object.values(genreCount).slice(0, maxGenres),
                 backgroundColor: createPieColors(Object.keys(genreCount).length, colors),
                 borderColor: 'rgba(255,255,255,255)',
                 borderWidth:1,
             }],
         
             // These labels appear in the legend and in the tooltips when hovering different arcs
-            labels: Object.keys(genreCount)
+            labels: Object.keys(genreCount).slice(0, maxGenres)
         },
         options: {
             title: {

@@ -1,3 +1,7 @@
+/**
+ * Dependencies:
+ *      form_util.js
+ */
 document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById("submitForm").onsubmit = () => {

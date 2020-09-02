@@ -1,7 +1,18 @@
-// Set of functions the stats pages might need. Like validation etc.
-
-
 /**
+ * Set of functions related to the username process on submit.
+ * Process:
+ *      Check if usernames exist in SpotifyUser db.
+ *      If not:
+ *          Check if usernames exist in spotify's db.
+ *          If not:
+ *              Stop process
+ *          Create a SpotifyUser account
+ *      Update usernames SpotifyUser entry
+ *  Dependancies:
+ *      util.js
+ */
+
+ /**
  * The process of the usernames input. This makes sure that the input is valid, creates and updates profiles.
  * @param {strings[]} usernames the updated users accounts
  * @param {boolean} forced Should the usernames be forced to update
@@ -16,7 +27,7 @@ async function processingUsernames(usernames, forced){
 
         if(!valid){
             // TODO better title
-            updateTitle("Stats")
+            updateTitle("MusicMatch");
             return false
         }
     }
@@ -63,10 +74,7 @@ async function updateProfiles(usernames, forced){
 
         await fetch("/ajax/cache_results", getFetchContext(args)); 
 
-        createMessage("success", `Updated ${username}'s profile`);
-        
-        updateTitle("Updated profile");
-        
+        createMessage("success", `Updated ${username}'s profile`);            
     }
 }
 
@@ -80,7 +88,7 @@ async function updateProfiles(usernames, forced){
  */
 async function validateUsernames(usernames){
     
-    updateTitle("Checking if accounts exist in database.");
+    updateTitle("Checking if accounts exist in database...");
 
     let args = {"usernames": usernames};
     let response = await fetch("/ajax/validate_usernames", getFetchContext(args));
@@ -105,7 +113,7 @@ async function validateUsernames(usernames){
  */
 async function validateSpotify(usernames){
 
-    updateTitle("Checking if accounts exist in spotify database.");
+    updateTitle("Checking if accounts exist in spotify database...");
     
     let args = {"usernames": usernames};
     let response = await fetch("/ajax/validate_spotify_usernames", getFetchContext(args));
@@ -125,36 +133,3 @@ async function validateSpotify(usernames){
 
     return false
 }
-
-/**
- * Updates the innerText of the title div
- * @param {string} title
- */
-function updateTitle(title){
-    document.getElementById("title").innerText = title;
-}
-
-/**
- * Clears the charts. This is done by removing the old element and then creating 
- * a new element with the same attributes.
- * 
- * TODO seach for a cleaner solution.
- */
-function clearCharts(){
-
-    let chartIDs = ["artistChart", "genreChart"];
-
-    for(let id of chartIDs){
-
-        let element = document.getElementById(id);
-        let cloneElement = element.cloneNode(false);
-
-        // Set  the elements after the title
-        let chartsElement = document.getElementById("charts");
-        chartsElement.appendChild(cloneElement);
-
-        
-        element.remove();
-    }
-}
-

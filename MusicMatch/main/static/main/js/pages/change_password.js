@@ -1,3 +1,8 @@
+/**
+ * Dependencies:
+ *      form_util.js
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById("formChangePassword").onsubmit = () => {

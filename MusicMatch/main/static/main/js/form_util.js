@@ -1,4 +1,4 @@
-// Set of functions used in the authorisation pages 
+// Set of functions used in forms
 
 /**
  * Checks if the password and confirm password are the same.

@@ -3,8 +3,18 @@
 {% load static %}
 
 {% block scripts %}
-    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
-    <script src="{% static 'main/js/home.js' %}"></script>
+    
+    <script src="{% static 'main/js/components/chartBlockSlider.js' %}"></script>
+    <script src="{% static 'main/js/components/statsBlock.js' %}"></script>
+
+    <script src="{% static 'main/js/auth.js' %}"></script>
+    <script src="{% static 'main/js/util.js' %}"></script>
+
+    <script src="{% static 'main/js/pages/index/compare.js' %}"></script>
+    <script src="{% static 'main/js/pages/index/index.js' %}"></script>
+    <script src="{% static 'main/js/pages/index/playlist.js' %}"></script>
+    <script src="{% static 'main/js/pages/index/stats.js' %}"></script>
+    <script src="{% static 'main/js/pages/index/userField.js' %}"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
