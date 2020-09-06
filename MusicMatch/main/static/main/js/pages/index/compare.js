@@ -26,7 +26,7 @@ async function createComparisonCharts(usernames){
     let response = await fetch("/ajax/compare", getFetchContext(args));
 
     // Parse to json format
-    let data = await response.json();
+    let data = await responseWrapper(response);
 
     createChartBlockSlider("stats-chart-artists", data["artist_comparison"], " songs");
     chartBlockSliderLegend("stats-chart-artists", "Artist comparison", usernames);

@@ -79,7 +79,7 @@ async function validateUsername(){
     let args = {"username": username};
     let response = await fetch("/ajax/validate_username", getFetchContext(args));
 
-    let data = await response.json();
+    let data = await responseWrapper(response);
 
     if(!data["valid_username"]){
         let userField = usernameInputElement.parentNode;

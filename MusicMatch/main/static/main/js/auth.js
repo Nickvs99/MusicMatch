@@ -57,7 +57,7 @@ async function updateProfiles(usernames, forced){
             let vars = {"usernames": username}
             let response = await fetch("/ajax/check_update", getFetchContext(args))
 
-            let data = await response.json();
+            let data = await responseWrapper(response);
             
             forced = data["update"];
         }
@@ -73,7 +73,7 @@ async function updateProfiles(usernames, forced){
         updateTitle(`Cashing results for ${username}'s profile...`);
 
         await fetch("/ajax/cache_results", getFetchContext(args)); 
-
+        
         createMessage("success", `Updated ${username}'s profile`);            
     }
 }
@@ -93,7 +93,7 @@ async function validateUsernames(usernames){
     let args = {"usernames": usernames};
     let response = await fetch("/ajax/validate_usernames", getFetchContext(args));
 
-    let data = await response.json();
+    let data = await responseWrapper(response);
 
     inValidUsernames = [];
     for(let username in data){
@@ -118,7 +118,7 @@ async function validateSpotify(usernames){
     let args = {"usernames": usernames};
     let response = await fetch("/ajax/validate_spotify_usernames", getFetchContext(args));
 
-    let data = await response.json();
+    let data = await responseWrapper(response);
 
     if (data["all_valid"]){
         return true

@@ -382,7 +382,7 @@ def send_email(subject, message, recipients, request=None):
             recipients,
             fail_silently = False
         )
-        raise Exception
+
     except:
         
         if(request):

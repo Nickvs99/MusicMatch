@@ -20,6 +20,22 @@ function getFetchContext(dict){
     }
 }
 
+async function responseWrapper(response) {
+    
+    let data = await response.json();
+
+    createMessages(data["messages"]);
+
+    return data;
+}
+
+function createMessages(messages) {
+
+    for(let message of messages) {
+        createMessage(message["tag"], message["message"]);
+    }
+}
+
 /**
  * Create a information message to the user
  * @param {string} context Choises are one of 
@@ -38,13 +54,16 @@ function createMessage(context, message){
     
     if(bootstrapContexts.includes(context)){
         messageElement.classList.add("alert", "alert-" + context);
-        messageElement.innerText = message;
+    }
+    else if (context = "error") {
+        messageElement.classList.add("alert", "alert-danger");
     }
     else {
-        console.log(`ERROR: ${context} is an invalid context type. Choose from ${bootstrapContexts}`);
+        console.error(`ERROR: ${context} is an invalid context type. Choose from ${bootstrapContexts}`);
         messageElement.classList.add("alert", "alert-danger");
-        messageElement.innerText = message;
     }
+    messageElement.innerText = message;
+
     messagesElement.appendChild(messageElement);
 }
 

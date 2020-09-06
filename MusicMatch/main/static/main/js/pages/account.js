@@ -25,6 +25,8 @@
         let args = {"email": emailValue};
         let response = await fetch("/ajax/set_email", getFetchContext(args));
 
+        let data = responseWrapper(response);
+        
         hideElementsByIds(["inputEmail", "saveEmail"]); 
         showElementsByIds(["emailValue", "editEmail"]);
 

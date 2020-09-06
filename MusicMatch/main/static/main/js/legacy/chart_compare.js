@@ -82,7 +82,7 @@ async function UpdateCharts(usernames){
     let response = await fetch("/ajax/compare", getFetchContext(args));
 
     // Parse to json format
-    let data = await response.json();
+    let data = await responseWrapper(response);
 
     let artists = data["artists"];
     let user1ArtistCount = data["user1_artist_count"];
@@ -163,7 +163,7 @@ async function CheckAccesToken(){
 
     let response = await fetch("/ajax/check_access_token", getFetchContext({}))
 
-    let data = await response.json();
+    let data = await responseWrapper(response);
 
     if(!data["loggedin"]){
 

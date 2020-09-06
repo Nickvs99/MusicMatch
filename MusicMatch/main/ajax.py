@@ -34,7 +34,7 @@ def stats(request):
         "total_genres": total_genres,
     }
 
-    return JsonResponse(data)
+    return JsonResponseWrapper(request, data)
 
 def compare(request):
     """
@@ -82,7 +82,7 @@ def compare(request):
     }
     
 
-    return JsonResponse(data)
+    return JsonResponseWrapper(request, data)
 
 def playlist(request):
     """
@@ -111,7 +111,7 @@ def playlist(request):
     create_playlist(sp, user.user.username, usernames, in_common_songs)
     
     data = {}
-    return JsonResponse(data)
+    return JsonResponseWrapper(request, data)
 
 def validate_spotify_usernames(request):
     """
@@ -141,7 +141,7 @@ def validate_spotify_usernames(request):
 
     data["all_valid"] = all_valid
 
-    return JsonResponse(data)
+    return JsonResponseWrapper(request, data)
 
 def validate_usernames(request):
     """
@@ -169,7 +169,7 @@ def validate_usernames(request):
         else:
             data[username] = True
 
-    return JsonResponse(data)
+    return JsonResponseWrapper(request, data)
 
 def check_access_token(request):
     """
@@ -187,15 +187,15 @@ def check_access_token(request):
     if not request.user.is_authenticated:
         data["loggedin"] = False
 
-        return JsonResponse(data)
+        return JsonResponseWrapper(request, data)
 
     user = ExtendedUser.objects.filter(user__username=request.user.username).first()
 
     if user.access_token == "":
         data["access_token"] = False
-        return JsonResponse(data)
+        return JsonResponseWrapper(request, data)
 
-    return JsonResponse(data)
+    return JsonResponseWrapper(request, data)
 
 @transaction.atomic
 def update(request):
@@ -220,7 +220,7 @@ def update(request):
     write_data_to_db(username)
 
     data = {}
-    return JsonResponse(data)
+    return JsonResponseWrapper(request, data)
 
 def check_update(request):
     """ 
@@ -240,12 +240,12 @@ def check_update(request):
 
         data["update"] = True
 
-        return JsonResponse(data)
+        return JsonResponseWrapper(request, data)
 
     if user.last_updated is None:
         data["update"] = True
 
-        return JsonResponse(data)
+        return JsonResponseWrapper(request, data)
 
     # Check if it has been more than x days since last update
     delta = datetime.date.today() - user.last_updated
@@ -253,11 +253,11 @@ def check_update(request):
         
         data["update"] = True
 
-        return JsonResponse(data)
+        return JsonResponseWrapper(request, data)
 
     data["update"] = False
 
-    return JsonResponse(data)
+    return JsonResponseWrapper(request, data)
 
 def cache_results(request):
     """
@@ -279,7 +279,7 @@ def cache_results(request):
     user.save()
 
     data = {}
-    return JsonResponse(data)
+    return JsonResponseWrapper(request, data)
 
 def validate_username(request):
     """
@@ -295,7 +295,7 @@ def validate_username(request):
         'valid_username': not User.objects.filter(username=username).exists(),
     }
 
-    return JsonResponse(data)
+    return JsonResponseWrapper(request, data)
 
 def set_email(request):
     """ Change the email of the currently authenticated user. """
@@ -311,7 +311,7 @@ def set_email(request):
 
     link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"remove_email/{request.user.username}")
     message = f"Hey {request.user.username}\n\nYour email has successfully changed. If this is not you, please click on the following link. This link will remove your email adres.\n {link}"
-    send_email("MusicMatch - Change of email", message, [email])
+    send_email("MusicMatch - Change of email", message, [email], request=request)
 
     data = {}
-    return JsonResponse(data)
+    return JsonResponseWrapper(request, data)

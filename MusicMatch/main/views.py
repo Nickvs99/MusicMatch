@@ -112,7 +112,7 @@ def register_view(request):
 
         link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"remove_email/{username}")
         message = f'Hey {username}, \n\nThank you for signing up with MusicMatch! \n\n If this is not you, please click on the following link. This link will remove your email adres.\n {link}'
-        send_email('MusicMatch - confirmation email', message, [email])
+        send_email('MusicMatch - confirmation email', message, [email], request=request)
               
         login(request, user)
         return redirect("index")
@@ -156,9 +156,11 @@ def forgot_password_view(request):
         
         link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"change_password/{username}")
         message = f"Hey {username} \n\n. Please click on the following link to reset your password: \n\n {link}"
-        send_email("MusicMatch - Change of password", message, [email])
+        success = send_email("MusicMatch - Change of password", message, email, request=request)
 
-        messages.success(request, "Check your email!")
+        if success:
+            messages.success(request, "Check your email!")
+            
         return render(request, "main/pages/forgot_password.html")
 
 def verify(request):

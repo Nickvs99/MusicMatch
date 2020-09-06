@@ -6,6 +6,8 @@ import os
 import json
 from cryptography.fernet import Fernet
 
+from django.contrib.messages import get_messages
+from django.http import JsonResponse
 
 def get_env_var(env_var_name):
     """Gets the enviroment variable. If the enviroment variable does not exist, raise an exception. """
@@ -24,6 +26,36 @@ def print_dic(dic):
 
     for key, value in dic.items():
         print(key, value)
+
+def JsonResponseWrapper(request, data):
+    """ 
+    Wrapper around django's JsonResponse function. 
+    Adds the django messages to the data dict and returns it.
+    Args:
+        dict: data
+    Returns:
+        dict
+    """
+
+    data["messages"] = parse_messages(get_messages(request))
+
+    print(data["messages"])
+    return JsonResponse(data)
+
+def parse_messages(messages):
+    """
+    Extract the tag and message from all the messages.
+    Args:
+        messages: django's FallbackStorage
+    Returns:
+        list: [{"tag": tag, "message", message}, {...}]
+    """
+
+    parsed_messages = []
+    for message in messages:
+        parsed_messages.append({"tag": message.tags, "message": message.message})
+
+    return parsed_messages
 
 def get_fernet_key():
     """ Returns the Fernet key in byte format."""

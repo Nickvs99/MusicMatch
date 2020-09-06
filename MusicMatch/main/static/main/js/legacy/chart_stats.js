@@ -45,7 +45,7 @@ async function UpdateCharts(username){
     let args = {"username": username};
     let response = await fetch("/ajax/stats", getFetchContext(args));
 
-    let data = await response.json()
+    let data = await responseWrapper(response)
 
     let artistCount = data["artist_count"];
     let genreCount = data["genre_count"]

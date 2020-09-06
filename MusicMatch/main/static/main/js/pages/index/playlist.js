@@ -42,7 +42,7 @@ async function CheckAccesToken(){
 
     let response = await fetch("/ajax/check_access_token", getFetchContext({}))
 
-    let data = await response.json();
+    let data = await responseWrapper(response);
 
     if(!data["loggedin"]){
 
