@@ -10,6 +10,7 @@ import spotipy.oauth2 as oauth2
 
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from django.contrib import messages
 
 from .models import *
 from .util import get_env_var
@@ -364,7 +365,7 @@ def add_missing_artists_info(sp, artists_dict):
 
             count += 1
 
-def send_email(subject, message, recipients):
+def send_email(subject, message, recipients, request=None):
     """
     Sends email
     Args:
@@ -375,14 +376,21 @@ def send_email(subject, message, recipients):
 
     try:
         send_mail(
-                subject,
-                message,
-                get_env_var("EMAIL_HOST_USER"),
-                recipients,
-                fail_silently = False
-            )
+            subject,
+            message,
+            get_env_var("EMAIL_NOREPLY_USER"),
+            recipients,
+            fail_silently = False
+        )
+        raise Exception
     except:
-        print( '\n'.join((
+        
+        if(request):
+            messages.error(request, f"There was a problem with sending you an email. Please contact us at {get_env_var('EMAIL_CONTACT_USER')}.")
+
+        import traceback
+        print(traceback.format_exc())
+        print('\n'.join((
             "Possible solutions:",
             " - Make sure your email and password are the right combination.",
             " - Turn on less secure apps on your google account, visit https://myaccount.google.com/lesssecureapps?pli=1 to turn the feature on.",
