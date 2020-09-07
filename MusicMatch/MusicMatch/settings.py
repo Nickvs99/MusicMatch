@@ -26,7 +26,7 @@ SECRET_KEY = get_env_var("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', "rocky-chamber-86282.herokuapp.com/"]
+ALLOWED_HOSTS = ["rocky-chamber-86282.herokuapp.com/"]
 
 
 # Application definition
