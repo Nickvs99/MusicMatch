@@ -15,24 +15,24 @@
     document.getElementById("saveEmail").onclick = async () => {
 
         clearMessages();
-
+        
         let emailValue = document.getElementById("inputEmail").value;
+
         if (emailValue == ""){
             createMessage("danger", "Your email has to have a value.");
             return
         }
-        
-        let args = {"email": emailValue};
-        let response = await fetch("/ajax/set_email", getFetchContext(args));
 
-        let data = responseWrapper(response);
-        
+        document.getElementById("emailValue").innerHTML = emailValue;
         hideElementsByIds(["inputEmail", "saveEmail"]); 
         showElementsByIds(["emailValue", "editEmail"]);
 
-        createMessage("success", "Successfully changed email.");
+        let args = {"email": emailValue};
+        let response = await fetch("/ajax/set_email", getFetchContext(args));
 
-        document.getElementById("emailValue").innerHTML = emailValue;
+        let data = await responseWrapper(response);
+        
+        createMessage("success", "Successfully changed email.");
     }
 
 
