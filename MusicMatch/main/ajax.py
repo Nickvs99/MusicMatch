@@ -214,11 +214,11 @@ def update(request):
     if user is None:
         user = SpotifyUser(username=username)
         user.save()
-    print("userSaved")
+    print(user)
     # Clear all song relationships with this user
     if user.songs:
         user.songs.clear()
-    print("Clear")
+
     write_data_to_db(username)
 
     data = {}
