@@ -1,3 +1,3 @@
-web: python MusicMatch/manage.py migrate
-web: python MusicMatch/manage.py runserver
+web: gunicorn musicmatch.wsgi
+
 
