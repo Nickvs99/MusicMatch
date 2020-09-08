@@ -1,3 +1,3 @@
-web: gunicorn musicmatch.wsgi
+web: gunicorn MusicMatch/musicmatch.wsgi
 
 
