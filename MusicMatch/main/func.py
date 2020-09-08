@@ -332,6 +332,8 @@ def write_data_to_db(username):
     print("Adding missing artists")
     add_missing_artists_info(sp, missing_artists_info)
 
+    print("Added missing artists")
+
 def add_missing_artists_info(sp, artists_dict):
     """ 
     Adds the genre information for new artists.
@@ -350,7 +352,6 @@ def add_missing_artists_info(sp, artists_dict):
         
         # Get json response for n artists
         artists_response = sp.artists(artists_id[i * spotify_limit: (i + 1) * spotify_limit])
-        print(artists_response["artists"])
         for artist in artists_response["artists"]:
             
             genres = []
