@@ -24,9 +24,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = get_env_var("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["rocky-chamber-86282.herokuapp.com/"]
+ALLOWED_HOSTS = ["rocky-chamber-86282.herokuapp.com"]
 
 
 # Application definition
