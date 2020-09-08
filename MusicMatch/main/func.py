@@ -280,7 +280,6 @@ def write_data_to_db(username):
     for playlist in playlists:
 
         songs = get_songs(sp, username, playlist)
-        print(songs)
         for song in songs:
             
             song_id = song["track"]["id"]
