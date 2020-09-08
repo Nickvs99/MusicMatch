@@ -295,10 +295,14 @@ def write_data_to_db(username):
             # These are only a very small percentage of the songs
             if not song['track']:
                 continue
-
-            new_song = Song(id=song_id, name=song["track"]["name"])
-            new_song.save()
-
+            try:
+                new_song = Song(id=song_id, name=song["track"]["name"])
+                new_song.save()
+            except:
+                print("EXCEPTION :(")
+                print(song_id)
+                print(song["track"]["name"])
+                
             user.songs.add(new_song)
 
             artists = []
