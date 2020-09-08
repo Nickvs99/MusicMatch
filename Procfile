@@ -1,4 +1,3 @@
-eb: sh -c 'cd ./MusicMatch/'
-web: gunicorn MusicMatch.MusicMatch.wsgi
+web: gunicorn --pythonpath MusicMatch MusicMatch.wsgi
 
 
