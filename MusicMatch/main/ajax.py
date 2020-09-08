@@ -197,7 +197,6 @@ def check_access_token(request):
 
     return JsonResponseWrapper(request, data)
 
-@transaction.atomic
 def update(request):
     """
     Updates a user. 

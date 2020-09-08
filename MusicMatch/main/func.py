@@ -250,6 +250,7 @@ def get_n_dict_and_count(n, keys, dict1, dict2):
 
     return keys, user1_count, user2_count
 
+@transaction.atomic
 def write_data_to_db(username):
     """
     Writes the songs, artists and genres from username to the database.
@@ -302,7 +303,7 @@ def write_data_to_db(username):
                 print("EXCEPTION :(")
                 print(song_id)
                 print(song["track"]["name"])
-                
+
             user.songs.add(new_song)
 
             artists = []
