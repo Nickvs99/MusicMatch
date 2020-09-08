@@ -350,7 +350,7 @@ def add_missing_artists_info(sp, artists_dict):
         
         # Get json response for n artists
         artists_response = sp.artists(artists_id[i * spotify_limit: (i + 1) * spotify_limit])
-        print(artists_response["artists"]
+        print(artists_response["artists"])
         for artist in artists_response["artists"]:
             
             genres = []
