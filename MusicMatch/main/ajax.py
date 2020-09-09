@@ -276,11 +276,13 @@ def cache_results(request):
     
     results = get_data(user)
 
+    print("Before setting artist_count")
     print(results[0])
-    print(results[1])
     user.artist_count = results[0]
     user.genre_count = results[1]
 
+    print("After setting artist_count")
+    print(results[0])
     user.save()
 
     data = {}
