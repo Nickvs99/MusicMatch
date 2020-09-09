@@ -110,7 +110,8 @@ def playlist(request):
         if song in user1_songs:
             in_common_songs.append(song.id)
 
-    create_playlist(sp, user.user.username, usernames, in_common_songs)
+    # Create a playlist for the spotify account of the user
+    create_playlist(sp, user.spotify_account.username, usernames, in_common_songs)
     
     data = {}
     return JsonResponseWrapper(request, data)
