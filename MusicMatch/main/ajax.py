@@ -26,6 +26,8 @@ def stats(request):
 
     total_genres = get_total_genres(user)
 
+    print("Artists response")
+    print(user.artist_count)
     data = {
         "artist_count": user.artist_count,
         "genre_count": user.genre_count,
