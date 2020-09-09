@@ -14,7 +14,7 @@ class Artist(models.Model):
 
     id = models.CharField(max_length=100, primary_key=True)
 
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=200)
 
     genres = models.ManyToManyField(Genre)
 
@@ -25,7 +25,7 @@ class Song(models.Model):
 
     id = models.CharField(max_length=100, primary_key=True)
 
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=200)
 
     artists = models.ManyToManyField(Artist)
 
