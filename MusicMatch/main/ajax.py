@@ -29,8 +29,8 @@ def stats(request):
     print("Artists response")
     print(user.artist_count)
     data = {
-        "artist_count": user.artist_count,
-        "genre_count": user.genre_count,
+        "artist_count": sort_dict_value(user.artist_count),
+        "genre_count": sort_dict_value(user.genre_count),
         "total_songs": total_songs,
         "total_artists": total_artists,
         "total_genres": total_genres,
@@ -276,13 +276,9 @@ def cache_results(request):
     
     results = get_data(user)
 
-    print("Before setting artist_count")
-    print(results[0])
     user.artist_count = results[0]
     user.genre_count = results[1]
 
-    print("After setting artist_count")
-    print(results[0])
     user.save()
 
     data = {}
