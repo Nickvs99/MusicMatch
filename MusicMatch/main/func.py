@@ -263,7 +263,7 @@ def write_data_to_db(username):
     if user is None:
         user = SpotifyUser(username=username)
         user.save()
-
+    
     user.last_updated = datetime.date.today()
     user.save()
 
@@ -292,7 +292,7 @@ def write_data_to_db(username):
             # These are only a very small percentage of the songs
             if not song['track']:
                 continue
-            
+
             new_song = Song(id=song_id, name=song["track"]["name"])
             new_song.save()
 
