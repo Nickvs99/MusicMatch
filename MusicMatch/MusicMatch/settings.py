@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 from main.util import get_env_var
+import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +27,7 @@ SECRET_KEY = get_env_var("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [get_env_var("DOMAIN")]
 
 
 # Application definition
@@ -120,6 +121,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Handels the emails
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -128,3 +130,6 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = get_env_var("EMAIL_NOREPLY_USER")
 EMAIL_HOST_PASSWORD = get_env_var("EMAIL_NOREPLY_PASSWORD")
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())

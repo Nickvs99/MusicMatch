@@ -27,8 +27,8 @@ def stats(request):
     total_genres = get_total_genres(user)
 
     data = {
-        "artist_count": user.artist_count,
-        "genre_count": user.genre_count,
+        "artist_count": sort_dict_value(user.artist_count),
+        "genre_count": sort_dict_value(user.genre_count),
         "total_songs": total_songs,
         "total_artists": total_artists,
         "total_genres": total_genres,
@@ -108,7 +108,8 @@ def playlist(request):
         if song in user1_songs:
             in_common_songs.append(song.id)
 
-    create_playlist(sp, user.user.username, usernames, in_common_songs)
+    # Create a playlist for the spotify account of the user
+    create_playlist(sp, user.spotify_account.username, usernames, in_common_songs)
     
     data = {}
     return JsonResponseWrapper(request, data)
