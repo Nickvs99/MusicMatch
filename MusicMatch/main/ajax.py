@@ -26,8 +26,6 @@ def stats(request):
 
     total_genres = get_total_genres(user)
 
-    print("Artists response")
-    print(user.artist_count)
     data = {
         "artist_count": sort_dict_value(user.artist_count),
         "genre_count": sort_dict_value(user.genre_count),
@@ -200,6 +198,7 @@ def check_access_token(request):
 
     return JsonResponseWrapper(request, data)
 
+@transaction.atomic
 def update(request):
     """
     Updates a user. 
@@ -209,14 +208,12 @@ def update(request):
 
     username = jsonLoad["username"]
 
-    print(username)
     user = SpotifyUser.objects.filter(pk=username).first()
 
-    print(user)
     if user is None:
         user = SpotifyUser(username=username)
         user.save()
-    print(user)
+
     # Clear all song relationships with this user
     if user.songs:
         user.songs.clear()

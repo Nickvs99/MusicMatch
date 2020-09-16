@@ -11,7 +11,6 @@ import spotipy.oauth2 as oauth2
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.contrib import messages
-from django.db import transaction
 
 from .models import *
 from .util import get_env_var
@@ -251,24 +250,20 @@ def get_n_dict_and_count(n, keys, dict1, dict2):
 
     return keys, user1_count, user2_count
 
-@transaction.atomic
 def write_data_to_db(username):
     """
     Writes the songs, artists and genres from username to the database.
     Adds a relationship between the songs and the SpotifyUser.
     Args: username, str
     """
-    print("Writing data")
 
     sp = get_sp()
-
-    print("Got SP")
 
     user =  SpotifyUser.objects.filter(username=username).first()
     if user is None:
         user = SpotifyUser(username=username)
         user.save()
-    print(user)
+
     user.last_updated = datetime.date.today()
     user.save()
 
@@ -278,10 +273,10 @@ def write_data_to_db(username):
     missing_artists_info = {}
 
     playlists = get_playlists(sp, username)
-    print(playlists)
     for playlist in playlists:
 
         songs = get_songs(sp, username, playlist)
+
         for song in songs:
             
             song_id = song["track"]["id"]
@@ -297,13 +292,9 @@ def write_data_to_db(username):
             # These are only a very small percentage of the songs
             if not song['track']:
                 continue
-            try:
-                new_song = Song(id=song_id, name=song["track"]["name"])
-                new_song.save()
-            except:
-                print("EXCEPTION :(")
-                print(song_id)
-                print(song["track"]["name"])
+            
+            new_song = Song(id=song_id, name=song["track"]["name"])
+            new_song.save()
 
             user.songs.add(new_song)
 
@@ -333,11 +324,8 @@ def write_data_to_db(username):
                 artists.append(artist_obj)
 
             new_song.artists.add(*artists)
-    print("DONE")
-    print("Adding missing artists")
-    add_missing_artists_info(sp, missing_artists_info)
 
-    print("Added missing artists")
+    add_missing_artists_info(sp, missing_artists_info)
 
 def add_missing_artists_info(sp, artists_dict):
     """ 
@@ -357,6 +345,7 @@ def add_missing_artists_info(sp, artists_dict):
         
         # Get json response for n artists
         artists_response = sp.artists(artists_id[i * spotify_limit: (i + 1) * spotify_limit])
+
         for artist in artists_response["artists"]:
             
             genres = []
