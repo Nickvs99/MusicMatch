@@ -129,6 +129,7 @@ def account_view(request):
         return redirect("index")
 
     user = ExtendedUser.objects.filter(user=request.user).first()
+
     context = {
         "user": user,
         "username": user.user.username,
@@ -218,18 +219,10 @@ def callback(request):
     # Get the profiles id and link it to the extended user
     sp = get_auth_sp(user)
     response = sp.current_user()
-
-    spotify_account = SpotifyUser.objects.filter(username=response["id"]).first()
-    if spotify_account is None:
-        spotify_account = SpotifyUser(username=response["id"])
-        spotify_account.save()
-
-    if hasattr(spotify_account, "extendeduser"):
-        messages.error(request, "This spotify account is already tied to another account.")
-    else:
-        messages.success(request, "Your spotify account is now tied to your musicmatch account. ")
-        user.spotify_account = spotify_account
-        user.save()
+    
+    messages.success(request, "Your spotify account is now tied to your musicmatch account. ")
+    user.spotify_account = response["id"]
+    user.save()
 
     return redirect("index")
 

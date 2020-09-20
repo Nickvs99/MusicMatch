@@ -133,3 +133,7 @@ config.sh
 
 .vscode
 Other
+
+# Server storage
+MusicMatch/file_storage/artists/*
+MusicMatch/file_storage/spotify_users/*

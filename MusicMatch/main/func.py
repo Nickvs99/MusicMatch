@@ -3,6 +3,7 @@ import json
 from math import ceil
 import requests
 import datetime
+import pickle 
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -13,7 +14,9 @@ from django.core.mail import send_mail
 from django.contrib import messages
 
 from .models import *
-from .util import get_env_var
+from .util import *
+import main.pckl.helper as pckl_helper
+import main.pckl.classes as pckl_classes
 
 """ A set of functions used in views.py. """
 
@@ -250,120 +253,6 @@ def get_n_dict_and_count(n, keys, dict1, dict2):
 
     return keys, user1_count, user2_count
 
-def write_data_to_db(username):
-    """
-    Writes the songs, artists and genres from username to the database.
-    Adds a relationship between the songs and the SpotifyUser.
-    Args: username, str
-    """
-
-    sp = get_sp()
-
-    user =  SpotifyUser.objects.filter(username=username).first()
-    if user is None:
-        user = SpotifyUser(username=username)
-        user.save()
-    
-    user.last_updated = datetime.date.today()
-    user.save()
-
-    # dict with arists who are not yet in the database. These are grouped together,
-    # since this will result in less calls to the spotify database.
-    # key: artist id, value: Artist object
-    missing_artists_info = {}
-
-    playlists = get_playlists(sp, username)
-    for playlist in playlists:
-
-        songs = get_songs(sp, username, playlist)
-
-        for song in songs:
-            
-            song_id = song["track"]["id"]
-            
-            if Song.objects.filter(pk = song_id).exists():
-
-                user.songs.add(Song.objects.filter(pk = song_id).first())
-
-                continue
-  
-            # Check if the song has a track attribute. 
-            # I guess local songs dont have them, but are still obtained with the spotipy id. 
-            # These are only a very small percentage of the songs
-            if not song['track']:
-                continue
-
-            new_song = Song(id=song_id, name=song["track"]["name"])
-            new_song.save()
-
-            user.songs.add(new_song)
-
-            artists = []
-            for artist in song["track"]["artists"]:
-
-                artist_id = artist["id"]
-
-                # Some artists dont have an spotify id. This is a very small percentage of the artists
-                if artist_id is None:
-                    continue
-                
-                artist_obj = Artist.objects.filter(pk = artist_id).first()
-                
-                # Check if the artist exists in the database
-                if not artist_obj:
-                    
-                    if artist_id not in missing_artists_info:
-                        artist_obj = Artist(id=artist_id, name=artist["name"])
-                        artist_obj.save()
-
-                        missing_artists_info[artist_id] = artist_obj
-                    
-                    else:
-                        artist_obj = missing_artists_info[artist_id]
-
-                artists.append(artist_obj)
-
-            new_song.artists.add(*artists)
-
-    add_missing_artists_info(sp, missing_artists_info)
-
-def add_missing_artists_info(sp, artists_dict):
-    """ 
-    Adds the genre information for new artists.
-    Args:
-        sp: spotipy object
-        artists_dict: dict, key = artist_id, value = Artist object
-    """
-    
-    # Get all missing artists ids
-    artists_id = list(artists_dict.keys())
-
-    spotify_limit = 50
-    count = 0
-    # Since the limit of obtaining arists is 50, multiple requests have to be made.
-    for i in range (ceil(len(artists_id)/spotify_limit)):
-        
-        # Get json response for n artists
-        artists_response = sp.artists(artists_id[i * spotify_limit: (i + 1) * spotify_limit])
-
-        for artist in artists_response["artists"]:
-            
-            genres = []
-            for genre in artist["genres"]:
-                
-                # Check if genre already exists
-                genre_obj = Genre.objects.filter(pk = genre).first()
-                if not genre_obj:
-
-                    genre_obj = Genre(name = genre)
-                    genre_obj.save()
-
-                genres.append(genre_obj) 
-
-            artist_obj = artists_dict[artists_id[count]]
-            artist_obj.genres.add(*genres)
-
-            count += 1
 
 def send_email(subject, message, recipients, request=None):
     """
@@ -439,40 +328,42 @@ def get_dict_comparison(dict1, dict2):
 
     return dict_comparison
 
-def get_unique_songs(songs1, songs2):
+def get_unique_items(list1, list2):
     """
-    Get the total number of unique songs across two song query sets.
+    Get the total number of unique items across two lists/sets.
     Args:
-        songs1, songs2: Queryset of songs
+        list1, list2
 
     Returns:
-        int: The total number of unique songs
+        set: All unique items
     """
 
-    song_count = songs1.count()
+    unique_values = set([])
 
-    for song in songs2.all():
-        if not songs1.filter(id=song.id).exists():
-            song_count += 1
+    for item in list1:
+        unique_values.add(item)
 
-    return song_count
+    for item in list2:
+        unique_values.add(item)
 
-def get_shared_songs(songs1, songs2):
+    return unique_values
+
+def get_shared_items(list1, list2):
     """
-    Get the total number of songs which occur in both querysets.
+    Get the items which are both in list1 and list2.
     Args:
-        songs1, songs2: Queryset of songs
+        list1, list2
 
     Returns:
-        int: The total number of shared songs
+        set: Items which are both in list1 and list2.
     """
 
-    song_count = 0
-    for song in songs2.all():
-        if songs1.filter(id=song.id).exists():
-            song_count += 1
+    items = set([])
+    for item in list1:
+        if item in list2:
+            items.add(item)
 
-    return song_count
+    return items
 
 def get_unique_keys(dict1, dict2):
     """
@@ -506,3 +397,114 @@ def get_shared_keys(dict1, dict2):
             key_count += 1
     
     return key_count
+
+def write_data_to_server(username):
+    """
+    Cache the most important data from the spotify servers onto my server.
+
+    These are:
+    - Artist data
+    - Spotify user data
+    """
+    sp = get_sp()
+
+    song_ids = set([])
+    missing_artist_ids = set([])
+
+    artist_count = {}
+
+    playlists = get_playlists(sp, username)
+    for playlist in playlists:
+
+        songs = get_songs(sp, username, playlist)
+
+        for song in songs:
+              
+            # Check if the song has a track attribute. 
+            # I guess local songs dont have them, but are still obtained with the spotipy id. 
+            # These are only a very small percentage of the songs
+            if not song['track']:
+                continue
+            
+            song_id = song["track"]["id"]
+
+            # No duplicate songs
+            if song_id in song_ids:
+                continue
+            
+            song_ids.add(song_id)
+
+            for artist in song["track"]["artists"]:
+
+                artist_id = artist["id"]
+                artist_name = artist["name"]
+
+                # Some artists dont have an spotify id. This is a very small percentage of the artists
+                if artist_id is None:
+                    continue
+                
+                path = pckl_helper.get_artist_file_path(artist_name)
+                if not os.path.isfile(path):
+                    missing_artist_ids.add(artist_id)
+
+                if artist_name in artist_count:
+                    artist_count[artist_name] += 1
+                else:
+                    artist_count[artist_name] = 1
+
+    add_missing_artists_info(sp, missing_artist_ids)
+
+    genre_count = {}
+    for key, value in artist_count.items():
+
+        path = pckl_helper.get_artist_file_path(key)
+        artist_obj = pckl_helper.get_pickle_data(path)
+
+        for genre in artist_obj.genres:
+
+            if genre in genre_count:
+                genre_count[genre] += value
+            else:
+                genre_count[genre] = value
+
+
+    artist_count = sort_dict_value(artist_count)
+    genre_count = sort_dict_value(genre_count)
+
+    spotify_user = pckl_classes.SpotifyUser(song_ids, artist_count, genre_count)
+
+    path = pckl_helper.get_user_file_path(username)
+    pckl_helper.write_pickle_data(path, spotify_user)
+        
+
+def add_missing_artists_info(sp, artists_id):
+    """ 
+    Adds the genre information for new artists.
+    Args:
+        sp: spotipy object
+        artists_id: set of strings
+    """
+
+    artists_id = list(artists_id)
+
+    spotify_limit = 50
+    count = 0
+    # Since the limit of obtaining arists is 50, multiple requests have to be made.
+    for i in range (ceil(len(artists_id)/spotify_limit)):
+        
+        # Get json response for n artists
+        artists_response = sp.artists(artists_id[i * spotify_limit: (i + 1) * spotify_limit])
+
+        for artist in artists_response["artists"]:
+            
+            genres = []
+            for genre in artist["genres"]:
+                
+                genres.append(genre) 
+
+            art = pckl_classes.Artist(artist["id"], artist["name"], genres)
+
+            path = pckl_helper.get_artist_file_path(artist["name"])
+            pckl_helper.write_pickle_data(path, art)
+
+            count += 1

@@ -69,10 +69,6 @@ async function updateProfiles(usernames, forced){
         updateTitle(`Updating ${username}'s profile...`);
 
         await fetch("/ajax/update", getFetchContext(args));
-
-        updateTitle(`Cashing results for ${username}'s profile...`);
-
-        await fetch("/ajax/cache_results", getFetchContext(args)); 
         
         createMessage("success", `Updated ${username}'s profile`);            
     }
