@@ -4,9 +4,11 @@ from django.contrib.auth.models import User
 
 import datetime
 import json
+import os
 
 from .func import *
 from .util import *
+import main.pckl.helper as pckl_helper
 
 def stats(request):
     """
@@ -14,24 +16,22 @@ def stats(request):
     Returns:
         artist_count: dict, key: artist name (str), value: count (int)
         genre_count: dict, key: genre name (str), value: count (int)
+        total_songs: int, Total number of songs
+        total_artists: int, Total number of artists
+        total_genres: int, Total number of genres
     """
 
     username = json.loads(request.body).get('username', None)
 
-    user = SpotifyUser.objects.filter(pk=username).first()
-
-    total_artists = get_total_artists(user)
-
-    total_songs = get_total_songs(user)
-
-    total_genres = get_total_genres(user)
+    path = pckl_helper.get_user_file_path(username)
+    user = pckl_helper.get_pickle_data(path)
 
     data = {
-        "artist_count": sort_dict_value(user.artist_count),
-        "genre_count": sort_dict_value(user.genre_count),
-        "total_songs": total_songs,
-        "total_artists": total_artists,
-        "total_genres": total_genres,
+        "artist_count": user.artist_count,
+        "genre_count": user.genre_count,
+        "total_songs": len(user.song_ids),
+        "total_artists": len(user.artist_count),
+        "total_genres": len(user.genre_count),
     }
 
     return JsonResponseWrapper(request, data)
@@ -41,46 +41,45 @@ def compare(request):
     Returns the data used for the comparison between two users.
     Both users have to be an entry in the SpotifyUser table.
     Returns:
-        artists: list (str) artist names 
-        user1_artist_count: dict, keys: artist name (str), value: count (int)
-        user2_artist_count: dict, keys: artist name (str), value: count (int)
+        unique_songs: int, The number of unique songs accross the songs of both users
+        unique_artists: int, idem but for artists
+        unique_genres: int, idem but for genres
+        
+        shared_songs: int, The number of songs shared between the two users
+        shared_artists: int, idem but for artists
+        shared_genres: int, idem but for genres
 
-        genres: list (str) genre names 
-        user1_genre_count: dict, keys: artist name (str), value: count (int)
-        user2_genre_count: dict, keys: artist name (str), value: count (int)
+        artist_comparison: list[artist_name (str), list[float, float]], sorted decreasingly
+        genre_comparison: list[genre_name (str), list[float, float]], sorted decreasingly
     """
 
     jsonLoad = json.loads(request.body)
 
     usernames = jsonLoad["usernames"]
 
-    user1 = SpotifyUser.objects.filter(pk=usernames[0]).first()
-    user2 = SpotifyUser.objects.filter(pk=usernames[1]).first()
+    path1 = pckl_helper.get_user_file_path(usernames[0])
+    user1 = pckl_helper.get_pickle_data(path1)
 
-    user1_artist_count = user1.artist_count
-    user1_genre_count = user1.genre_count
+    path2 = pckl_helper.get_user_file_path(usernames[1])
+    user2 = pckl_helper.get_pickle_data(path2)
 
-    user2_artist_count = user2.artist_count
-    user2_genre_count = user2.genre_count
+    artist_comparison = get_dict_comparison(user1.artist_count, user2.artist_count)
 
-    artist_comparison = get_dict_comparison(user1_artist_count, user2_artist_count)
-
-    genre_comparison = get_dict_comparison(user1_genre_count, user2_genre_count)
+    genre_comparison = get_dict_comparison(user1.genre_count, user2.genre_count)
 
     data = {
-        "unique_songs": get_unique_songs(user1.songs, user2.songs),
-        "shared_songs": get_shared_songs(user1.songs, user2.songs),
+        "unique_songs": len(get_unique_items(user1.song_ids, user2.song_ids)),
+        "shared_songs": len(get_shared_items(user1.song_ids, user2.song_ids)),
         
-        "unique_artists": get_unique_keys(user1_artist_count, user2_artist_count),
-        "shared_artists": get_shared_keys(user1_artist_count, user2_artist_count),
+        "unique_artists": get_unique_keys(user1.artist_count, user2.artist_count),
+        "shared_artists": get_shared_keys(user1.artist_count, user2.artist_count),
         
-        "unique_genres": get_unique_keys(user1_genre_count, user2_genre_count),
-        "shared_genres": get_shared_keys(user1_genre_count, user2_genre_count),
+        "unique_genres": get_unique_keys(user1.genre_count, user2.genre_count),
+        "shared_genres": get_shared_keys(user1.genre_count, user2.genre_count),
 
         "artist_comparison": artist_comparison,
         "genre_comparison": genre_comparison,
     }
-    
 
     return JsonResponseWrapper(request, data)
 
@@ -95,21 +94,18 @@ def playlist(request):
 
     user = ExtendedUser.objects.get(user__username=request.user.username)
 
-    user1 = SpotifyUser.objects.get(pk=usernames[0])
-    user2 = SpotifyUser.objects.get(pk=usernames[1])
+    path1 = pckl_helper.get_user_file_path(usernames[0])
+    user1 = pckl_helper.get_pickle_data(path1)
+
+    path2 = pckl_helper.get_user_file_path(usernames[1])
+    user2 = pckl_helper.get_pickle_data(path2)
 
     sp = get_auth_sp(user)
 
-    user1_songs = user1.songs.all()
-    user2_songs = user2.songs.all()
-
-    in_common_songs = []
-    for song in user2_songs:
-        if song in user1_songs:
-            in_common_songs.append(song.id)
+    in_common_songs = get_shared_items(user1.song_ids, user2.song_ids)
 
     # Create a playlist for the spotify account of the user
-    create_playlist(sp, user.spotify_account.username, usernames, in_common_songs)
+    create_playlist(sp, user.spotify_account, usernames, list(in_common_songs))
     
     data = {}
     return JsonResponseWrapper(request, data)
@@ -146,29 +142,20 @@ def validate_spotify_usernames(request):
 
 def validate_usernames(request):
     """
-    Checks whether the usernames have an enrie in the SpotifyUser table.
+    Checks whether the usernames are found in the file_storage/spotify_users.
     Returns:
-        usernames username: bool, True if the username has a spotify account
-        all_valid: bool, True when all usernames are valid
+        usernames dict{str: bool} username: bool, True if the username has a cached version.
     """
     jsonLoad = json.loads(request.body)
 
     usernames = jsonLoad["usernames"]
 
-    sp = get_sp()
-
     data = {}
 
-    all_valid = True
     for username in usernames:
         
-        if not SpotifyUser.objects.filter(pk=username).exists():
-
-            data[username] = False
-            all_valid = False
-
-        else:
-            data[username] = True
+        path = pckl_helper.get_user_file_path(username)
+        data[username] = os.path.isfile(path)
 
     return JsonResponseWrapper(request, data)
 
@@ -208,18 +195,8 @@ def update(request):
 
     username = jsonLoad["username"]
 
-    user = SpotifyUser.objects.filter(pk=username).first()
-
-    if user is None:
-        user = SpotifyUser(username=username)
-        user.save()
-
-    # Clear all song relationships with this user
-    if user.songs:
-        user.songs.clear()
-
-    write_data_to_db(username)
-
+    write_data_to_server(username)
+    
     data = {}
     return JsonResponseWrapper(request, data)
 
@@ -230,21 +207,20 @@ def check_update(request):
         update: bool, True when user does not exist or 
             if it has been more than 14 days since the last update.
     """
-    data = {}
+    data = {"update": True}
 
     jsonLoad = json.loads(request.body)
 
     username = jsonLoad["username"]
 
-    user =  SpotifyUser.objects.filter(username=username).first()
-    if user is None:
-
-        data["update"] = True
+    path = pckl_helper.get_user_file_path(username)
+    if not os.path.isfile(path):
 
         return JsonResponseWrapper(request, data)
 
+    user = pckl_helper.get_pickle_data(path)
+
     if user.last_updated is None:
-        data["update"] = True
 
         return JsonResponseWrapper(request, data)
 
@@ -252,35 +228,11 @@ def check_update(request):
     delta = datetime.date.today() - user.last_updated
     if delta.days > 14:
         
-        data["update"] = True
-
         return JsonResponseWrapper(request, data)
 
     data["update"] = False
 
-    return JsonResponseWrapper(request, data)
-
-def cache_results(request):
-    """
-    Caches the results for a user. These results are
-    artist_count and genre_count.
-    """
-
-    jsonLoad = json.loads(request.body)
-
-    username = jsonLoad["username"]
-
-    user = SpotifyUser.objects.filter(username=username).first()
-    
-    results = get_data(user)
-
-    user.artist_count = results[0]
-    user.genre_count = results[1]
-
-    user.save()
-
-    data = {}
-    return JsonResponseWrapper(request, data)
+    return JsonResponseWrapper(request, data)    
 
 def validate_username(request):
     """

@@ -5,6 +5,7 @@ Some utility functions needed for all apps.
 import os
 import json
 from cryptography.fernet import Fernet
+import re
 
 from django.contrib.messages import get_messages
 from django.http import JsonResponse
@@ -39,7 +40,6 @@ def JsonResponseWrapper(request, data):
 
     data["messages"] = parse_messages(get_messages(request))
 
-    print(data["messages"])
     return JsonResponse(data)
 
 def parse_messages(messages):
@@ -81,3 +81,9 @@ def decrypt_message(message):
     f = Fernet(get_env_var("FERNET_KEY"))
 
     return f.decrypt(message.encode()).decode("utf-8")
+
+def remove_chars(string):
+    """
+    Returns a string where all the forbidden windows path chars are removed.
+    """
+    return re.sub(r'[\\/:*?"<>|]', '', str(string))
