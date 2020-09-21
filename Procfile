@@ -1,1 +1,1 @@
-web: sh ./MusicMatch/run.sh
+web: sh ./run.sh
