@@ -23,7 +23,8 @@ def environment_check():
 
     # Check if each environment key has a value
     env_keys = ["DOMAIN", "SECRET_KEY", "CLIENT_ID", "CLIENT_SECRET", "FERNET_KEY",
-                "EMAIL_NOREPLY_USER", "EMAIL_NOREPLY_PASSWORD", "EMAIL_SERVER_USER"]
+                "EMAIL_NOREPLY_USER", "EMAIL_NOREPLY_PASSWORD", "EMAIL_SERVER_USER",
+                "DEBUG"]
 
     for key in env_keys:
         get_env_var(key)
