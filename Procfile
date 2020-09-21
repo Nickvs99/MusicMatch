@@ -1,1 +1,1 @@
-web: gunicorn --pythonpath MusicMatch MusicMatch.wsgi
+web: sh ./run.sh
