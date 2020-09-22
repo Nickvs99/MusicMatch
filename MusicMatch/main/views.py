@@ -1,17 +1,17 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User
-from django.contrib.auth import update_session_auth_hash
+from django.shortcuts import redirect, render
 
 import os
 import requests
 import json
 
-from .models import *
-
-from .func import *
-from .util import *
+from main.email import send_email
+from main.fernet import decrypt_message, encrypt_message
+from main.models import ExtendedUser
+from main.spotify.auth import get_auth_sp
+from main.util.util import get_env_var
 
 def stats_view(request):
 

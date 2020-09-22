@@ -1,14 +1,20 @@
-from django.http import JsonResponse
-from django.db import transaction
-from django.contrib.auth.models import User
-
 import datetime
 import json
 import os
 
-from .func import *
-from .util import *
+from django.contrib.auth.models import User
+
+from main.email import send_email
+from main.fernet import encrypt_message
+from main.models import ExtendedUser
 import main.pckl.helper as pckl_helper
+from main.server_data import write_data_to_server
+from main.spotify.auth import get_auth_sp, get_sp, user_exists
+from main.spotify.data import create_playlist
+from main.util.dict import get_dict_comparison, get_shared_keys, get_unique_keys 
+from main.util.lst import get_shared_items, get_unique_items
+from main.util.util import get_env_var, JsonResponseWrapper
+
 
 def stats(request):
     """
@@ -185,7 +191,6 @@ def check_access_token(request):
 
     return JsonResponseWrapper(request, data)
 
-@transaction.atomic
 def update(request):
     """
     Updates a user. 

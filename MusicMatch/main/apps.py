@@ -6,8 +6,8 @@ class MainConfig(AppConfig):
 
     def ready(self):
         
-        from main.func import send_email
-        from main.util import get_env_var
+        from main.email import send_email
+        from main.util.util import get_env_var
         
         environment_check()
 
@@ -19,7 +19,7 @@ def environment_check():
     Checks if all environment variables have a correct value. An exception is raised when one
     of the variables does not have a value
     """
-    from main.util import get_env_var
+    from main.util.util import get_env_var
 
     # Check if each environment key has a value
     env_keys = ["DOMAIN", "SECRET_KEY", "CLIENT_ID", "CLIENT_SECRET", "FERNET_KEY",

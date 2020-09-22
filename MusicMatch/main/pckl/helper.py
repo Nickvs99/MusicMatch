@@ -3,7 +3,8 @@ Set of functions used for pickling(?) files.
 """
 
 import pickle
-from main.util import remove_chars
+
+from main.util.util import remove_chars
 
 def get_user_file_path(username):
     """
