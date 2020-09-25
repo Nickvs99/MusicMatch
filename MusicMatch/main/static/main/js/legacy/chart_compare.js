@@ -84,17 +84,12 @@ async function UpdateCharts(usernames){
     // Parse to json format
     let data = await responseWrapper(response);
 
-    let artists = data["artists"];
-    let user1ArtistCount = data["user1_artist_count"];
-    let user2ArtistCount = data["user2_artist_count"];
-
-    let genres = data["genres"];
-    let user1GenreCount = data["user1_genre_count"];
-    let user2GenreCount = data["user2_genre_count"];
+    let artistComparison = data["artist_comparison"];
+    let genreComparison = data["genre_comparison"];
 
     // Update charts
-    horizontalBarChart("artistChart", usernames, artists, user1ArtistCount, user2ArtistCount, "Most in common artists");
-    horizontalBarChart("genreChart", usernames, genres, user1GenreCount, user2GenreCount, "Most in common genres");
+    horizontalBarChart("artistChart", usernames, artistComparison, "Most in common artists", 10);
+    horizontalBarChart("genreChart", usernames, genreComparison, "Most in common genres", 10);
 
     updateTitle(`Comparison between ${usernames[0]} and ${usernames[1]}`);
 }
@@ -108,7 +103,19 @@ async function UpdateCharts(usernames){
  * @param {dict} data2 
  * @param {string} title The title of the chart
  */
-function horizontalBarChart(id, usernames, labels, data1, data2, title){
+function horizontalBarChart(id, usernames, dict_comparison, title, n){
+
+    let labels = Object.keys(dict_comparison).slice(0, n);
+
+    let data1 = [];
+    let data2 = [];
+
+    for(let label of labels) {
+        let values = dict_comparison[label];
+
+        data1.push(values[0]);
+        data2.push(values[1]);
+    }
 
     // Checks if element exists
     var element = document.getElementById(id);
