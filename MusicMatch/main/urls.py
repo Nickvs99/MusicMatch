@@ -4,8 +4,6 @@ from . import ajax
 
 urlpatterns = [
     path("", views.home_view, name="index"),
-    path("stats/", views.stats_view, name="stats"),
-    path("compare/", views.compare_view, name="compare"),
     path("update/", views.update_view, name="update"),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
@@ -28,5 +26,8 @@ urlpatterns = [
     path("ajax/check_access_token", ajax.check_access_token),
     path("ajax/update", ajax.update),
     path("ajax/check_update", ajax.check_update),
+
+    path("legacy/stats/", views.stats_view, name="stats"),
+    path("legacy/compare/", views.compare_view, name="compare"),
 
 ]
