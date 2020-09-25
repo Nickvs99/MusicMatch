@@ -105,7 +105,7 @@ async function UpdateCharts(usernames){
  */
 function horizontalBarChart(id, usernames, dict_comparison, title, n){
 
-    let labels = Object.keys(dict_comparison)
+    let labels = Object.keys(dict_comparison).slice(0, n);
 
     let data1 = [];
     let data2 = [];
@@ -116,13 +116,8 @@ function horizontalBarChart(id, usernames, dict_comparison, title, n){
 
         data1.push(values[0]);
         data2.push(values[1]);
-
-        count++;
-        if (count >= n) {
-            break;
-        }
     }
-    
+
     // Checks if element exists
     var element = document.getElementById(id);
     if (!element){
@@ -133,7 +128,7 @@ function horizontalBarChart(id, usernames, dict_comparison, title, n){
     var myGenreChart = new Chart(ctx, {
         type: 'horizontalBar',
         data: {
-            labels: Object.keys(dict_comparison).slice(0, n),
+            labels: labels,
             datasets: [{
                 label: usernames[0],
                 data: data1,
