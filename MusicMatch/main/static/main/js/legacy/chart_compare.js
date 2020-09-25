@@ -110,7 +110,6 @@ function horizontalBarChart(id, usernames, dict_comparison, title, n){
     let data1 = [];
     let data2 = [];
 
-    let count = 0;
     for(let label of labels) {
         let values = dict_comparison[label];
 
