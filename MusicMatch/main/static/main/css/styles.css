@@ -67,6 +67,12 @@ footer {
   display: none !important;
 }
 
+@media only screen and (max-width: 576px) {
+  .sm-hidden {
+    display: none !important;
+  }
+}
+
 .chart {
   margin: 0 auto;
   max-width: 575px;

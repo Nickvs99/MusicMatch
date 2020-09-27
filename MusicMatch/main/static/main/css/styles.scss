@@ -8,6 +8,8 @@ $border-radius: 20px;
 
 $font-color: #707070;
 
+$sm-width: 576px;
+
 body {
     width:100%;
     height: 100vh;
@@ -56,7 +58,7 @@ footer {
     flex: 1 0 auto; 
 }
 
-@media only screen and (max-width: 576px) {
+@media only screen and (max-width: $sm-width) {
     .main {
       margin-left:10px;
       margin-right:10px;
@@ -68,6 +70,12 @@ footer {
 
 .hidden {
     display:none !important; 
+}
+
+.sm-hidden {
+    @media only screen and (max-width: $sm-width) {
+        display:none !important; 
+    }
 }
 
 .chart {
