@@ -32,6 +32,8 @@ def stats(request):
     path = pckl_helper.get_user_file_path(username)
     user = pckl_helper.get_pickle_data(path)
 
+    user.songs_check(request)
+
     data = {
         "artist_count": user.artist_count,
         "genre_count": user.genre_count,
@@ -68,6 +70,9 @@ def compare(request):
 
     path2 = pckl_helper.get_user_file_path(usernames[1])
     user2 = pckl_helper.get_pickle_data(path2)
+
+    user1.songs_check(request)
+    user2.songs_check(request)
 
     artist_comparison = get_dict_comparison(user1.artist_count, user2.artist_count)
 

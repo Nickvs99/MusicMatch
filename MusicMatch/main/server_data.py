@@ -81,7 +81,7 @@ def write_data_to_server(username):
     artist_count = sort_dict_value(artist_count)
     genre_count = sort_dict_value(genre_count)
 
-    spotify_user = pckl_classes.SpotifyUser(song_ids, artist_count, genre_count)
+    spotify_user = pckl_classes.SpotifyUser(username, song_ids, artist_count, genre_count)
 
     path = pckl_helper.get_user_file_path(username)
     pckl_helper.write_pickle_data(path, spotify_user)
