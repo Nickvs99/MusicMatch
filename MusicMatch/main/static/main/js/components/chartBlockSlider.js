@@ -21,7 +21,7 @@ async function createChartBlockSlider(id, dict, valueSuffix) {
 
     let length = keys.length;
 
-    const batchSize = 50;
+    const batchSize = 25;
 
     for(let i = 0; i < Math.ceil(keys.length/batchSize); i++) {
 
@@ -33,7 +33,7 @@ async function createChartBlockSlider(id, dict, valueSuffix) {
         // Thus it takes ~17 ms to scroll pased a block
 
         // Let the browser breath, this stops the site from becoming unresponsive on lower specs (mobile)
-        await timeout(1000);
+        await timeout(500);
     }
 
     console.log("END", Date.now())
