@@ -8,21 +8,40 @@
  * @param {string} id
  * @param {dict} artistCount 
  */
-function createChartBlockSlider(id, dict, valueSuffix) {
+async function createChartBlockSlider(id, dict, valueSuffix) {
 
     let chartElement = document.getElementById(id);
 
     removeChildren(chartElement);
     
-    let position = 1;
-    for (const [key, values] of Object.entries(dict)) {
+    console.log("START: ", Date.now())
+    
+    let keys = Object.keys(dict);
+    let values = Object.values(dict);
+
+    let length = keys.length;
+
+    const batchSize = 50;
+
+    for(let i = 0; i < Math.ceil(keys.length/batchSize); i++) {
+
+        let position_end = Math.min(length, (i + 1) * batchSize)
+        createChartBlockBatch(chartElement, i * batchSize, position_end, keys, values, valueSuffix);
         
-        let valuesSuffix = appendSuffix(values, valueSuffix);
-
-        createChartBlock(chartElement, position, key, valuesSuffix);
-
-        position += 1;
+        // Let the browser breath, this stops the site from becoming unresponsive on lower specs (mobile)
+        await timeout(1000);
     }
+
+    console.log("END", Date.now())
+}
+
+function createChartBlockBatch(parent, position_start, position_end, keys, values, valueSuffix) {
+
+    for(let i = position_start; i < position_end; i++) {
+
+        createChartBlock(parent, i + 1, keys[i], values[i], valueSuffix);
+    }
+
 }
 
 /**
@@ -41,7 +60,7 @@ function chartBlockSliderLegend(id, title, legendItems) {
     chartElement.insertBefore(chartBlock, chartElement.firstChild);
 }
 
-function createChartBlock(parent, position, key, values) {
+function createChartBlock(parent, position, key, values, valueSuffix="") {
 
     let newElement = createElement(parent, "chart-block");
 
@@ -56,14 +75,18 @@ function createChartBlock(parent, position, key, values) {
 
         newElement.classList.add("chart-block-height-2");
         for(let value of values) {
-            createElement(newElement, "chart-value-label", value);
+            createElement(newElement, "chart-value-label", value + valueSuffix);
         }
     }
     else {
         newElement.classList.add("chart-block-height-1");
 
-        createElement(newElement, "chart-value-label", values);
+        createElement(newElement, "chart-value-label", values + valueSuffix);
     }
 
     return newElement;
+}
+
+function timeout(func, ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
