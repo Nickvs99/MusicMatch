@@ -27,7 +27,11 @@ async function createChartBlockSlider(id, dict, valueSuffix) {
 
         let position_end = Math.min(length, (i + 1) * batchSize)
         createChartBlockBatch(chartElement, i * batchSize, position_end, keys, values, valueSuffix);
-        
+
+        console.log(valueSuffix + ", " + i + ", " + Date.now())
+        // NOTE It took ~15 sec to scroll through 876 blocks
+        // Thus it takes ~17 ms to scroll pased a block
+
         // Let the browser breath, this stops the site from becoming unresponsive on lower specs (mobile)
         await timeout(1000);
     }
@@ -87,6 +91,6 @@ function createChartBlock(parent, position, key, values, valueSuffix="") {
     return newElement;
 }
 
-function timeout(func, ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+function timeout( ms) {
+    return new Promise(res => setTimeout(res, ms));
 }
