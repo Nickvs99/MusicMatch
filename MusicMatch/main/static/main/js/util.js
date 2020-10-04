@@ -170,3 +170,11 @@ function updateTitle(title){
 function innerText(id, text) {
     document.getElementById(id).innerText = text;
 }
+
+/**
+ * Pause the execution of a function for a period of time
+ * @param {float} ms 
+ */
+function timeout(ms) {
+    return new Promise(res => setTimeout(res, ms));
+}

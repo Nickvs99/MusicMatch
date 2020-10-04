@@ -4,24 +4,48 @@
  */
 
 /**
- * Create the artist chart.
+ * Create an ChartBlockSlider. A horizontal scrolling slider. 
  * @param {string} id
  * @param {dict} artistCount 
+ * @param {dict} string 
  */
-function createChartBlockSlider(id, dict, valueSuffix) {
+async function createChartBlockSlider(id, dict, valueSuffix) {
 
     let chartElement = document.getElementById(id);
 
     removeChildren(chartElement);
-    
-    let position = 1;
-    for (const [key, values] of Object.entries(dict)) {
         
-        let valuesSuffix = appendSuffix(values, valueSuffix);
+    let keys = Object.keys(dict);
+    let values = Object.values(dict);
 
-        createChartBlock(chartElement, position, key, valuesSuffix);
+    let size = keys.length;
 
-        position += 1;
+    // Create chart blocks in batches to stop lower specs from freezing
+    const batchSize = 25;
+    for(let i = 0; i < Math.ceil(size/batchSize); i++) {
+
+        let position_end = Math.min(size, (i + 1) * batchSize)
+        createChartBlockBatch(chartElement, i * batchSize, position_end, keys, values, valueSuffix);
+
+        // Let the browser breath, this stops the site from becoming unresponsive on lower specs (mobile)
+        await timeout(500);
+    }
+}
+
+/**
+ * Creates a number of chart blocks 
+ * @param {DOMElement} parent 
+ * @param {int} position_start 
+ * @param {int} position_end 
+ * @param {string[]} keys 
+ * @param {int[]} values 
+ * @param {string} valueSuffix 
+ */
+function createChartBlockBatch(parent, position_start, position_end, keys, values, valueSuffix) {
+
+    for(let i = position_start; i < position_end; i++) {
+
+        createChartBlock(parent, i + 1, keys[i], values[i], valueSuffix);
     }
 }
 
@@ -41,7 +65,7 @@ function chartBlockSliderLegend(id, title, legendItems) {
     chartElement.insertBefore(chartBlock, chartElement.firstChild);
 }
 
-function createChartBlock(parent, position, key, values) {
+function createChartBlock(parent, position, key, values, valueSuffix="") {
 
     let newElement = createElement(parent, "chart-block");
 
@@ -56,13 +80,13 @@ function createChartBlock(parent, position, key, values) {
 
         newElement.classList.add("chart-block-height-2");
         for(let value of values) {
-            createElement(newElement, "chart-value-label", value);
+            createElement(newElement, "chart-value-label", value + valueSuffix);
         }
     }
     else {
         newElement.classList.add("chart-block-height-1");
 
-        createElement(newElement, "chart-value-label", values);
+        createElement(newElement, "chart-value-label", values + valueSuffix);
     }
 
     return newElement;
