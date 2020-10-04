@@ -4,48 +4,49 @@
  */
 
 /**
- * Create the artist chart.
+ * Create an ChartBlockSlider. A horizontal scrolling slider. 
  * @param {string} id
  * @param {dict} artistCount 
+ * @param {dict} string 
  */
 async function createChartBlockSlider(id, dict, valueSuffix) {
 
     let chartElement = document.getElementById(id);
 
     removeChildren(chartElement);
-    
-    console.log("START: ", Date.now())
-    
+        
     let keys = Object.keys(dict);
     let values = Object.values(dict);
 
-    let length = keys.length;
+    let size = keys.length;
 
+    // Create chart blocks in batches to stop lower specs from freezing
     const batchSize = 25;
+    for(let i = 0; i < Math.ceil(size/batchSize); i++) {
 
-    for(let i = 0; i < Math.ceil(keys.length/batchSize); i++) {
-
-        let position_end = Math.min(length, (i + 1) * batchSize)
+        let position_end = Math.min(size, (i + 1) * batchSize)
         createChartBlockBatch(chartElement, i * batchSize, position_end, keys, values, valueSuffix);
-
-        console.log(valueSuffix + ", " + i + ", " + Date.now())
-        // NOTE It took ~15 sec to scroll through 876 blocks
-        // Thus it takes ~17 ms to scroll pased a block
 
         // Let the browser breath, this stops the site from becoming unresponsive on lower specs (mobile)
         await timeout(500);
     }
-
-    console.log("END", Date.now())
 }
 
+/**
+ * Creates a number of chart blocks 
+ * @param {DOMElement} parent 
+ * @param {int} position_start 
+ * @param {int} position_end 
+ * @param {string[]} keys 
+ * @param {int[]} values 
+ * @param {string} valueSuffix 
+ */
 function createChartBlockBatch(parent, position_start, position_end, keys, values, valueSuffix) {
 
     for(let i = position_start; i < position_end; i++) {
 
         createChartBlock(parent, i + 1, keys[i], values[i], valueSuffix);
     }
-
 }
 
 /**
@@ -89,8 +90,4 @@ function createChartBlock(parent, position, key, values, valueSuffix="") {
     }
 
     return newElement;
-}
-
-function timeout( ms) {
-    return new Promise(res => setTimeout(res, ms));
 }
