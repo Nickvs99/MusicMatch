@@ -1,11 +1,5 @@
 # MusicMatch
-Nick van Santen, project, Minor Programmeren
 
-It can be quite hard to compare music styles with others. Especially when you like a bit of everything or aren't sure to which genres you're actually listening. This webapp is meant to make it easier to compare your music style with others and to create a playlist with songs both users like.
+This web app provides the ability to easily see your music taste and compare it with others. You will be able to see your favorite artists and genres and see how they rank up with other people. Furthermore, it lets you create playlists suited for multiple people.
 
-## Features:
-- View your music style
-    - Most streamed artists
-    - Popular genres
-- Compare your music style with others
-- Create a playlist from these results.
+Give it a try at https://rocky-chamber-86282.herokuapp.com. 
