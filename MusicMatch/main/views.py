@@ -111,8 +111,8 @@ def register_view(request):
         messages.success(request, "Successfully registered.")
 
         link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"remove_email/{username}")
-        message = f'Hey {username}, \n\nThank you for signing up with MusicMatch! \n\n If this is not you, please click on the following link. This link will remove your email adres.\n {link}'
-        send_email('MusicMatch - confirmation email', message, [email], request=request)
+        message = f'Hey {username}, \n\nThank you for signing up with Spotifyfy! \n\n If this is not you, please click on the following link. This link will remove your email adres.\n {link}'
+        send_email('Spotifyfy - confirmation email', message, [email], request=request)
               
         login(request, user)
         return redirect("index")
@@ -157,7 +157,7 @@ def forgot_password_view(request):
         
         link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"change_password/{username}")
         message = f"Hey {username} \n\n. Please click on the following link to reset your password: \n\n {link}"
-        success = send_email("MusicMatch - Change of password", message, email, request=request)
+        success = send_email("Spotifyfy - Change of password", message, email, request=request)
 
         if success:
             messages.success(request, "Check your email!")
@@ -220,7 +220,7 @@ def callback(request):
     sp = get_auth_sp(user)
     response = sp.current_user()
     
-    messages.success(request, "Your spotify account is now tied to your musicmatch account. ")
+    messages.success(request, "Your spotify account is now tied to your Spotifyfy account. ")
     user.spotify_account = response["id"]
     user.save()
 

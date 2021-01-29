@@ -27,7 +27,7 @@ async function processingUsernames(usernames, forced){
 
         if(!valid){
             // TODO better title
-            updateTitle("MusicMatch");
+            updateTitle("Spotifyfy");
             return false
         }
     }

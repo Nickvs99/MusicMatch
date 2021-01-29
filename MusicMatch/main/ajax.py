@@ -274,7 +274,7 @@ def set_email(request):
 
     link = get_env_var("DOMAIN") + "/account/" + encrypt_message(f"remove_email/{request.user.username}")
     message = f"Hey {request.user.username}\n\nYour email has successfully changed. If this is not you, please click on the following link. This link will remove your email adres.\n {link}"
-    send_email("MusicMatch - Change of email", message, [email], request=request)
+    send_email("Spotifyfy - Change of email", message, [email], request=request)
 
     data = {}
     return JsonResponseWrapper(request, data)
